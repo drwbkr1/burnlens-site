@@ -74,9 +74,9 @@ function Topography() {
     >
       <defs>
         <linearGradient id="terrain" x1="0%" x2="100%" y1="0%" y2="100%">
-          <stop offset="0%" stopColor="rgba(253, 186, 116, 0.95)" />
-          <stop offset="55%" stopColor="rgba(251, 146, 60, 0.42)" />
-          <stop offset="100%" stopColor="rgba(248, 113, 113, 0.28)" />
+          <stop offset="0%" stopColor="rgba(253, 186, 116, 0.92)" />
+          <stop offset="55%" stopColor="rgba(251, 146, 60, 0.36)" />
+          <stop offset="100%" stopColor="rgba(248, 113, 113, 0.2)" />
         </linearGradient>
       </defs>
       {paths.map((d) => (
@@ -85,7 +85,7 @@ function Topography() {
           d={d}
           fill="none"
           stroke="url(#terrain)"
-          strokeWidth="1.5"
+          strokeWidth="1.35"
           strokeLinecap="round"
         />
       ))}
@@ -94,50 +94,81 @@ function Topography() {
 }
 
 function HeroMapPreview() {
-  return (
-    <div className="relative overflow-hidden rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(27,14,10,0.96),rgba(14,9,7,0.98))] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.38)]">
-      <div className="absolute -left-10 top-2 h-44 w-44 rounded-full bg-orange-300/12 blur-3xl" />
-      <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-red-300/10 blur-3xl" />
-      <div className="absolute bottom-0 left-1/3 h-44 w-44 rounded-full bg-amber-200/10 blur-3xl" />
+  const beacons = [
+    "left-[22%] top-[38%]",
+    "left-[52%] top-[49%]",
+    "left-[76%] top-[34%]",
+  ];
 
-      <div className="relative h-[22rem] overflow-hidden rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(33,17,12,0.95),rgba(14,9,7,0.99))]">
+  return (
+    <div className="relative overflow-hidden rounded-[1.95rem] border border-white/10 bg-[linear-gradient(180deg,rgba(33,17,12,0.97),rgba(15,9,7,1))] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.38)]">
+      <div className="absolute left-0 top-0 h-48 w-48 rounded-full bg-orange-300/10 blur-3xl" />
+      <div className="absolute right-0 top-10 h-56 w-56 rounded-full bg-red-300/8 blur-3xl" />
+      <div className="absolute bottom-0 left-1/3 h-48 w-48 rounded-full bg-amber-200/8 blur-3xl" />
+
+      <div className="relative h-[23rem] overflow-hidden rounded-[1.55rem] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(248,113,113,0.10),transparent_28%),linear-gradient(180deg,rgba(38,20,13,0.98),rgba(16,10,8,1))]">
         <Topography />
 
-        <div className="absolute left-5 top-5 rounded-full border border-orange-200/20 bg-orange-200/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-100">
-          Planning bundle preview
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.28)_35%,rgba(8,7,6,0.8)_100%)]" />
+        <div className="absolute -left-8 bottom-0 h-40 w-64 rounded-t-[100%] bg-[#20120d] opacity-95" />
+        <div className="absolute left-[18%] bottom-0 h-48 w-80 rounded-t-[100%] bg-[#27150f] opacity-95" />
+        <div className="absolute right-[12%] bottom-0 h-36 w-60 rounded-t-[100%] bg-[#1c110d] opacity-95" />
+        <div className="absolute right-[-8%] bottom-0 h-44 w-72 rounded-t-[100%] bg-[#160d0a] opacity-95" />
+
+        <div className="absolute left-6 top-6 rounded-full border border-orange-200/20 bg-orange-200/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-100">
+          Deschutes pilot landscape
         </div>
 
-        <div className="absolute inset-x-16 top-[48%] h-[3px] -translate-y-1/2 rotate-[12deg] rounded-full bg-orange-50/65 shadow-[0_0_18px_rgba(255,237,213,0.35)]" />
-        <div className="absolute left-28 top-28 h-24 w-24 rounded-full border border-orange-200/20 bg-orange-300/10 shadow-[0_0_60px_rgba(251,146,60,0.14)]" />
-        <div className="absolute left-40 top-36 h-14 w-14 rounded-full border border-red-200/25 bg-red-300/14" />
-        <div className="absolute right-28 top-28 h-20 w-20 rounded-full border border-amber-200/25 bg-amber-300/14" />
+        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
+          <defs>
+            <linearGradient id="routeGlow" x1="0%" x2="100%" y1="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(254,243,199,0.95)" />
+              <stop offset="100%" stopColor="rgba(251,146,60,0.95)" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M10 72 C 24 64, 31 52, 42 53 C 53 54, 58 67, 69 66 C 79 65, 86 47, 95 40"
+            fill="none"
+            stroke="rgba(255,237,213,0.18)"
+            strokeWidth="3.6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M10 72 C 24 64, 31 52, 42 53 C 53 54, 58 67, 69 66 C 79 65, 86 47, 95 40"
+            fill="none"
+            stroke="url(#routeGlow)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
 
-        <div className="absolute left-6 top-20 w-[10.5rem] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">Route context</div>
-          <div className="mt-2 text-sm leading-6 text-stone-100">
-            View corridor exposure and access constraints in one place.
+        {beacons.map((position, index) => (
+          <div key={position} className={`absolute ${position}`}>
+            <div className="absolute -inset-3 rounded-full bg-orange-300/15 blur-xl" />
+            <div className="relative h-4 w-4 rounded-full border border-amber-100/80 bg-amber-300 shadow-[0_0_18px_rgba(252,211,77,0.6)]" />
+            <div className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-orange-200/18" />
+            <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-orange-200/10" />
+            {index === 1 ? (
+              <div className="absolute left-6 top-[-0.15rem] rounded-full border border-white/10 bg-black/25 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-stone-300 backdrop-blur-md">
+                screening point
+              </div>
+            ) : null}
           </div>
-        </div>
+        ))}
 
-        <div className="absolute right-6 top-20 w-[11.5rem] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">Included</div>
-          <div className="mt-2 space-y-2 text-sm leading-6 text-stone-100">
-            <div>Current conditions summary</div>
-            <div>Facilities and constraints</div>
-            <div>Confidence notes</div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-6 left-6 right-6 rounded-[1.3rem] border border-white/10 bg-black/25 px-4 py-4 backdrop-blur-md">
-          <div className="grid gap-3 md:grid-cols-3">
+        <div className="absolute bottom-5 left-5 right-5 rounded-[1.25rem] border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md">
+          <div className="grid gap-3 sm:grid-cols-3">
             {[
-              ["Exposure", "Smoke, heat, and nearby fire context"],
-              ["Access", "Road links and chokepoints"],
-              ["Use", "Planning conversations, not emergency direction"],
+              ["Terrain", "Landscape context"],
+              ["Route", "Evacuation corridor"],
+              ["Beacons", "Exposure checkpoints"],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-3">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">{label}</div>
-                <div className="mt-2 text-sm leading-6 text-stone-100">{value}</div>
+              <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-orange-200" />
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.16em] text-stone-400">{label}</div>
+                  <div className="mt-1 text-sm text-stone-100">{value}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -313,7 +344,7 @@ export default function BurnLensLandingPage() {
           <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-[0_28px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl md:p-5">
             <HeroMapPreview />
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1">
-              <div className="text-sm text-stone-300">Preview of the first planning bundle</div>
+              <div className="text-sm text-stone-300">Illustrative view of route screening across a wildfire-prone landscape</div>
               <div className="rounded-full border border-orange-200/20 bg-orange-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-orange-100">
                 Planning use only
               </div>
