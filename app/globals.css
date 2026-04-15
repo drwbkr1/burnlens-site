@@ -11,7 +11,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: #07110d;
+  background: #120b08;
   color: rgb(245 245 244);
   font-family:
     Inter,
@@ -33,7 +33,7 @@ a {
 }
 
 ::selection {
-  background: rgba(190, 242, 100, 0.28);
+  background: rgba(251, 191, 36, 0.28);
   color: white;
 }
 
