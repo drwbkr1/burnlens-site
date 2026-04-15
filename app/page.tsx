@@ -47,43 +47,14 @@ const outputs = [
 ];
 
 const timeline = [
-  {
-    title: "Pre-development",
-    timeframe: "Current stage",
-    text: "Pilot scoping, reviewer outreach, fiscal sponsor outreach, and grant outreach.",
-    current: true,
-  },
-  {
-    title: "Phase 0 setup",
-    timeframe: "Weeks 1–2",
-    text: "Confirm geography, reviewers, workflow, and output structure.",
-  },
-  {
-    title: "Phase 0 build",
-    timeframe: "Weeks 3–6",
-    text: "Assemble baseline layers, workflow logic, and the first planning package.",
-  },
-  {
-    title: "Phase 0 refinement",
-    timeframe: "Weeks 7–9",
-    text: "QA, authoritative comparison, and packaging improvements.",
-  },
-  {
-    title: "Phase 0 review",
-    timeframe: "Weeks 10–12",
-    text: "External review, feedback, and continuation materials.",
-  },
-  {
-    title: "Continuation gate",
-    timeframe: "Decision point",
-    text: "Go / no-go decision for Phase 1.",
-  },
-  {
-    title: "Phase 1",
-    timeframe: "Next phase",
-    text: "Narrow model build, evaluation, and integrated delivery update.",
-  },
-];
+  ["Current", "Pre-development"],
+  ["Weeks 1–2", "Phase 0 setup"],
+  ["Weeks 3–6", "Phase 0 build"],
+  ["Weeks 7–9", "Refinement"],
+  ["Weeks 10–12", "Review"],
+  ["Decision", "Continuation gate"],
+  ["Next", "Phase 1"],
+] as const;
 
 function Topography() {
   const paths = [
@@ -124,41 +95,40 @@ function Topography() {
 
 function HeroMapPreview() {
   return (
-    <div className="relative mt-6 overflow-hidden rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(27,14,10,0.96),rgba(14,9,7,0.98))] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.38)]">
+    <div className="relative overflow-hidden rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(27,14,10,0.96),rgba(14,9,7,0.98))] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.38)]">
       <div className="absolute -left-10 top-2 h-44 w-44 rounded-full bg-orange-300/12 blur-3xl" />
       <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-red-300/10 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 h-44 w-44 rounded-full bg-amber-200/10 blur-3xl" />
 
-      <div className="relative h-[25rem] overflow-hidden rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(33,17,12,0.95),rgba(14,9,7,0.99))]">
+      <div className="relative h-[22rem] overflow-hidden rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(33,17,12,0.95),rgba(14,9,7,0.99))]">
         <Topography />
 
         <div className="absolute left-5 top-5 rounded-full border border-orange-200/20 bg-orange-200/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-100">
           Planning bundle preview
         </div>
 
-        <div className="absolute inset-x-12 top-1/2 h-[3px] -translate-y-1/2 rotate-[13deg] rounded-full bg-orange-50/70 shadow-[0_0_18px_rgba(255,237,213,0.4)]" />
-        <div className="absolute left-24 top-28 h-28 w-28 rounded-full border border-orange-200/20 bg-orange-300/10 shadow-[0_0_60px_rgba(251,146,60,0.14)]" />
-        <div className="absolute left-40 top-36 h-16 w-16 rounded-full border border-red-200/25 bg-red-300/14" />
-        <div className="absolute left-72 top-24 h-20 w-20 rounded-full border border-amber-200/25 bg-amber-300/14" />
-        <div className="absolute right-24 top-44 h-24 w-24 rounded-full border border-orange-200/20 bg-orange-300/10" />
+        <div className="absolute inset-x-16 top-[48%] h-[3px] -translate-y-1/2 rotate-[12deg] rounded-full bg-orange-50/65 shadow-[0_0_18px_rgba(255,237,213,0.35)]" />
+        <div className="absolute left-28 top-28 h-24 w-24 rounded-full border border-orange-200/20 bg-orange-300/10 shadow-[0_0_60px_rgba(251,146,60,0.14)]" />
+        <div className="absolute left-40 top-36 h-14 w-14 rounded-full border border-red-200/25 bg-red-300/14" />
+        <div className="absolute right-28 top-28 h-20 w-20 rounded-full border border-amber-200/25 bg-amber-300/14" />
 
-        <div className="absolute left-6 top-20 max-w-[11rem] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
+        <div className="absolute left-6 top-20 w-[10.5rem] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
           <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">Route context</div>
           <div className="mt-2 text-sm leading-6 text-stone-100">
             View corridor exposure and access constraints in one place.
           </div>
         </div>
 
-        <div className="absolute right-6 top-16 max-w-[12rem] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">What is included</div>
+        <div className="absolute right-6 top-20 w-[11.5rem] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">Included</div>
           <div className="mt-2 space-y-2 text-sm leading-6 text-stone-100">
             <div>Current conditions summary</div>
-            <div>Key facilities and constraints</div>
-            <div>Confidence and limitations notes</div>
+            <div>Facilities and constraints</div>
+            <div>Confidence notes</div>
           </div>
         </div>
 
-        <div className="absolute bottom-6 left-6 right-6 rounded-[1.35rem] border border-white/10 bg-black/25 px-5 py-4 backdrop-blur-md">
+        <div className="absolute bottom-6 left-6 right-6 rounded-[1.3rem] border border-white/10 bg-black/25 px-4 py-4 backdrop-blur-md">
           <div className="grid gap-3 md:grid-cols-3">
             {[
               ["Exposure", "Smoke, heat, and nearby fire context"],
@@ -340,18 +310,14 @@ export default function BurnLensLandingPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 shadow-[0_28px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl">
-            <div className="relative flex items-center justify-between gap-4">
-              <div>
-                <div className="text-xs uppercase tracking-[0.22em] text-stone-400">
-                  Landscape-first design
-                </div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">
-                  A clearer view of routes, exposure, and constraints
-                </h2>
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-[0_28px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl md:p-5">
+            <HeroMapPreview />
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1">
+              <div className="text-sm text-stone-300">Preview of the first planning bundle</div>
+              <div className="rounded-full border border-orange-200/20 bg-orange-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-orange-100">
+                Planning use only
               </div>
             </div>
-            <HeroMapPreview />
           </div>
         </section>
 
@@ -436,50 +402,45 @@ export default function BurnLensLandingPage() {
         </section>
 
         <section id="timeline" className="border-y border-white/10 bg-white/[0.03]">
-          <div className="mx-auto max-w-7xl px-6 py-20 md:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-16">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
                 Timeline
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
                 Current stage and next steps.
               </h2>
-              <p className="mt-6 text-base leading-8 text-stone-300">
-                BurnLens is moving through a bounded Phase 0 process: scoping, workflow assembly,
-                review, and a continuation gate before any broader build.
+              <p className="mt-4 text-base leading-8 text-stone-300">
+                BurnLens is moving through a bounded Phase 0 process: scoping, build, review, and a continuation gate before any broader phase.
               </p>
             </div>
 
-            <div className="mt-10 rounded-[1.6rem] border border-orange-200/15 bg-orange-300/10 p-5 text-sm leading-7 text-orange-50">
-              Current status: Pre-development — pilot scoping, reviewer outreach, fiscal sponsor
-              outreach, and grant outreach.
+            <div className="mt-8 rounded-[1.6rem] border border-orange-200/15 bg-orange-300/10 px-5 py-4 text-sm leading-7 text-orange-50">
+              Current status: Pre-development — pilot scoping, reviewer outreach, fiscal sponsor outreach, and grant outreach.
             </div>
 
-            <div className="relative mt-10 pl-8 before:absolute before:bottom-0 before:left-[0.8rem] before:top-0 before:w-px before:bg-gradient-to-b before:from-orange-200/70 before:via-orange-300/30 before:to-red-300/0">
-              <div className="space-y-6">
-                {timeline.map((item) => (
-                  <div key={item.title} className="relative rounded-[1.7rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.16)]">
-                    <div
-                      className={`absolute -left-[1.78rem] top-7 h-4 w-4 rounded-full border ${
-                        item.current
-                          ? "border-amber-200 bg-amber-300 shadow-[0_0_20px_rgba(252,211,77,0.55)]"
-                          : "border-orange-200/40 bg-[#24130e]"
-                      }`}
-                    />
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-stone-300">
-                        {item.timeframe}
-                      </div>
-                      {item.current ? (
-                        <div className="rounded-full border border-amber-200/20 bg-amber-300/15 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-amber-100">
-                          Current
+            <div className="mt-8 overflow-x-auto pb-2">
+              <div className="relative min-w-[860px] px-2 py-6">
+                <div className="absolute left-10 right-10 top-[2.25rem] h-px bg-gradient-to-r from-orange-200/30 via-orange-200/70 to-red-200/30" />
+                <div className="grid grid-cols-7 gap-3">
+                  {timeline.map(([timeframe, label], index) => (
+                    <div key={label} className="relative text-center">
+                      <div
+                        className={`mx-auto h-4 w-4 rounded-full border ${
+                          index === 0
+                            ? "border-amber-200 bg-amber-300 shadow-[0_0_16px_rgba(252,211,77,0.55)]"
+                            : "border-orange-200/40 bg-[#24130e]"
+                        }`}
+                      />
+                      <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3">
+                        <div className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
+                          {timeframe}
                         </div>
-                      ) : null}
+                        <div className="mt-2 text-sm font-medium leading-6 text-white">{label}</div>
+                      </div>
                     </div>
-                    <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-stone-300">{item.text}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
