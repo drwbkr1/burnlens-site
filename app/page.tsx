@@ -56,128 +56,6 @@ const timeline = [
   ["Next", "Phase 1"],
 ] as const;
 
-function Topography() {
-  const paths = [
-    "M-20 118 C 94 72, 194 162, 324 118 S 530 58, 640 124",
-    "M-40 206 C 104 152, 224 258, 352 210 S 524 154, 660 224",
-    "M-24 300 C 122 244, 226 362, 360 316 S 522 258, 642 322",
-    "M-30 402 C 108 346, 212 456, 352 414 S 540 352, 654 424",
-    "M-40 506 C 108 436, 242 560, 392 504 S 560 446, 666 524",
-  ];
-
-  return (
-    <svg
-      viewBox="0 0 600 600"
-      className="absolute inset-0 h-full w-full opacity-55"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="terrain" x1="0%" x2="100%" y1="0%" y2="100%">
-          <stop offset="0%" stopColor="rgba(253, 186, 116, 0.92)" />
-          <stop offset="55%" stopColor="rgba(251, 146, 60, 0.36)" />
-          <stop offset="100%" stopColor="rgba(248, 113, 113, 0.2)" />
-        </linearGradient>
-      </defs>
-      {paths.map((d) => (
-        <path
-          key={d}
-          d={d}
-          fill="none"
-          stroke="url(#terrain)"
-          strokeWidth="1.35"
-          strokeLinecap="round"
-        />
-      ))}
-    </svg>
-  );
-}
-
-function HeroMapPreview() {
-  const beacons = [
-    "left-[22%] top-[38%]",
-    "left-[52%] top-[49%]",
-    "left-[76%] top-[34%]",
-  ];
-
-  return (
-    <div className="relative overflow-hidden rounded-[1.95rem] border border-white/10 bg-[linear-gradient(180deg,rgba(33,17,12,0.97),rgba(15,9,7,1))] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.38)]">
-      <div className="absolute left-0 top-0 h-48 w-48 rounded-full bg-orange-300/10 blur-3xl" />
-      <div className="absolute right-0 top-10 h-56 w-56 rounded-full bg-red-300/8 blur-3xl" />
-      <div className="absolute bottom-0 left-1/3 h-48 w-48 rounded-full bg-amber-200/8 blur-3xl" />
-
-      <div className="relative h-[23rem] overflow-hidden rounded-[1.55rem] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(248,113,113,0.10),transparent_28%),linear-gradient(180deg,rgba(38,20,13,0.98),rgba(16,10,8,1))]">
-        <Topography />
-
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.28)_35%,rgba(8,7,6,0.8)_100%)]" />
-        <div className="absolute -left-8 bottom-0 h-40 w-64 rounded-t-[100%] bg-[#20120d] opacity-95" />
-        <div className="absolute left-[18%] bottom-0 h-48 w-80 rounded-t-[100%] bg-[#27150f] opacity-95" />
-        <div className="absolute right-[12%] bottom-0 h-36 w-60 rounded-t-[100%] bg-[#1c110d] opacity-95" />
-        <div className="absolute right-[-8%] bottom-0 h-44 w-72 rounded-t-[100%] bg-[#160d0a] opacity-95" />
-
-        <div className="absolute left-6 top-6 rounded-full border border-orange-200/20 bg-orange-200/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-100">
-          Deschutes pilot landscape
-        </div>
-
-        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
-          <defs>
-            <linearGradient id="routeGlow" x1="0%" x2="100%" y1="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(254,243,199,0.95)" />
-              <stop offset="100%" stopColor="rgba(251,146,60,0.95)" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M10 72 C 24 64, 31 52, 42 53 C 53 54, 58 67, 69 66 C 79 65, 86 47, 95 40"
-            fill="none"
-            stroke="rgba(255,237,213,0.18)"
-            strokeWidth="3.6"
-            strokeLinecap="round"
-          />
-          <path
-            d="M10 72 C 24 64, 31 52, 42 53 C 53 54, 58 67, 69 66 C 79 65, 86 47, 95 40"
-            fill="none"
-            stroke="url(#routeGlow)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-
-        {beacons.map((position, index) => (
-          <div key={position} className={`absolute ${position}`}>
-            <div className="absolute -inset-3 rounded-full bg-orange-300/15 blur-xl" />
-            <div className="relative h-4 w-4 rounded-full border border-amber-100/80 bg-amber-300 shadow-[0_0_18px_rgba(252,211,77,0.6)]" />
-            <div className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-orange-200/18" />
-            <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-orange-200/10" />
-            {index === 1 ? (
-              <div className="absolute left-6 top-[-0.15rem] rounded-full border border-white/10 bg-black/25 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-stone-300 backdrop-blur-md">
-                screening point
-              </div>
-            ) : null}
-          </div>
-        ))}
-
-        <div className="absolute bottom-5 left-5 right-5 rounded-[1.25rem] border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md">
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              ["Terrain", "Landscape context"],
-              ["Route", "Evacuation corridor"],
-              ["Beacons", "Exposure checkpoints"],
-            ].map(([label, value]) => (
-              <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-orange-200" />
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.16em] text-stone-400">{label}</div>
-                  <div className="mt-1 text-sm text-stone-100">{value}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function BurnLensLandingPage() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "";
   const [form, setForm] = useState<FormState>(initialForm);
@@ -293,15 +171,15 @@ export default function BurnLensLandingPage() {
       </header>
 
       <main id="top">
-        <section className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-[1.02fr_0.98fr] md:py-28">
-          <div>
+        <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+          <div className="max-w-5xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-200/20 bg-orange-200/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-orange-100">
               Wildfire planning support
             </div>
-            <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-tight text-white md:text-7xl md:leading-[1.02]">
+            <h1 className="mt-6 max-w-5xl text-5xl font-semibold tracking-tight text-white md:text-7xl md:leading-[1.02]">
               Clearer wildfire planning for stronger, more connected communities.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-stone-300 md:text-xl">
+            <p className="mt-6 max-w-4xl text-lg leading-8 text-stone-300 md:text-xl">
               BurnLens turns frequently updated satellite imagery and authoritative fire information
               into planning-ready materials that help local partners screen evacuation access,
               understand exposure, and coordinate with more confidence.
@@ -321,34 +199,22 @@ export default function BurnLensLandingPage() {
                 See the pilot focus
               </a>
             </div>
-
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
-              {[
-                ["Pilot geography", "Deschutes County, Oregon"],
-                ["Primary task", "Evacuation-access and exposure screening"],
-                ["Delivery style", "File-first package for planning teams"],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.16)] backdrop-blur-sm"
-                >
-                  <div className="text-[11px] uppercase tracking-[0.22em] text-stone-400">
-                    {label}
-                  </div>
-                  <div className="mt-2 text-sm font-medium leading-6 text-white">{value}</div>
-                </div>
-              ))}
-            </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-[0_28px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl md:p-5">
-            <HeroMapPreview />
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1">
-              <div className="text-sm text-stone-300">Illustrative view of route screening across a wildfire-prone landscape</div>
-              <div className="rounded-full border border-orange-200/20 bg-orange-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-orange-100">
-                Planning use only
+          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+            {[
+              ["Pilot geography", "Deschutes County, Oregon"],
+              ["Primary task", "Evacuation-access and exposure screening"],
+              ["Delivery style", "File-first package for planning teams"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.16)] backdrop-blur-sm"
+              >
+                <div className="text-[11px] uppercase tracking-[0.22em] text-stone-400">{label}</div>
+                <div className="mt-2 text-sm font-medium leading-6 text-white">{value}</div>
               </div>
-            </div>
+            ))}
           </div>
         </section>
 
