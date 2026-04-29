@@ -16,9 +16,26 @@ const skills = [
 ];
 
 const certifications = [
-  "Imperial College London — Linear Algebra / Multivariate Calculus",
-  "Kaggle — Machine Learning / Feature Engineering",
-  "MIMO — Python AI Development Professional Certificate",
+  {
+    title: "Imperial College London — Linear Algebra",
+    href: "https://coursera.org/share/dcaf6f3b5422e369abf0c812761dcd2b",
+  },
+  {
+    title: "Imperial College London — Multivariate Calculus",
+    href: "https://coursera.org/share/b1d9aee762f9ed5b40dcb4099444472e",
+  },
+  {
+    title: "Kaggle — Intermediate Machine Learning",
+    href: "https://www.kaggle.com/learn/certification/drewbaker15/intermediate-machine-learning",
+  },
+  {
+    title: "Kaggle — Feature Engineering",
+    href: "https://www.kaggle.com/learn/certification/drewbaker15/feature-engineering",
+  },
+  {
+    title: "MIMO — Python AI Development Professional Certificate",
+    href: "https://www.virtualbadge.io/certificate-validator?credential=309dfe20-7aec-47a8-a208-b4622bb1b74c",
+  },
 ] as const;
 
 const leadership = [
@@ -135,9 +152,18 @@ export default function ResumePage() {
             <h2 className="text-2xl font-semibold text-white">Certifications</h2>
             <div className="mt-5 space-y-3">
               {certifications.map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-[#1a100c]/90 px-4 py-3 text-sm leading-6 text-stone-200">
-                  {item}
-                </div>
+                <a
+                  key={item.title}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block rounded-2xl border border-white/10 bg-[#1a100c]/90 px-4 py-3 text-sm leading-6 text-stone-200 transition hover:-translate-y-0.5 hover:border-orange-200/30 hover:bg-white/[0.07]"
+                >
+                  <span className="block font-medium text-stone-100">{item.title}</span>
+                  <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.18em] text-orange-100/80 transition group-hover:text-orange-100">
+                    View credential
+                  </span>
+                </a>
               ))}
             </div>
           </div>
