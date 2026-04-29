@@ -15,6 +15,19 @@ const skills = [
   "Technical writing",
 ];
 
+const certifications = [
+  "Imperial College London — Linear Algebra / Multivariate Calculus",
+  "Kaggle — Machine Learning / Feature Engineering",
+  "MIMO — Python AI Development Professional Certificate",
+] as const;
+
+const leadership = [
+  "SSI Assistant Scuba Instructor, 2019",
+  "Founder, Ball State eSports, 2016",
+  "Promotions Officer, Electronic Gaming League, 2016",
+  "Eagle Scout Award, 2011",
+] as const;
+
 const experience = [
   {
     role: "Gen AI Associate",
@@ -40,7 +53,7 @@ const experience = [
 
 export const metadata = {
   title: "Resume | William (Drew) Baker",
-  description: "USGIF resume page for William (Drew) Baker.",
+  description: "USGIF resume snapshot for William (Drew) Baker.",
 };
 
 export default function ResumePage() {
@@ -112,6 +125,30 @@ export default function ResumePage() {
                 <span key={skill} className="rounded-full border border-orange-200/15 bg-orange-200/10 px-3 py-1.5 text-xs font-medium text-orange-50">
                   {skill}
                 </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-6 grid gap-6 md:grid-cols-2">
+          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
+            <h2 className="text-2xl font-semibold text-white">Certifications</h2>
+            <div className="mt-5 space-y-3">
+              {certifications.map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-[#1a100c]/90 px-4 py-3 text-sm leading-6 text-stone-200">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
+            <h2 className="text-2xl font-semibold text-white">Leadership</h2>
+            <div className="mt-5 space-y-3">
+              {leadership.map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-[#1a100c]/90 px-4 py-3 text-sm leading-6 text-stone-200">
+                  {item}
+                </div>
               ))}
             </div>
           </div>
