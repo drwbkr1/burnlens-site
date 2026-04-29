@@ -56,6 +56,34 @@ const timeline = [
   ["Next", "Phase 1"],
 ] as const;
 
+const certifications = [
+  "Imperial College London — Linear Algebra / Multivariate Calculus",
+  "Kaggle — Machine Learning / Feature Engineering",
+  "MIMO — Python AI Development Professional Certificate",
+] as const;
+
+const leadershipRoles = [
+  "SSI Assistant Scuba Instructor, 2019",
+  "Founder, Ball State eSports, 2016",
+  "Promotions Officer, Electronic Gaming League, 2016",
+  "Eagle Scout Award, 2011",
+] as const;
+
+const resumeHighlights = [
+  [
+    "Graduate focus",
+    "M.S. student in AI and ML at Purdue with emphasis on image recognition, forecasting, distributed control, and ethical AI.",
+  ],
+  [
+    "Applied AI work",
+    "Gen AI Associate evaluating prompt and response quality across large-scale model-improvement projects.",
+  ],
+  [
+    "Translation strength",
+    "Technical writer experienced in turning complex technology and energy topics into accessible public-facing content.",
+  ],
+] as const;
+
 export default function BurnLensLandingPage() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "";
   const [form, setForm] = useState<FormState>(initialForm);
@@ -160,6 +188,7 @@ export default function BurnLensLandingPage() {
               ["How it works", "#how"],
               ["Timeline", "#timeline"],
               ["Pilot", "#pilot"],
+              ["Founder", "#resume"],
               ["Contact", "#contact"],
             ].map(([label, href]) => (
               <a key={label} href={href} className="transition hover:text-white">
@@ -436,6 +465,77 @@ export default function BurnLensLandingPage() {
                     <span className="text-sm leading-6 text-stone-100">{item}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="resume" className="border-y border-white/10 bg-white/[0.025]">
+          <div className="mx-auto max-w-7xl px-6 py-20 md:py-24">
+            <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr]">
+              <div className="max-w-3xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
+                  Founder profile
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+                  Resume highlights behind BurnLens.
+                </h2>
+                <p className="mt-6 text-base leading-8 text-stone-300">
+                  BurnLens is led by William “Drew” Baker, a Purdue graduate student in AI and
+                  machine learning building toward geospatial AI, remote sensing, and practical
+                  decision-support workflows for resilience planning.
+                </p>
+                <p className="mt-4 text-base leading-8 text-stone-300">
+                  The background combines applied AI evaluation, technical writing, energy-sector
+                  literacy, project communication, and leadership experience from education,
+                  instruction, student organization building, and scouting.
+                </p>
+              </div>
+
+              <div className="grid gap-5">
+                <div className="grid gap-4 md:grid-cols-3">
+                  {resumeHighlights.map(([label, text]) => (
+                    <div
+                      key={label}
+                      className="rounded-[1.6rem] border border-white/10 bg-[#1a100c]/95 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.14)]"
+                    >
+                      <div className="text-[11px] uppercase tracking-[0.2em] text-stone-400">
+                        {label}
+                      </div>
+                      <p className="mt-3 text-sm leading-7 text-stone-200">{text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div className="rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.025] p-6">
+                    <h3 className="text-xl font-semibold text-white">Certifications</h3>
+                    <div className="mt-5 space-y-3">
+                      {certifications.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-stone-200"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.025] p-6">
+                    <h3 className="text-xl font-semibold text-white">Leadership roles</h3>
+                    <div className="mt-5 space-y-3">
+                      {leadershipRoles.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-stone-200"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
