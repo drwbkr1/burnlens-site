@@ -2,8 +2,8 @@ const links = [
   {
     label: "Resume",
     href: "/usgif/resume",
-    eyebrow: "PDF",
-    description: "Download Drew's USGIF resume.",
+    eyebrow: "Profile",
+    description: "View Drew's USGIF resume snapshot.",
   },
   {
     label: "BurnLens",
@@ -40,7 +40,7 @@ const links = [
 export const metadata = {
   title: "William (Drew) Baker | USGIF Links",
   description:
-    "USGIF link hub for William (Drew) Baker: resume, BurnLens, LinkedIn, projects, and contact information.",
+    "USGIF link hub for William (Drew) Baker: resume snapshot, BurnLens, LinkedIn, projects, and contact information.",
 };
 
 export default function USGIFLinksPage() {
@@ -82,7 +82,7 @@ export default function USGIFLinksPage() {
                   href="/usgif/resume"
                   className="rounded-2xl bg-amber-300 px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5"
                 >
-                  Download resume
+                  View resume
                 </a>
                 <a
                   href="mailto:bake1139@purdue.edu?subject=USGIF%20follow-up"
