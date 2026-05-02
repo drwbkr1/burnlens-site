@@ -1,21 +1,16 @@
-const skills = [
-  "Python",
-  "Jupyter / Kaggle",
-  "Google Cloud Platform",
-  "LLMs & RAG",
-  "Gemini",
-  "Embeddings",
-  "Vector stores / ChromaDB",
-  "ReAct-style agents",
-  "HDBSCAN clustering",
-  "Basic supervised ML",
-  "Prompt engineering",
-  "Energy data governance",
-  "Policy analysis",
-  "Technical writing",
-];
-
 const certifications = [
+  {
+    title: "NASA ARSET — Fundamentals of Remote Sensing",
+    href: "https://appliedsciences.nasa.gov/what-we-do/capacity-building/arset",
+  },
+  {
+    title: "NASA ARSET — Machine Learning for Earth Science",
+    href: "https://appliedsciences.nasa.gov/what-we-do/capacity-building/arset",
+  },
+  {
+    title: "NASA ARSET — Hyperspectral Data",
+    href: "https://appliedsciences.nasa.gov/what-we-do/capacity-building/arset",
+  },
   {
     title: "Imperial College London — Linear Algebra",
     href: "https://coursera.org/share/dcaf6f3b5422e369abf0c812761dcd2b",
@@ -50,23 +45,78 @@ const experience = [
     role: "Gen AI Associate",
     org: "Innodata",
     location: "Remote",
-    dates: "April 2024 – Present",
+    dates: "Apr 2024 – Apr 2026",
     bullets: [
-      "Annotate and evaluate 200–500 AI prompt/response tasks weekly across multiple projects, contributing to RLHF-style training data and model behavior improvement.",
-      "Collaborate with a 35+ person distributed team to identify failure modes, refine prompts, and align outputs with client objectives.",
+      "Annotated and evaluated 200–500 AI prompt/response tasks weekly across multiple projects, contributing to RLHF-style training data and model behavior improvement.",
+      "Collaborated with a 35+ person distributed team to identify failure modes, refine prompts, and align outputs with client objectives.",
     ],
   },
   {
     role: "Technical Content Writer",
     org: "Independent Contractor",
     location: "Remote",
-    dates: "November 2021 – March 2024",
+    dates: "Nov 2021 – Mar 2024",
     bullets: [
-      "Wrote and edited 300+ articles in technology niches, including first-page ranking solar energy articles for Sunrun and similar providers.",
-      "Specialized in translating complex technical topics into accessible content for broad audiences.",
+      "Wrote and edited 300+ technology articles, including first-page ranking solar energy content for Sunrun and similar providers.",
+      "Translated complex technical and energy topics into accessible content for broad audiences.",
     ],
   },
 ] as const;
+
+const projects = [
+  {
+    title: "BurnLens Wildfire GEOINT Planning Workflow",
+    bullets: [
+      "Developing a public-interest wildfire screening workflow for evacuation-access and exposure planning in Deschutes County, Oregon.",
+      "Frames satellite imagery, authoritative fire information, local overlays, provenance, and fit-for-use limits into planning-ready map and memo packages.",
+    ],
+  },
+  {
+    title: "LLM-Powered Solar Incentive Assistant",
+    label: "Google AI Intensive",
+    bullets: [
+      "Built a Gemini-based RAG prototype to answer residential solar incentive questions for California and North Carolina.",
+      "Implemented document/PDF ingestion, ChromaDB vector storage, embeddings, and agentic tool use with DSIRE, Geocode, and PVWatts APIs.",
+    ],
+  },
+  {
+    title: "HDBSCAN Hierarchical Clusterer",
+    label: "Purdue GRAD 504",
+    bullets: [
+      "Built a Python-based HDBSCAN clustering pipeline to explore regional patterning in a small-medium dataset.",
+      "Evaluated encoding strategies and distance metrics, then communicated cluster behavior and limitations to non-technical readers.",
+    ],
+  },
+] as const;
+
+const skillGroups = [
+  {
+    label: "Geospatial / EO",
+    text: "GeoPandas, rioxarray, Google Earth Engine, STAC, COG, GIS programming, remote sensing workflows.",
+  },
+  {
+    label: "ML / AI",
+    text: "Python, LLMs & RAG, Gemini, embeddings, ChromaDB, ReAct-style agents, HDBSCAN, prompt engineering.",
+  },
+  {
+    label: "Communication",
+    text: "Technical writing, policy analysis, stakeholder-facing documentation.",
+  },
+] as const;
+
+const SectionTitle = ({ icon, title }: { icon: string; title: string }) => (
+  <div className="mb-4 flex items-center gap-3">
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-orange-600 text-lg shadow-[0_10px_22px_rgba(234,88,12,0.22)]">
+      {icon}
+    </span>
+    <div className="flex min-w-0 flex-1 items-center gap-3">
+      <h2 className="whitespace-nowrap text-xl font-black uppercase tracking-tight text-stone-950">
+        {title}
+      </h2>
+      <span className="mt-1 h-px flex-1 bg-orange-600" />
+    </div>
+  </div>
+);
 
 export const metadata = {
   title: "Resume | William (Drew) Baker",
@@ -75,10 +125,9 @@ export const metadata = {
 
 export default function ResumePage() {
   return (
-    <main className="min-h-screen bg-[#120b08] text-stone-100">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.15),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(249,115,22,0.11),transparent_24%),linear-gradient(180deg,#120b08_0%,#1a0f0b_48%,#120b08_100%)]" />
-      <section className="mx-auto max-w-5xl px-6 py-12 md:py-16">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <main className="min-h-screen bg-[#120b08] px-4 py-8 text-stone-950 md:px-6 md:py-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <a
             href="/usgif"
             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-300 transition hover:bg-white/[0.07] hover:text-white"
@@ -93,124 +142,171 @@ export default function ResumePage() {
           </a>
         </div>
 
-        <header className="mt-8 rounded-[2rem] border border-white/10 bg-white/[0.05] p-7 shadow-[0_28px_70px_rgba(0,0,0,0.25)] backdrop-blur-md md:p-9">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-orange-100">
-            USGIF Resume Snapshot
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white md:text-6xl">
-            William (Drew) Baker
-          </h1>
-          <p className="mt-4 text-xl text-stone-200">
-            Graduate Student – AI/ML for Energy & Power Systems
-          </p>
-          <p className="mt-5 max-w-3xl text-base leading-8 text-stone-300">
-            AI/ML graduate student at Purdue with interests in image recognition, forecasting, distributed control, ethical AI, geospatial AI, remote sensing, disaster-response decision support, and responsible technical communication.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            <a className="rounded-2xl bg-amber-300 px-5 py-3 font-semibold text-black" href="mailto:bake1139@purdue.edu">
-              bake1139@purdue.edu
-            </a>
-            <a className="rounded-2xl border border-white/12 bg-white/5 px-5 py-3 font-semibold text-white" href="https://www.linkedin.com/in/william-baker-843946162/" target="_blank" rel="noopener noreferrer">
-              LinkedIn
-            </a>
-          </div>
-        </header>
-
-        <section className="mt-6 grid gap-6 md:grid-cols-2">
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
-            <h2 className="text-2xl font-semibold text-white">Education</h2>
-            <div className="mt-5 space-y-5 text-sm leading-7 text-stone-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white">Purdue University</h3>
-                <p>M.S., AI and ML · GPA 4.0</p>
-                <p>May 2025 – Present · Expected Fall 2027</p>
-                <p className="mt-2">Coursework: Intro to AI, Technical Foundations of AI, AI Ethics, AI Policy.</p>
+        <article className="mx-auto overflow-hidden rounded-[2rem] bg-[#fffdf8] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.38)] ring-1 ring-black/5 print:rounded-none print:p-6 print:shadow-none md:p-10">
+          <header className="grid gap-6 border-b-2 border-orange-600 pb-6 md:grid-cols-[1fr_auto] md:items-start">
+            <div>
+              <h1 className="text-5xl font-black tracking-tight text-stone-950 md:text-6xl">
+                William (Drew) Baker
+              </h1>
+              <p className="mt-3 text-lg font-black uppercase tracking-tight text-orange-600">
+                AI/ML Graduate Student <span className="mx-2 text-stone-400">|</span>
+                <span className="normal-case tracking-normal">Geospatial AI, Remote Sensing & Disaster Resilience</span>
+              </p>
+              <div className="mt-5 grid gap-2 text-sm font-medium text-stone-700 sm:grid-cols-3">
+                <span>📍 Whiteland, IN</span>
+                <span>📞 (317) 847-4670</span>
+                <a className="text-stone-700 underline decoration-orange-500/40 underline-offset-4 hover:text-orange-700" href="mailto:bake1139@purdue.edu">
+                  ✉️ bake1139@purdue.edu
+                </a>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white">Ball State University</h3>
-                <p>B.G.S., Marketing Planning</p>
-                <p>August 2011 – August 2017</p>
-                <p className="mt-2">Emphasis on digital media planning, content creation, and web development.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
-            <h2 className="text-2xl font-semibold text-white">Skills</h2>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <span key={skill} className="rounded-full border border-orange-200/15 bg-orange-200/10 px-3 py-1.5 text-xs font-medium text-orange-50">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-6 grid gap-6 md:grid-cols-2">
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
-            <h2 className="text-2xl font-semibold text-white">Certifications</h2>
-            <div className="mt-5 space-y-3">
-              {certifications.map((item) => (
+              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-stone-700">
                 <a
-                  key={item.title}
-                  href={item.href}
+                  className="text-blue-700 underline decoration-blue-500/30 underline-offset-4 hover:text-blue-900"
+                  href="https://www.linkedin.com/in/william-baker-843946162/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block rounded-2xl border border-white/10 bg-[#1a100c]/90 px-4 py-3 text-sm leading-6 text-stone-200 transition hover:-translate-y-0.5 hover:border-orange-200/30 hover:bg-white/[0.07]"
                 >
-                  <span className="block font-medium text-stone-100">{item.title}</span>
-                  <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.18em] text-orange-100/80 transition group-hover:text-orange-100">
-                    View credential
-                  </span>
+                  LinkedIn: william-baker-843946162
                 </a>
-              ))}
+                <a
+                  className="text-blue-700 underline decoration-blue-500/30 underline-offset-4 hover:text-blue-900"
+                  href="https://burnlensproject.org/usgif"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Portfolio: burnlensproject.org/usgif
+                </a>
+              </div>
             </div>
-          </div>
 
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
-            <h2 className="text-2xl font-semibold text-white">Leadership</h2>
-            <div className="mt-5 space-y-3">
-              {leadership.map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-[#1a100c]/90 px-4 py-3 text-sm leading-6 text-stone-200">
-                  {item}
+            <a
+              href="https://burnlensproject.org/usgif"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="justify-self-start md:justify-self-end"
+              aria-label="Open portfolio and USGIF links"
+            >
+              <div className="flex h-36 w-36 items-center justify-center rounded-xl border border-stone-300 bg-white p-2 shadow-sm">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fburnlensproject.org%2Fusgif"
+                  alt="QR code for Portfolio and USGIF links"
+                  className="h-full w-full"
+                />
+              </div>
+              <p className="mt-2 text-center text-xs font-bold text-stone-800">Portfolio / USGIF links</p>
+            </a>
+          </header>
+
+          <section className="border-b border-stone-300 py-6">
+            <SectionTitle icon="●" title="Summary" />
+            <p className="max-w-4xl text-base leading-7 text-stone-800">
+              AI/ML graduate student focused on geospatial AI, remote sensing, Earth observation workflows, and disaster/energy resilience. Experience spans RLHF-style model evaluation, RAG prototypes, geospatial Python tools, remote sensing data standards, policy analysis, and technical communication for technical and non-technical audiences.
+            </p>
+          </section>
+
+          <div className="grid gap-8 pt-6 lg:grid-cols-[1.55fr_1fr]">
+            <div className="space-y-9 lg:border-r lg:border-stone-300 lg:pr-8">
+              <section>
+                <SectionTitle icon="▣" title="Experience" />
+                <div className="space-y-6">
+                  {experience.map((item) => (
+                    <article key={item.role}>
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                        <h3 className="text-lg font-black text-stone-950">
+                          {item.role} <span className="font-semibold text-stone-500">|</span> {item.org} <span className="font-semibold text-stone-500">|</span> {item.location}
+                        </h3>
+                        <p className="text-sm font-bold italic text-orange-600">{item.dates}</p>
+                      </div>
+                      <ul className="mt-3 space-y-2 pl-5 text-sm leading-6 text-stone-800">
+                        {item.bullets.map((bullet) => (
+                          <li key={bullet} className="list-disc">{bullet}</li>
+                        ))}
+                      </ul>
+                    </article>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              </section>
 
-        <section className="mt-6 rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-6">
-          <h2 className="text-2xl font-semibold text-white">Experience</h2>
-          <div className="mt-6 space-y-6">
-            {experience.map((item) => (
-              <article key={item.role} className="rounded-[1.35rem] border border-white/10 bg-[#1a100c]/90 p-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+              <section>
+                <SectionTitle icon="◆" title="Selected Projects" />
+                <div className="space-y-6">
+                  {projects.map((project) => (
+                    <article key={project.title}>
+                      <h3 className="text-base font-black text-stone-950">
+                        {project.title}
+                        {"label" in project && project.label ? (
+                          <span className="font-semibold text-stone-600"> ({project.label})</span>
+                        ) : null}
+                      </h3>
+                      <ul className="mt-2 space-y-2 pl-5 text-sm leading-6 text-stone-800">
+                        {project.bullets.map((bullet) => (
+                          <li key={bullet} className="list-disc">{bullet}</li>
+                        ))}
+                      </ul>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            <aside className="space-y-8">
+              <section>
+                <SectionTitle icon="◒" title="Education" />
+                <div className="space-y-5 text-sm leading-6 text-stone-800">
                   <div>
-                    <h3 className="text-xl font-semibold text-white">{item.role}</h3>
-                    <p className="mt-1 text-sm text-stone-300">{item.org} · {item.location}</p>
+                    <h3 className="text-base font-black text-stone-950">Purdue University</h3>
+                    <p>M.S., AI and ML | GPA 4.0</p>
+                    <p className="font-bold italic text-orange-600">May 2025 – Present | Expected Fall 2027</p>
+                    <p className="mt-2"><span className="font-black">Coursework:</span> Intro to AI, Technical Foundations of AI, AI Ethics, AI Policy, GIS Programming.</p>
                   </div>
-                  <p className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs uppercase tracking-[0.16em] text-stone-300">
-                    {item.dates}
-                  </p>
+                  <div className="border-t border-stone-300 pt-4">
+                    <h3 className="text-base font-black text-stone-950">Ball State University</h3>
+                    <p>B.G.S., Marketing Planning</p>
+                    <p className="font-bold italic text-orange-600">Aug 2011 – Aug 2017</p>
+                  </div>
                 </div>
-                <ul className="mt-4 space-y-2 text-sm leading-7 text-stone-300">
-                  {item.bullets.map((bullet) => (
-                    <li key={bullet}>• {bullet}</li>
+              </section>
+
+              <section>
+                <SectionTitle icon="⚙" title="Skills" />
+                <div className="space-y-4 text-sm leading-6 text-stone-800">
+                  {skillGroups.map((group) => (
+                    <p key={group.label}>
+                      <span className="font-black text-orange-600">{group.label}:</span> {group.text}
+                    </p>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <SectionTitle icon="◈" title="Certifications" />
+                <div className="space-y-2">
+                  {certifications.map((item) => (
+                    <a
+                      key={item.title}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-xl border border-stone-200 bg-white/60 px-3 py-2 text-sm font-medium leading-5 text-stone-800 transition hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50"
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <SectionTitle icon="◉" title="Leadership" />
+                <ul className="space-y-2 pl-5 text-sm leading-6 text-stone-800">
+                  {leadership.map((item) => (
+                    <li key={item} className="list-disc">{item}</li>
                   ))}
                 </ul>
-              </article>
-            ))}
+              </section>
+            </aside>
           </div>
-        </section>
-
-        <section className="mt-6 rounded-[1.75rem] border border-amber-200/15 bg-amber-300/10 p-6">
-          <h2 className="text-2xl font-semibold text-white">USGIF positioning</h2>
-          <p className="mt-4 text-sm leading-7 text-stone-200">
-            Looking for conversations about GeoAI, remote sensing analytics, wildfire planning, data governance, responsible AI, internships, and early-career pathways where AI/ML and geospatial decision support overlap.
-          </p>
-        </section>
-      </section>
+        </article>
+      </div>
     </main>
   );
 }
