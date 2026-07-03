@@ -3,25 +3,25 @@ const links = [
     label: "Resume",
     href: "/usgif/resume",
     eyebrow: "Profile",
-    description: "View Drew's USGIF resume snapshot.",
+    description: "View Drew's graduate portfolio resume snapshot.",
   },
   {
     label: "BurnLens",
     href: "https://burnlensproject.org/",
     eyebrow: "Project",
-    description: "Public-interest wildfire planning support for local resilience work.",
+    description: "Portfolio-grade wildfire planning workflow for GeoAI and disaster resilience.",
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/william-baker-843946162/",
     eyebrow: "Profile",
-    description: "Connect after the symposium.",
+    description: "Connect about GeoAI, internships, and applied AI work.",
   },
   {
     label: "HC Clusterer",
     href: "https://colab.research.google.com/drive/1iw--FYslASbASPbh40ldStJtOB5QKfRe#scrollTo=5Zez04aIzJl6",
     eyebrow: "Project",
-    description: "Notebook project exploring clustering workflows.",
+    description: "Coursework project exploring clustering workflows and evaluation.",
   },
   {
     label: "Data Governance Policy Brief",
@@ -31,19 +31,19 @@ const links = [
   },
   {
     label: "Email",
-    href: "mailto:bake1139@purdue.edu?subject=USGIF%20follow-up",
+    href: "mailto:bake1139@purdue.edu?subject=Graduate%20portfolio%20follow-up",
     eyebrow: "Contact",
     description: "Send a direct follow-up note.",
   },
 ] as const;
 
 export const metadata = {
-  title: "William (Drew) Baker | USGIF Links",
+  title: "William (Drew) Baker | Graduate Portfolio",
   description:
-    "USGIF link hub for William (Drew) Baker: resume snapshot, BurnLens, LinkedIn, projects, and contact information.",
+    "Graduate portfolio for William (Drew) Baker: resume snapshot, BurnLens, LinkedIn, projects, writing samples, and contact information.",
 };
 
-export default function USGIFLinksPage() {
+export default function GraduatePortfolioLinksPage() {
   return (
     <main className="min-h-screen bg-[#120b08] text-stone-100">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_26%),radial-gradient(circle_at_82%_12%,rgba(249,115,22,0.12),transparent_24%),linear-gradient(180deg,#120b08_0%,#1a0f0b_48%,#120b08_100%)]" />
@@ -59,7 +59,7 @@ export default function USGIFLinksPage() {
           <div className="mt-8 grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
             <section className="rounded-[2rem] border border-white/10 bg-white/[0.05] p-7 shadow-[0_28px_70px_rgba(0,0,0,0.25)] backdrop-blur-md md:p-9">
               <div className="inline-flex rounded-full border border-orange-200/20 bg-orange-200/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-orange-100">
-                USGIF Symposium 2026
+                Graduate Portfolio
               </div>
               <h1 className="mt-6 text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.02]">
                 William (Drew) Baker
@@ -70,7 +70,7 @@ export default function USGIFLinksPage() {
 
               <div className="mt-8 space-y-3 rounded-[1.5rem] border border-white/10 bg-[#1a100c]/90 p-5 text-sm leading-7 text-stone-300">
                 <p>
-                  I am using USGIF to connect BurnLens, AI/ML coursework, and geospatial project work with real GEOINT career paths.
+                  This page collects my graduate portfolio work across BurnLens, AI/ML coursework, geospatial analysis, and technical communication.
                 </p>
                 <p>
                   Best follow-up topics: GeoAI, remote sensing analytics, wildfire planning, data governance, internships, and early-career technical roles.
@@ -85,7 +85,7 @@ export default function USGIFLinksPage() {
                   View resume
                 </a>
                 <a
-                  href="mailto:bake1139@purdue.edu?subject=USGIF%20follow-up"
+                  href="mailto:bake1139@purdue.edu?subject=Graduate%20portfolio%20follow-up"
                   className="rounded-2xl border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/8"
                 >
                   Email me
@@ -120,7 +120,7 @@ export default function USGIFLinksPage() {
           </div>
 
           <footer className="mt-8 text-center text-xs leading-6 text-stone-500">
-            Scan page for USGIF Symposium conversations. Built on burnlensproject.org/usgif.
+            Graduate portfolio link hub. Built on burnlensproject.org/usgif.
           </footer>
         </div>
       </section>
