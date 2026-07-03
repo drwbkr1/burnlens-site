@@ -120,7 +120,7 @@ const SectionTitle = ({ icon, title }: { icon: string; title: string }) => (
 
 export const metadata = {
   title: "Resume | William (Drew) Baker",
-  description: "USGIF resume snapshot for William (Drew) Baker.",
+  description: "Graduate portfolio resume snapshot for William (Drew) Baker.",
 };
 
 export default function ResumePage() {
@@ -132,10 +132,10 @@ export default function ResumePage() {
             href="/usgif"
             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-300 transition hover:bg-white/[0.07] hover:text-white"
           >
-            Back to USGIF links
+            Back to portfolio
           </a>
           <a
-            href="mailto:bake1139@purdue.edu?subject=USGIF%20follow-up"
+            href="mailto:bake1139@purdue.edu?subject=Graduate%20portfolio%20follow-up"
             className="rounded-full border border-orange-200/20 bg-orange-200/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-orange-100 transition hover:bg-orange-200/20"
           >
             Contact
@@ -184,16 +184,16 @@ export default function ResumePage() {
               target="_blank"
               rel="noopener noreferrer"
               className="justify-self-start md:justify-self-end"
-              aria-label="Open portfolio and USGIF links"
+              aria-label="Open graduate portfolio"
             >
               <div className="flex h-36 w-36 items-center justify-center rounded-xl border border-stone-300 bg-white p-2 shadow-sm">
                 <img
                   src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fburnlensproject.org%2Fusgif"
-                  alt="QR code for Portfolio and USGIF links"
+                  alt="QR code for graduate portfolio"
                   className="h-full w-full"
                 />
               </div>
-              <p className="mt-2 text-center text-xs font-bold text-stone-800">Portfolio / USGIF links</p>
+              <p className="mt-2 text-center text-xs font-bold text-stone-800">Graduate portfolio</p>
             </a>
           </header>
 
