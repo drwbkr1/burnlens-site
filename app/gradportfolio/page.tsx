@@ -37,31 +37,6 @@ const projects = [
   },
 ] as const;
 
-const sources = [
-  ["Satellite imagery", "Sentinel / Landsat / public EO"],
-  ["Terrain & access", "DEM, roads, parcels, facilities"],
-  ["Weather context", "NOAA and local conditions"],
-  ["Project evidence", "Run logs, notes, documents"],
-] as const;
-
-const processingSteps = [
-  {
-    title: "Preprocess",
-    items: ["Clean inputs", "Normalize layers", "Document provenance"],
-  },
-  {
-    title: "Engineer features",
-    items: ["Vegetation signals", "Topographic context", "Spatial grouping"],
-  },
-] as const;
-
-const outputs = [
-  ["Planning map", "Bounded geospatial view"],
-  ["Pattern summary", "Clusters, risk, and context"],
-  ["QA receipt", "Scope, checks, limitations"],
-  ["Portfolio artifact", "Public-safe explanation"],
-] as const;
-
 const focusItems = [
   ["Graduate Student", "AI/ML & geospatial systems"],
   ["Research Focus", "GeoAI, remote sensing, disaster resilience"],
@@ -79,13 +54,6 @@ const Pill = ({ children }: { children: string }) => (
   <span className="rounded-full bg-[#E9E2D8] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5C757A]">
     {children}
   </span>
-);
-
-const WorkflowBox = ({ title, text }: { title: string; text: string }) => (
-  <div className="rounded-2xl border border-[#C7CDBF]/70 bg-white/75 p-4 shadow-[0_14px_34px_rgba(92,117,122,0.08)]">
-    <p className="text-sm font-bold text-[#36484C]">{title}</p>
-    <p className="mt-1 text-xs leading-5 text-[#6B6F66]">{text}</p>
-  </div>
 );
 
 export default function GraduatePortfolioLinksPage() {
@@ -175,94 +143,16 @@ export default function GraduatePortfolioLinksPage() {
                 </h2>
               </div>
               <span className="rounded-full bg-[#C7CDBF]/70 px-4 py-2 text-xs font-semibold text-[#4F5D46]">
-                Geospatial workflow graphic
+                Scalable SVG graphic
               </span>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1.2fr_1fr]">
-              <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#5C757A]">
-                  1. Data sources
-                </p>
-                <div className="space-y-3">
-                  {sources.map(([title, text]) => (
-                    <WorkflowBox key={title} title={title} text={text} />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#5C757A]">
-                  2. Processing
-                </p>
-                <div className="space-y-3">
-                  {processingSteps.map((step) => (
-                    <div key={step.title} className="rounded-2xl border border-[#C7CDBF]/70 bg-white/75 p-4 shadow-[0_14px_34px_rgba(92,117,122,0.08)]">
-                      <p className="text-sm font-bold text-[#36484C]">{step.title}</p>
-                      <ul className="mt-3 space-y-2 text-xs leading-5 text-[#6B6F66]">
-                        {step.items.map((item) => (
-                          <li key={item} className="flex items-center gap-2">
-                            <span className="grid h-4 w-4 place-items-center rounded border border-[#757F64]/60 text-[9px] text-[#757F64]">
-                              ✓
-                            </span>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#5C757A]">
-                  3. Analysis & modeling
-                </p>
-                <div className="rounded-[1.5rem] border border-[#C7CDBF]/70 bg-white/80 p-4 shadow-[0_14px_34px_rgba(92,117,122,0.08)]">
-                  <div className="overflow-hidden rounded-2xl border border-[#C7CDBF] bg-[#C7CDBF]/40 p-3">
-                    <div className="grid h-40 grid-cols-5 gap-1 rounded-xl bg-[#E9E2D8] p-2">
-                      {Array.from({ length: 25 }).map((_, index) => {
-                        const isHot = [7, 8, 12, 13, 17].includes(index);
-                        const isTeal = [2, 3, 4, 9, 14, 19].includes(index);
-                        return (
-                          <span
-                            key={index}
-                            className={`rounded-md ${
-                              isHot
-                                ? "bg-[#CB7A5C]/75"
-                                : isTeal
-                                  ? "bg-[#5C757A]/45"
-                                  : "bg-[#757F64]/35"
-                            }`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <WorkflowBox title="Machine learning" text="Classification, clustering, evaluation" />
-                    <WorkflowBox title="Human review" text="Scope, fit-for-use, evidence checks" />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#5C757A]">
-                  4. Outputs & insights
-                </p>
-                <div className="space-y-3">
-                  {outputs.map(([title, text]) => (
-                    <WorkflowBox key={title} title={title} text={text} />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-3 border-t border-[#C7CDBF]/70 pt-4 text-xs font-semibold text-[#6B6F66]">
-              <span className="inline-flex items-center gap-2"><span className="h-px w-8 bg-[#5C757A]" /> Data flow</span>
-              <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#757F64]" /> Data layer</span>
-              <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#CB7A5C]" /> Model output</span>
-              <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#5C757A]" /> Reviewed artifact</span>
+            <div className="overflow-hidden rounded-2xl border border-[#C7CDBF]/70 bg-[#F8F5EE] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+              <img
+                src="/images/gradportfolio-workflow.svg"
+                alt="Workflow diagram showing data sources, processing, analysis and modeling, and outputs and insights."
+                className="h-auto w-full"
+              />
             </div>
           </section>
         </section>
