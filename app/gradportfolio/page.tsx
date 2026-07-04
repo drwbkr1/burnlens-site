@@ -1,26 +1,20 @@
 const links = [
   {
-    label: "Resume",
-    href: "/gradportfolio/resume",
-    eyebrow: "Profile",
-    description: "View Drew's graduate portfolio resume snapshot.",
+    label: "OpenClaw Showcase",
+    href: "https://github.com/drwbkr1/openclaw-showcase",
+    eyebrow: "AI Operations",
+    description: "Public-safe showcase for agent workflow design, scoped tasks, run logs, QA review, safety boundaries, and human approval gates.",
   },
   {
     label: "BurnLens",
     href: "https://burnlensproject.org/",
-    eyebrow: "Project",
+    eyebrow: "GeoAI Project",
     description: "Portfolio-grade wildfire planning workflow for GeoAI and disaster resilience.",
-  },
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/william-baker-843946162/",
-    eyebrow: "Profile",
-    description: "Connect about GeoAI, internships, and applied AI work.",
   },
   {
     label: "HC Clusterer",
     href: "https://colab.research.google.com/drive/1iw--FYslASbASPbh40ldStJtOB5QKfRe#scrollTo=5Zez04aIzJl6",
-    eyebrow: "Project",
+    eyebrow: "Coursework Project",
     description: "Coursework project exploring clustering workflows and evaluation.",
   },
   {
@@ -29,18 +23,12 @@ const links = [
     eyebrow: "Writing",
     description: "Policy and governance writing sample.",
   },
-  {
-    label: "Email",
-    href: "mailto:bake1139@purdue.edu?subject=Graduate%20portfolio%20follow-up",
-    eyebrow: "Contact",
-    description: "Send a direct follow-up note.",
-  },
 ] as const;
 
 export const metadata = {
   title: "William (Drew) Baker | Graduate Portfolio",
   description:
-    "Graduate portfolio for William (Drew) Baker: resume snapshot, BurnLens, LinkedIn, projects, writing samples, and contact information.",
+    "Graduate portfolio for William (Drew) Baker: OpenClaw Showcase, BurnLens, applied AI coursework, writing samples, resume, and contact information.",
 };
 
 export default function GraduatePortfolioLinksPage() {
@@ -70,10 +58,10 @@ export default function GraduatePortfolioLinksPage() {
 
               <div className="mt-8 space-y-3 rounded-[1.5rem] border border-white/10 bg-[#1a100c]/90 p-5 text-sm leading-7 text-stone-300">
                 <p>
-                  This page collects my graduate portfolio work across BurnLens, AI/ML coursework, geospatial analysis, and technical communication.
+                  This page collects my graduate portfolio work across AI operations, BurnLens, AI/ML coursework, geospatial analysis, and technical communication.
                 </p>
                 <p>
-                  Best follow-up topics: GeoAI, remote sensing analytics, wildfire planning, data governance, internships, and early-career technical roles.
+                  Best follow-up topics: agent workflow design, GeoAI, remote sensing analytics, wildfire planning, data governance, internships, and early-career technical roles.
                 </p>
               </div>
 
