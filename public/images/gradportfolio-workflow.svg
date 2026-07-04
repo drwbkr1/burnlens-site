@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Portfolio workflow diagram</title>
+  <desc id="desc">Workflow diagram showing data sources, processing, analysis and modeling, and outputs and insights.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#5C757A" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .serif{font-family: Georgia, 'Times New Roman', serif;}
+      .sans{font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;}
+      .stage{font:700 24px Inter, ui-sans-serif, system-ui; letter-spacing:.01em;}
+      .card-title{font:700 26px Georgia, 'Times New Roman', serif; fill:#4F5D46;}
+      .body{font:400 18px Inter, ui-sans-serif, system-ui; fill:#2F3F42;}
+      .small{font:600 15px Inter, ui-sans-serif, system-ui; fill:#5C757A;}
+      .tiny{font:600 13px Inter, ui-sans-serif, system-ui; fill:#6B6F66;}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#E9E2D8"/>
+  <rect x="35" y="35" width="1530" height="930" rx="32" fill="#F8F5EE" filter="url(#shadow)"/>
+
+  <g transform="translate(88 72)">
+    <path d="M0 58 C30 18 56 10 88 0" stroke="#4F5D46" stroke-width="3" fill="none"/>
+    <path d="M24 44 C4 30 4 12 28 4 C46 20 42 38 24 44Z" fill="#757F64" opacity=".9"/>
+    <path d="M48 29 C32 16 34 1 56 -5 C70 12 64 26 48 29Z" fill="#757F64" opacity=".85" transform="translate(0 8)"/>
+    <path d="M64 16 C50 5 54 -8 73 -12 C83 2 78 14 64 16Z" fill="#757F64" opacity=".75" transform="translate(0 12)"/>
+  </g>
+
+  <text x="160" y="95" class="sans" font-size="21" font-weight="700" letter-spacing="5" fill="#4F5D46">PORTFOLIO WORKFLOW</text>
+  <line x1="160" y1="115" x2="220" y2="115" stroke="#757F64" stroke-width="3"/>
+  <text x="150" y="180" class="serif" font-size="58" fill="#4F5D46">From source data to reviewed artifact</text>
+
+  <g class="stage">
+    <text x="110" y="250" fill="#4F5D46">1. Data Sources</text>
+    <text x="495" y="250" fill="#CB7A5C">2. Processing</text>
+    <text x="850" y="250" fill="#5C757A">3. Analysis &amp; Modeling</text>
+    <text x="1250" y="250" fill="#4F5D46">4. Outputs &amp; Insights</text>
+  </g>
+  <g stroke="#4F5D46" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M350 241 H425"/><path d="M410 228 L428 241 L410 254"/>
+    <path d="M720 241 H790"/><path d="M775 228 L793 241 L775 254"/>
+    <path d="M1145 241 H1210"/><path d="M1195 228 L1213 241 L1195 254"/>
+  </g>
+
+  <g id="sources" transform="translate(70 285)">
+    <g>
+      <rect width="305" height="126" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="18" width="82" height="90" rx="13" fill="#E9E2D8"/>
+      <path d="M44 62 l34 -28 l20 24 l-34 28Z M68 36 l14 -12 M86 57 l16 -12 M40 76 l-12 20 M69 86 l-7 22" stroke="#4F5D46" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <text x="124" y="52" class="card-title">Satellite imagery</text>
+      <text x="124" y="84" class="body">Sentinel / Landsat /</text>
+      <text x="124" y="108" class="body">public EO</text>
+    </g>
+    <g transform="translate(0 146)">
+      <rect width="305" height="126" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="18" width="82" height="90" rx="13" fill="#E9E2D8"/>
+      <path d="M35 82 C48 62 74 62 88 82 M29 94 C48 72 78 72 96 94 M24 105 C49 82 82 82 104 105" stroke="#4F5D46" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <text x="124" y="52" class="card-title">Terrain &amp; access</text>
+      <text x="124" y="84" class="body">DEM, roads, parcels,</text>
+      <text x="124" y="108" class="body">facilities</text>
+    </g>
+    <g transform="translate(0 292)">
+      <rect width="305" height="126" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="18" width="82" height="90" rx="13" fill="#E9E2D8"/>
+      <path d="M44 74 C44 57 58 47 72 54 C82 38 105 49 103 69 C116 70 119 91 101 92 H47 C31 92 30 76 44 74Z M54 34 v-12 M76 31 l6 -11 M98 39 l11 -8 M46 105 l-5 12 M72 105 l-5 12 M98 105 l-5 12" stroke="#4F5D46" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <text x="124" y="52" class="card-title">Weather context</text>
+      <text x="124" y="84" class="body">NOAA and</text>
+      <text x="124" y="108" class="body">local conditions</text>
+    </g>
+    <g transform="translate(0 438)">
+      <rect width="305" height="126" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="18" width="82" height="90" rx="13" fill="#E9E2D8"/>
+      <path d="M48 32 H82 L99 49 V95 H48Z M82 32 V50 H99 M58 62 H86 M58 76 H90" stroke="#4F5D46" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="124" y="52" class="card-title">Project evidence</text>
+      <text x="124" y="84" class="body">Run logs, notes,</text>
+      <text x="124" y="108" class="body">documents</text>
+    </g>
+    <path d="M318 64 C350 64 352 105 352 130 V434 C352 462 348 494 318 494" stroke="#4F5D46" stroke-width="3" fill="none"/>
+    <path d="M348 280 H392" stroke="#4F5D46" stroke-width="3"/>
+    <path d="M377 267 L395 280 L377 293" stroke="#4F5D46" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <g id="processing" transform="translate(430 285)">
+    <rect width="300" height="270" rx="17" fill="#FFFDF8" stroke="#CB7A5C" stroke-width="2"/>
+    <rect x="22" y="25" width="76" height="76" rx="14" fill="#F3DED4"/>
+    <path d="M60 45 v-12 M60 93 v-12 M36 69 H24 M96 69 H84 M43 52 l-9 -9 M85 86 l-9 -9 M43 86 l-9 9 M85 52 l9 -9 M60 55 a14 14 0 1 0 0 28 a14 14 0 1 0 0 -28" stroke="#CB7A5C" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <text x="125" y="68" class="serif" font-size="28" font-weight="700" fill="#CB7A5C">Preprocess</text>
+    <line x1="125" y1="98" x2="272" y2="98" stroke="#E7BBA8" stroke-width="2"/>
+    <g class="body" fill="#2F3F42">
+      <circle cx="42" cy="145" r="11" fill="none" stroke="#CB7A5C" stroke-width="3"/><path d="M36 144 l5 5 l9 -11" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="66" y="151">Clean inputs</text>
+      <circle cx="42" cy="195" r="11" fill="none" stroke="#CB7A5C" stroke-width="3"/><path d="M36 194 l5 5 l9 -11" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="66" y="201">Normalize layers</text>
+      <circle cx="42" cy="245" r="11" fill="none" stroke="#CB7A5C" stroke-width="3"/><path d="M36 244 l5 5 l9 -11" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="66" y="251">Document provenance</text>
+    </g>
+    <rect y="292" width="300" height="270" rx="17" fill="#FFFDF8" stroke="#CB7A5C" stroke-width="2"/>
+    <rect x="22" y="317" width="76" height="76" rx="14" fill="#F3DED4"/>
+    <path d="M36 350 L60 338 L84 350 L60 362Z M36 370 L60 382 L84 370 M36 390 L60 402 L84 390" stroke="#CB7A5C" stroke-width="4" fill="none" stroke-linejoin="round"/>
+    <text x="125" y="360" class="serif" font-size="28" font-weight="700" fill="#CB7A5C">Engineer features</text>
+    <line x1="125" y1="390" x2="272" y2="390" stroke="#E7BBA8" stroke-width="2"/>
+    <g class="body" fill="#2F3F42">
+      <circle cx="42" cy="437" r="11" fill="none" stroke="#CB7A5C" stroke-width="3"/><path d="M36 436 l5 5 l9 -11" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="66" y="443">Vegetation signals</text>
+      <circle cx="42" cy="487" r="11" fill="none" stroke="#CB7A5C" stroke-width="3"/><path d="M36 486 l5 5 l9 -11" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="66" y="493">Topographic context</text>
+      <circle cx="42" cy="537" r="11" fill="none" stroke="#CB7A5C" stroke-width="3"/><path d="M36 536 l5 5 l9 -11" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="66" y="543">Spatial grouping</text>
+    </g>
+    <path d="M315 283 H360" stroke="#CB7A5C" stroke-width="3"/>
+    <path d="M345 270 L363 283 L345 296" stroke="#CB7A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <g id="analysis" transform="translate(790 285)">
+    <rect width="360" height="562" rx="17" fill="#FFFDF8" stroke="#5C757A" stroke-width="2.5"/>
+    <rect x="20" y="20" width="320" height="245" rx="13" fill="#E9E2D8" stroke="#C7CDBF"/>
+    <path d="M20 75 C80 30 130 80 180 48 C230 18 280 42 340 28 V265 H20Z" fill="#C7CDBF"/>
+    <path d="M20 160 C80 130 125 170 174 138 C220 110 285 132 340 96 V265 H20Z" fill="#757F64" opacity=".65"/>
+    <path d="M90 205 C130 152 175 142 215 166 C250 186 275 220 314 218 V265 H80Z" fill="#CB7A5C" opacity=".74"/>
+    <path d="M235 20 C260 85 292 134 340 162 V265 H260 C230 210 222 118 235 20Z" fill="#5C757A" opacity=".68"/>
+    <path d="M32 52 C92 92 86 145 122 191 M156 40 C150 104 180 160 170 235 M222 44 C214 100 240 136 228 228 M50 225 C110 200 154 228 205 202 C256 176 292 200 330 172" stroke="#F8F5EE" stroke-width="2" fill="none" opacity=".72"/>
+    <rect x="20" y="286" width="320" height="116" rx="14" fill="#FFFDF8" stroke="#5C757A" stroke-width="1.6"/>
+    <circle cx="65" cy="344" r="35" fill="#5C757A"/>
+    <path d="M48 347 L62 333 L77 351 L93 326 M48 347 L77 351 M62 333 L93 326" stroke="#F8F5EE" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="48" cy="347" r="5" fill="#F8F5EE"/><circle cx="62" cy="333" r="5" fill="#F8F5EE"/><circle cx="77" cy="351" r="5" fill="#F8F5EE"/><circle cx="93" cy="326" r="5" fill="#F8F5EE"/>
+    <text x="112" y="334" class="card-title" fill="#5C757A">Machine learning</text>
+    <text x="112" y="365" class="body">Classification, clustering,</text>
+    <text x="112" y="389" class="body">evaluation</text>
+    <rect x="20" y="422" width="320" height="116" rx="14" fill="#FFFDF8" stroke="#5C757A" stroke-width="1.6"/>
+    <circle cx="65" cy="480" r="35" fill="#5C757A"/>
+    <circle cx="65" cy="464" r="12" stroke="#F8F5EE" stroke-width="4" fill="none"/><path d="M42 505 C46 485 84 485 88 505" stroke="#F8F5EE" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <text x="112" y="470" class="card-title" fill="#5C757A">Human review</text>
+    <text x="112" y="501" class="body">Scope, fit-for-use,</text>
+    <text x="112" y="525" class="body">evidence checks</text>
+    <path d="M382 280 H430" stroke="#5C757A" stroke-width="3"/>
+    <path d="M415 267 L433 280 L415 293" stroke="#5C757A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <g id="outputs" transform="translate(1210 285)">
+    <g>
+      <rect width="305" height="132" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="20" width="82" height="92" rx="13" fill="#E9E2D8"/>
+      <path d="M40 40 V95 M60 40 V95 M80 40 V95 M35 66 H95 M62 60 l14 -14 M62 60 l14 14" stroke="#4F5D46" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <text x="124" y="58" class="card-title">Planning map</text>
+      <text x="124" y="91" class="body">Bounded</text><text x="124" y="115" class="body">geospatial view</text>
+    </g>
+    <g transform="translate(0 148)">
+      <rect width="305" height="132" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="20" width="82" height="92" rx="13" fill="#E9E2D8"/>
+      <circle cx="61" cy="66" r="28" fill="#C7CDBF"/><path d="M61 38 A28 28 0 0 1 88 76 L61 66Z" fill="#CB7A5C"/><path d="M61 66 L42 88 A28 28 0 0 1 35 55Z" fill="#757F64"/><circle cx="61" cy="66" r="15" fill="#FFFDF8"/>
+      <text x="124" y="58" class="card-title">Pattern summary</text>
+      <text x="124" y="91" class="body">Clusters, risk,</text><text x="124" y="115" class="body">and context</text>
+    </g>
+    <g transform="translate(0 296)">
+      <rect width="305" height="132" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="20" width="82" height="92" rx="13" fill="#E9E2D8"/>
+      <path d="M62 35 L92 48 V70 C92 92 78 104 62 112 C46 104 32 92 32 70 V48Z M48 72 l10 10 l20 -25" stroke="#4F5D46" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="124" y="58" class="card-title">QA receipt</text>
+      <text x="124" y="91" class="body">Scope, checks,</text><text x="124" y="115" class="body">limitations</text>
+    </g>
+    <g transform="translate(0 444)">
+      <rect width="305" height="132" rx="15" fill="#FFFDF8" stroke="#AEB5A6" stroke-width="2"/>
+      <rect x="20" y="20" width="82" height="92" rx="13" fill="#5C757A"/>
+      <path d="M48 38 H78 L92 52 V98 H48Z M78 38 V54 H92 M58 68 H82 M58 82 H86" stroke="#FFFDF8" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="124" y="58" class="card-title" fill="#5C757A">Portfolio artifact</text>
+      <text x="124" y="91" class="body">Public-safe</text><text x="124" y="115" class="body">explanation</text>
+    </g>
+  </g>
+
+  <line x1="70" y1="875" x2="1530" y2="875" stroke="#C7CDBF" stroke-width="2"/>
+  <g class="body" transform="translate(170 915)">
+    <path d="M0 0 H70" stroke="#4F5D46" stroke-width="4"/><path d="M55 -12 L72 0 L55 12" stroke="#4F5D46" stroke-width="4" fill="none" stroke-linecap="round"/><text x="95" y="7">Data flow</text>
+    <circle cx="420" cy="0" r="16" fill="#C7CDBF"/><text x="455" y="7">Data layer</text>
+    <circle cx="735" cy="0" r="16" fill="#CB7A5C"/><text x="770" y="7">Model output</text>
+    <circle cx="1070" cy="0" r="16" fill="#5C757A"/><text x="1105" y="7">Reviewed artifact</text>
+  </g>
+</svg>
