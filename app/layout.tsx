@@ -4,32 +4,32 @@ import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://burnlensproject.org"),
-  title: "BurnLens | Wildfire planning support for resilient communities",
+  title: "BurnLens Deschutes | Experimental CV + GEOINT portfolio project",
   description:
-    "BurnLens is a public-interest wildfire planning initiative that turns satellite imagery and authoritative fire information into planning-ready maps, memos, and screening materials for local resilience work.",
-  applicationName: "BurnLens",
+    "BurnLens Deschutes is an experimental, portfolio-first computer vision and GEOINT wildfire-screening project for Deschutes County, Oregon, with documented boundaries, traceability, and official-source precedence.",
+  applicationName: "BurnLens Deschutes",
   keywords: [
-    "BurnLens",
-    "wildfire planning",
-    "community resilience",
-    "evacuation access",
-    "geospatial AI",
-    "Deschutes County",
+    "BurnLens Deschutes",
+    "computer vision portfolio",
+    "GEOINT portfolio",
     "wildfire screening",
+    "experimental geospatial workflow",
+    "Deschutes County",
+    "source precedence",
   ],
   openGraph: {
-    title: "BurnLens",
+    title: "BurnLens Deschutes",
     description:
-      "Wildfire planning support for resilient communities through planning-ready maps, memos, and review materials.",
+      "Experimental CV + GEOINT portfolio work for wildfire-related screening, with transparent limitations and official-source precedence.",
     url: "https://burnlensproject.org",
-    siteName: "BurnLens",
+    siteName: "BurnLens Deschutes",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BurnLens",
+    title: "BurnLens Deschutes",
     description:
-      "Wildfire planning support for resilient communities through planning-ready maps, memos, and review materials.",
+      "Experimental CV + GEOINT portfolio work with transparent limitations. Not official wildfire information or emergency guidance.",
   },
   alternates: {
     canonical: "https://burnlensproject.org",
