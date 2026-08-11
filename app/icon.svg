@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Drew Baker portfolio mark</title>
+  <rect width="64" height="64" rx="7" fill="#E9E2D8"/>
+  <path d="M13 12h18c12 0 20 7.7 20 20s-8 20-20 20H13V12Zm12 10v20h5.4c5.8 0 9.1-3.6 9.1-10s-3.3-10-9.1-10H25Z" fill="#222222"/>
+  <path d="M13 54h38" stroke="#CB7A5C" stroke-width="4"/>
+</svg>

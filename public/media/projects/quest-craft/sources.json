@@ -1,0 +1,24 @@
+{
+  "project": "Quest Craft",
+  "source_boundary": {
+    "review_snapshot_commit": "bc14c43840aabb11ca35e94df0c8682672f24f3c",
+    "review_snapshot_tree": "01d7e8a0051d4b226e8e0232b5e4ab8f87105964",
+    "note": "The public reviewer snapshot supports factual claims only. No source code, favicon, social art, Lovable mark, private implementation material, or third-party asset was copied."
+  },
+  "assets": [
+    {
+      "path": "/media/projects/quest-craft/social-preview.jpg",
+      "kind": "portfolio-native social preview",
+      "created_at_utc": "2026-08-09T05:07:00Z",
+      "generation_tool": "OpenAI built-in image generation",
+      "generation_mode": "single original generation followed by local 1200-by-630 JPEG optimization",
+      "prompt_summary": "Scandinavian editorial cut-paper score: one slate-teal input branches into three terracotta and pale-sage narrative ribbons above a separate dark-olive authority rail, with exact Quest Craft title and case-study line.",
+      "reuse_basis": "Owner-directed original portfolio asset generated for this local case study; no source-project or third-party visual asset was supplied or reproduced.",
+      "sha256": "1ca659804462c6d4036408061f7c0e1ccbe32da4246085c44c958c48ccc23f5a",
+      "bytes": 146283,
+      "width": 1200,
+      "height": 630,
+      "alt": "Quest Craft editorial social card: one slate-teal input branches into three paper ribbons above a separate olive authority rail, with the line The story branches. Authority does not."
+    }
+  ]
+}

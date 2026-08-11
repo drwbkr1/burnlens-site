@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "project": "Runbook Sentinel",
+  "source_repository": "https://github.com/drwbkr1/runbook-sentinel",
+  "source_commit": "f149ac2408f30b504b78844780b8533bed2ebfdc",
+  "release_tag": "v0.0.20",
+  "reuse_boundary": "Owner-directed reuse in Drew Baker's personal portfolio; the source repository has no top-level license, so this manifest does not grant general reuse rights.",
+  "assets": [
+    {
+      "path": "/media/projects/runbook-sentinel/dashboard-baseline-0020.png",
+      "source_path": "artifacts/verification/dashboard-baseline-0020.png",
+      "sha256": "66f153bac21c2ce5f5b287115c162e9122a66253be59222dd0195332aa25c80c",
+      "bytes": 78862,
+      "author": "Drew Baker / Runbook Sentinel project",
+      "reuse_basis": "Owner-directed reuse in Drew Baker's personal portfolio; source repository has no top-level license",
+      "alt": "Runbook Sentinel baseline 0020 dashboard showing evaluation pass, exact coverage metrics, an authenticated external-operator boundary, and disconnected real infrastructure.",
+      "captured_at": "2026-08-08",
+      "status": "approved_for_local_portfolio_build"
+    }
+  ],
+  "evidence_sources": [
+    {
+      "source_path": "artifacts/evaluations/latest.json",
+      "bytes": 565269,
+      "sha256": "06817fabc90471d84ac36a38e96208d7554d07355398a5213072c0ae57a19221",
+      "use": "Selected baseline-0020 scenario, attempt, trajectory, terminal-state, retrieval, and trace claims; source is linked, not copied into the portfolio."
+    },
+    {
+      "source_path": "artifacts/evaluations/baseline-0018-model-comparison.json",
+      "bytes": 4791,
+      "sha256": "c083941704093872600779672b9acef53cefad114567d3de99624b33dd53b0a0",
+      "use": "Rejected local-model comparison claims; source is linked, not copied into the portfolio."
+    },
+    {
+      "source_path": "artifacts/evaluations/runs/baseline-0020-attempt-003.traces.jsonl",
+      "bytes": 117234,
+      "sha256": "475775862fcc73bd2a603d8c5dbf42bc7b3233ad7b4253be47af5b6c8297d5cb",
+      "use": "Hash-chain and 165-event trace claim; source is linked, not copied into the portfolio."
+    },
+    {
+      "source_path": "artifacts/verification/trace-integrity-gap-baseline-0016.json",
+      "bytes": 2589,
+      "sha256": "53481206d8817daabc8cf9a638509bcb3a9eb09833f205f75689ff1e86636f2a",
+      "use": "Retained pre-change trace-mutation failure and selected integrity-contract causality; source is linked, not copied into the portfolio."
+    },
+    {
+      "source_path": "artifacts/verification/action-split-gap-baseline-0020.json",
+      "bytes": 1780,
+      "sha256": "c80e09fdf0b6d34c1bd3f76011d556187f449775b1b781c38c906dbca52c8263",
+      "use": "Retained 5-of-6 action-and-split coverage gap and selected held-out rollback correction; source is linked, not copied into the portfolio."
+    }
+  ]
+}

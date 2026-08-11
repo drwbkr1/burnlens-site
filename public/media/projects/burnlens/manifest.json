@@ -1,0 +1,79 @@
+{
+  "manifest_version": "nordic-field-atlas-media-v1",
+  "manifest_id": "NFA-BURNLENS-MEDIA-2026-001",
+  "copied_at_utc": "2026-08-09T02:35:23.2217627Z",
+  "project": {
+    "name": "BurnLens Deschutes",
+    "repository": "drwbkr1/burnlens-deschutes",
+    "source_commit": "a741111d82e69689022d2058118ed8f4b9bf3546",
+    "release_tag": "v0.56.0-baseline-first-portfolio-release"
+  },
+  "reuse_basis": "Exact repository-owned public evidence bytes copied at the owner's direction for the owner's personal portfolio. BurnLens-owned composition is reused under the repository MIT license; underlying third-party data and derived artifacts retain their separate notices and terms.",
+  "license": {
+    "spdx": "MIT",
+    "copyright": "Copyright (c) 2026 Drew Baker",
+    "notice_path": "/media/projects/burnlens/LICENSE.txt",
+    "scope_note": "The MIT license covers BurnLens-owned software and documentation. It does not replace the terms or attribution requirements of underlying Copernicus, USGS, USDA Forest Service, or MTBS source material."
+  },
+  "required_attributions": [
+    "Contains modified Copernicus Sentinel data 2019.",
+    "Map services and data available from U.S. Geological Survey, National Geospatial Program.",
+    "Monitoring Trends in Burn Severity (MTBS), U.S. Geological Survey and USDA Forest Service."
+  ],
+  "mandatory_warning": "Experimental BurnLens CV output. Not official wildfire information. Not emergency guidance. Not evacuation, routing, tactical, or incident-command support. Official sources govern.",
+  "evidence_sources": [
+    {
+      "source_path": "samples/runs/phase-four/burnlens-ward-creek-rbr-run-v0.1.0/REPORT.md",
+      "bytes": 868,
+      "sha256": "3ff7e93ca34ddd1554494ad5cedec1ca245e32e8554449a0e594e0399923b867",
+      "use": "Model-value-gate and Ward Creek official-context mismatch claims; source is linked, not copied into the portfolio."
+    },
+    {
+      "source_path": "records/phase-five/failure-injections/PHASE-FIVE-FAILURE-INJECTION-RECORD-2026-001.json",
+      "bytes": 7104,
+      "sha256": "c5ff046ebd864751bb0fac9d160331d6ee4fcb505619af036fdbeae7b216c835",
+      "use": "Package-validator failure, remediation, and controlled R002 rejection claims; source is linked, not copied into the portfolio."
+    }
+  ],
+  "entries": [
+    {
+      "public_path": "/media/projects/burnlens/ward-creek-overlay.png",
+      "source_path": "site/public/evidence/ward-creek/overlay-quicklook.png",
+      "canonical_source_path": "samples/runs/phase-four/burnlens-ward-creek-rbr-run-v0.1.0/evidence/u05-overlay/run/OVERLAY-QUICKLOOK.png",
+      "source_manifest_id": "BURNLENS-SITES-EVIDENCE-MANIFEST-2026-001",
+      "source_sha256": "4764170a7c45659e1b3038a512c6344f769972fbe6dbd16ee04811366539d6b1",
+      "copied_sha256": "4764170a7c45659e1b3038a512c6344f769972fbe6dbd16ee04811366539d6b1",
+      "bytes": 99654,
+      "width": 1600,
+      "height": 1000,
+      "alt": "Ward Creek evidence plate mapping two accepted relative-burn-ratio footprints against bounded MTBS, road, facility, and BLM context; WCP-002 has zero percent MTBS overlap and is retained as false-positive-risk evidence.",
+      "reuse_basis": "Exact first-party public evidence copy; source and destination SHA-256 match."
+    },
+    {
+      "public_path": "/media/projects/burnlens/baseline-evaluation.png",
+      "source_path": "site/public/evidence/baseline/evaluation.png",
+      "canonical_source_path": "samples/baselines/burnlens-baseline-v0.1.0/BASELINE-EVALUATION-2026-001.png",
+      "source_manifest_id": "BURNLENS-SITES-EVIDENCE-MANIFEST-2026-001",
+      "source_sha256": "49bf3686fd7b109572fcbff8abb8e35d7d9054c7b2dd9e26e70cc26975700060",
+      "copied_sha256": "49bf3686fd7b109572fcbff8abb8e35d7d9054c7b2dd9e26e70cc26975700060",
+      "bytes": 169275,
+      "width": 1800,
+      "height": 1180,
+      "alt": "BurnLens non-model baseline evaluation plate showing four selected test-core examples and the bounded result: event-class Dice and IoU of 1.000 under one sealed test opening.",
+      "reuse_basis": "Exact first-party public evidence copy; source and destination SHA-256 match."
+    },
+    {
+      "public_path": "/media/projects/burnlens/model-decision.png",
+      "source_path": "site/public/evidence/model/evaluation.png",
+      "canonical_source_path": "samples/model-packages/burnlens-unet-binary-v0.1.0/PHASE-THREE-MODEL-DECISION.png",
+      "source_manifest_id": "BURNLENS-SITES-EVIDENCE-MANIFEST-2026-001",
+      "source_sha256": "7ff4065232ebe72740ce9e80726748d6cc4e4a7d593aa6bd9e491c39af9e9c08",
+      "copied_sha256": "7ff4065232ebe72740ce9e80726748d6cc4e4a7d593aa6bd9e491c39af9e9c08",
+      "bytes": 79512,
+      "width": 1800,
+      "height": 1120,
+      "alt": "Phase Three decision plate comparing model Dice 0.299 with relative-burn-ratio Dice 1.000 and recording the decision to reject the model as the analytical winner.",
+      "reuse_basis": "Exact first-party public evidence copy; source and destination SHA-256 match."
+    }
+  ]
+}

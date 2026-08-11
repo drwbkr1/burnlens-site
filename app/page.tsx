@@ -1,646 +1,286 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
 
-import { FormEvent, useMemo, useState } from "react";
+import { EvidenceSpine } from "@/components/editorial/EvidenceSpine";
+import { HistoricalCourseworkShelf } from "@/components/editorial/HistoricalCourseworkShelf";
+import { projects } from "@/content/projects";
+import { getSiteOrigin } from "@/lib/site-origin";
 
-type FormState = {
-  name: string;
-  email: string;
-  organization: string;
-  message: string;
+const burnlens = projects.burnlens;
+const runbook = projects.runbookSentinel;
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "William (Drew) Baker",
+  url: getSiteOrigin(),
+  sameAs: [
+    "https://github.com/drwbkr1",
+    "https://www.linkedin.com/in/william-baker-843946162/",
+  ],
+  knowsAbout: [
+    "software engineering",
+    "geospatial analysis",
+    "machine learning evaluation",
+    "climate risk",
+    "energy data governance",
+  ],
 };
 
-type Status = "idle" | "sending" | "success" | "fallback" | "error";
-
-const initialForm: FormState = {
-  name: "",
-  email: "",
-  organization: "",
-  message: "",
-};
-
-const workflow = [
-  [
-    "Frame the geography",
-    "Start with one community-and-corridor area where wildfire relevance, access constraints, and planning value are easy to see.",
-  ],
-  [
-    "Layer current context",
-    "Combine current satellite imagery, authoritative fire information, and local planning overlays into one bounded screening stack.",
-  ],
-  [
-    "Review access and exposure",
-    "Look at routes, facilities, parcels, and constraints together so local partners can discuss the full picture at once.",
-  ],
-  [
-    "Share a usable package",
-    "Deliver a map, memo, provenance, and confidence language that can move into a meeting without specialist translation.",
-  ],
-] as const;
-
-const outputs = [
-  "Annotated map for planning review",
-  "GIS-ready raster and vector outputs",
-  "Plain-language decision-support memo",
-  "Metadata and provenance sheet",
-  "Confidence and limitations note",
-  "Use boundaries and source precedence notes",
-];
-
-const timeline = [
-  ["Current", "Pre-development"],
-  ["Weeks 1–2", "Phase 0 setup"],
-  ["Weeks 3–6", "Phase 0 build"],
-  ["Weeks 7–9", "Refinement"],
-  ["Weeks 10–12", "Review"],
-  ["Decision", "Continuation gate"],
-  ["Next", "Phase 1"],
-] as const;
-
-const certifications = [
-  "Imperial College London — Linear Algebra / Multivariate Calculus",
-  "Kaggle — Machine Learning / Feature Engineering",
-  "MIMO — Python AI Development Professional Certificate",
-] as const;
-
-const leadershipRoles = [
-  "SSI Assistant Scuba Instructor, 2019",
-  "Founder, Ball State eSports, 2016",
-  "Promotions Officer, Electronic Gaming League, 2016",
-  "Eagle Scout Award, 2011",
-] as const;
-
-const resumeHighlights = [
-  [
-    "Graduate focus",
-    "M.S. student in AI and ML at Purdue with emphasis on image recognition, forecasting, distributed control, and ethical AI.",
-  ],
-  [
-    "Applied AI work",
-    "Gen AI Associate evaluating prompt and response quality across large-scale model-improvement projects.",
-  ],
-  [
-    "Translation strength",
-    "Technical writer experienced in turning complex technology and energy topics into accessible public-facing content.",
-  ],
-] as const;
-
-export default function BurnLensLandingPage() {
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "";
-  const [form, setForm] = useState<FormState>(initialForm);
-  const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const submitLabel = useMemo(() => {
-    if (status === "sending") return "Sending...";
-    if (status === "success") return "Message sent";
-    if (status === "fallback") return "Email draft ready";
-    return "Start a conversation";
-  }, [status]);
-
-  const handleChange = (field: keyof FormState, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    if (status !== "idle") {
-      setStatus("idle");
-      setErrorMessage("");
-    }
-  };
-
-  const openMailFallback = () => {
-    if (!contactEmail || typeof window === "undefined") return false;
-
-    const subject = encodeURIComponent(`BurnLens inquiry from ${form.name || "Website visitor"}`);
-    const body = encodeURIComponent(
-      [
-        `Name: ${form.name || ""}`,
-        `Email: ${form.email || ""}`,
-        `Organization: ${form.organization || "Not provided"}`,
-        "",
-        "Message:",
-        form.message || "",
-      ].join("\n")
-    );
-
-    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
-    return true;
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setStatus("sending");
-    setErrorMessage("");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const payload = (await response.json()) as { error?: string };
-      if (!response.ok) {
-        const normalized = payload.error?.toLowerCase() || "";
-        const shouldFallback =
-          !!contactEmail &&
-          (response.status >= 500 ||
-            normalized.includes("not configured") ||
-            normalized.includes("provider"));
-
-        if (shouldFallback && openMailFallback()) {
-          setStatus("fallback");
-          return;
-        }
-
-        throw new Error(payload.error || "The form could not be submitted.");
-      }
-
-      setStatus("success");
-      setForm(initialForm);
-    } catch (error) {
-      if (contactEmail && openMailFallback()) {
-        setStatus("fallback");
-        return;
-      }
-
-      setStatus("error");
-      setErrorMessage(
-        error instanceof Error ? error.message : "Something went wrong while sending your inquiry."
-      );
-    }
-  };
-
+function HeroPrinciple() {
   return (
-    <div className="min-h-screen bg-[#120b08] text-stone-100">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.13),transparent_22%),radial-gradient(circle_at_78%_10%,rgba(249,115,22,0.12),transparent_24%),radial-gradient(circle_at_50%_82%,rgba(239,68,68,0.09),transparent_22%),linear-gradient(180deg,#120b08_0%,#1a0f0b_48%,#120b08_100%)]" />
-      <div className="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:72px_72px] opacity-[0.05]" />
+    <>
+      <p className="plate-label">Field note 00 / working principle</p>
+      <EvidenceSpine
+        id="01"
+        claim="Useful systems should show their work."
+        evidence="Two released, inspectable flagships pair implementation with evaluation evidence."
+        boundary="No production, operational, or real-world authority claim without proof."
+      />
+      <p className="spine-note">
+        Claim, evidence, and boundary travel together throughout this portfolio.
+      </p>
+    </>
+  );
+}
 
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#120b08]/75 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <a href="#top" className="flex items-center gap-3 text-base font-semibold tracking-tight text-white">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-orange-200/20 bg-orange-200/10" />
-            BurnLens
-          </a>
-          <nav className="hidden gap-6 text-sm text-stone-300 md:flex">
-            {[
-              ["Why it matters", "#why"],
-              ["How it works", "#how"],
-              ["Timeline", "#timeline"],
-              ["Pilot", "#pilot"],
-              ["Founder", "#resume"],
-              ["Contact", "#contact"],
-            ].map(([label, href]) => (
-              <a key={label} href={href} className="transition hover:text-white">
-                {label}
-              </a>
-            ))}
-          </nav>
-        </div>
-      </header>
+export default function HomePage() {
+  return (
+    <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema).replace(/</g, "\\u003c") }}
+      />
 
-      <main id="top">
-        <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-          <div className="max-w-5xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-orange-200/20 bg-orange-200/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-orange-100">
-              Wildfire planning support
-            </div>
-            <h1 className="mt-6 max-w-5xl text-5xl font-semibold tracking-tight text-white md:text-7xl md:leading-[1.02]">
-              Clearer wildfire planning for stronger, more connected communities.
-            </h1>
-            <p className="mt-6 max-w-4xl text-lg leading-8 text-stone-300 md:text-xl">
-              BurnLens turns frequently updated satellite imagery and authoritative fire information
-              into planning-ready materials that help local partners screen evacuation access,
-              understand exposure, and coordinate with more confidence.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#contact"
-                className="rounded-2xl bg-amber-300 px-5 py-3 text-sm font-semibold text-black shadow-[0_20px_40px_rgba(251,191,36,0.16)] transition hover:-translate-y-0.5"
-              >
-                Start a conversation
-              </a>
-              <a
-                href="#pilot"
-                className="rounded-2xl border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/8"
-              >
-                See the pilot focus
-              </a>
-            </div>
+      <section className="hero shell" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <p className="eyebrow">Software systems · geospatial intelligence · energy &amp; risk</p>
+          <h1 id="hero-title">
+            I build evidence-bound systems <em>for uncertain terrain.</em>
+          </h1>
+          <p className="hero-deck">
+            I design and test software, geospatial workflows, and risk-aware decision tools—from
+            wildfire evidence to incident-agent safety and energy policy.
+          </p>
+          <div className="hero-actions" aria-label="Primary actions">
+            <a className="button button-primary" href="#selected-work">
+              Explore the work <span aria-hidden="true">↓</span>
+            </a>
+            <Link className="button button-secondary" href="/resume">
+              Read the résumé <span aria-hidden="true">↗</span>
+            </Link>
           </div>
-
-          <div className="mt-12 grid gap-4 sm:grid-cols-3">
-            {[
-              ["Pilot geography", "Deschutes County, Oregon"],
-              ["Primary task", "Evacuation-access and exposure screening"],
-              ["Delivery style", "File-first package for planning teams"],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.16)] backdrop-blur-sm"
-              >
-                <div className="text-[11px] uppercase tracking-[0.22em] text-stone-400">{label}</div>
-                <div className="mt-2 text-sm font-medium leading-6 text-white">{value}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="why" className="border-y border-white/10 bg-white/[0.025]">
-          <div className="mx-auto max-w-7xl px-6 py-20">
-            <div className="grid gap-10 md:grid-cols-[0.96fr_1.04fr]">
-              <div className="max-w-3xl">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-                  Why it matters
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-                  Built for the gap between wildfire data and usable local action.
-                </h2>
-                <p className="mt-6 text-base leading-8 text-stone-300">
-                  Public agencies and resilience partners can already access imagery, hazard layers,
-                  and fire information. What is often missing is a package that makes those inputs
-                  easier to interpret, circulate, and use in real planning conversations.
-                </p>
-                <p className="mt-4 text-base leading-8 text-stone-300">
-                  BurnLens is designed to make wildfire context more legible across people, not just
-                  across software. The goal is to help local teams align around a map, a memo, and a
-                  bounded understanding of what the product can and cannot support.
-                </p>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-2">
-                {[
-                  [
-                    "See the whole geography",
-                    "Access routes, parcels, facilities, and fire context appear together instead of across disconnected layers and tabs.",
-                  ],
-                  [
-                    "Brief with confidence",
-                    "The output is designed to move into meetings and planning discussions with provenance and caveats attached.",
-                  ],
-                  [
-                    "Support real coordination",
-                    "County, city, and resilience partners get something they can discuss together without bespoke technical translation.",
-                  ],
-                  [
-                    "Stay responsibly bounded",
-                    "Every package reinforces fit-for-use limits and defers to authoritative sources where they govern.",
-                  ],
-                ].map(([title, text]) => (
-                  <div
-                    key={title}
-                    className="rounded-[1.6rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.025] p-6 shadow-[0_20px_45px_rgba(0,0,0,0.14)]"
-                  >
-                    <div className="h-10 w-10 rounded-2xl border border-orange-200/20 bg-orange-200/10" />
-                    <h3 className="mt-4 text-xl font-semibold text-white">{title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-stone-300">{text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="how" className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-              How it works
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-              A calmer workflow for turning current fire context into something usable.
-            </h2>
-          </div>
-
-          <div className="mt-10 grid gap-6 xl:grid-cols-4">
-            {workflow.map(([title, text], index) => (
-              <div
-                key={title}
-                className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.16)] transition hover:-translate-y-1"
-              >
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-200/0 via-orange-200/70 to-red-200/0 opacity-80" />
-                <div className="text-sm font-semibold text-orange-100">0{index + 1}</div>
-                <h3 className="mt-4 text-xl font-semibold text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-7 text-stone-300">{text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="timeline" className="border-y border-white/10 bg-white/[0.03]">
-          <div className="mx-auto max-w-7xl px-6 py-16">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-                Timeline
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                Current stage and next steps.
-              </h2>
-              <p className="mt-4 text-base leading-8 text-stone-300">
-                BurnLens is moving through a bounded Phase 0 process: scoping, build, review, and a continuation gate before any broader phase.
-              </p>
-            </div>
-
-            <div className="mt-8 rounded-[1.6rem] border border-orange-200/15 bg-orange-300/10 px-5 py-4 text-sm leading-7 text-orange-50">
-              Current status: Pre-development — pilot scoping, reviewer outreach, fiscal sponsor outreach, and grant outreach.
-            </div>
-
-            <div className="mt-8 overflow-x-auto pb-2">
-              <div className="relative min-w-[860px] px-2 py-6">
-                <div className="absolute left-10 right-10 top-[2.25rem] h-px bg-gradient-to-r from-orange-200/30 via-orange-200/70 to-red-200/30" />
-                <div className="grid grid-cols-7 gap-3">
-                  {timeline.map(([timeframe, label], index) => (
-                    <div key={label} className="relative text-center">
-                      <div
-                        className={`mx-auto h-4 w-4 rounded-full border ${
-                          index === 0
-                            ? "border-amber-200 bg-amber-300 shadow-[0_0_16px_rgba(252,211,77,0.55)]"
-                            : "border-orange-200/40 bg-[#24130e]"
-                        }`}
-                      />
-                      <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3">
-                        <div className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
-                          {timeframe}
-                        </div>
-                        <div className="mt-2 text-sm font-medium leading-6 text-white">{label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="pilot" className="border-y border-white/10 bg-white/[0.03]">
-          <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 md:grid-cols-[0.95fr_1.05fr] md:py-24">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-                Pilot focus
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-                One defined geography. One real planning question.
-              </h2>
-              <p className="mt-6 text-base leading-8 text-stone-300">
-                The Phase 0 pilot is centered on one defined planning geography in Deschutes County,
-                Oregon. The goal is to test whether a planning-readable wildfire package improves
-                local review of evacuation-route exposure and access constraints enough to support a
-                county or city memo, briefing, or planning discussion.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {[
-                ["Pilot geography", "Deschutes County, Oregon"],
-                ["Primary task", "Evacuation-access and exposure screening"],
-                [
-                  "Review structure",
-                  "Planning or resilience reviewer plus a local fire or wildfire-planning reviewer",
-                ],
-                [
-                  "Current stage",
-                  "Pre-development: sponsor readiness, reviewer outreach, and pilot packaging",
-                ],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[1.7rem] border border-white/10 bg-[#1a100c]/95 p-6 shadow-[0_18px_45px_rgba(0,0,0,0.16)]"
-                >
-                  <div className="text-[11px] uppercase tracking-[0.22em] text-stone-400">
-                    {label}
-                  </div>
-                  <div className="mt-3 text-lg font-semibold leading-7 text-white">{value}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-          <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-[#18100d]/90 p-7">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-                    What partners receive
-                  </p>
-                  <h3 className="mt-2 text-2xl font-semibold text-white">
-                    A package built for review and meetings
-                  </h3>
-                </div>
-                <div className="rounded-full border border-orange-200/20 bg-orange-300/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-orange-50">
-                  Reviewable
-                </div>
-              </div>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {outputs.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-stone-200"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-amber-200/15 bg-amber-300/10 p-8 shadow-[0_22px_60px_rgba(0,0,0,0.16)]">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-amber-100/85">
-                Guardrails
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                Responsible use is part of the product, not a disclaimer added later.
-              </h2>
-              <div className="mt-5 space-y-3">
-                {[
-                  "Not incident command",
-                  "Not evacuation orders or emergency direction",
-                  "Not parcel-level enforcement",
-                  "Not a substitute for authoritative agency products",
-                ].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"
-                  >
-                    <span className="mt-2 h-2.5 w-2.5 rounded-full bg-amber-200" />
-                    <span className="text-sm leading-6 text-stone-100">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="resume" className="border-y border-white/10 bg-white/[0.025]">
-          <div className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-            <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr]">
-              <div className="max-w-3xl">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-                  Founder profile
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-                  Resume highlights behind BurnLens.
-                </h2>
-                <p className="mt-6 text-base leading-8 text-stone-300">
-                  BurnLens is led by William “Drew” Baker, a Purdue graduate student in AI and
-                  machine learning building toward geospatial AI, remote sensing, and practical
-                  decision-support workflows for resilience planning.
-                </p>
-                <p className="mt-4 text-base leading-8 text-stone-300">
-                  The background combines applied AI evaluation, technical writing, energy-sector
-                  literacy, project communication, and leadership experience from education,
-                  instruction, student organization building, and scouting.
-                </p>
-              </div>
-
-              <div className="grid gap-5">
-                <div className="grid gap-4 md:grid-cols-3">
-                  {resumeHighlights.map(([label, text]) => (
-                    <div
-                      key={label}
-                      className="rounded-[1.6rem] border border-white/10 bg-[#1a100c]/95 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.14)]"
-                    >
-                      <div className="text-[11px] uppercase tracking-[0.2em] text-stone-400">
-                        {label}
-                      </div>
-                      <p className="mt-3 text-sm leading-7 text-stone-200">{text}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div className="rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.025] p-6">
-                    <h3 className="text-xl font-semibold text-white">Certifications</h3>
-                    <div className="mt-5 space-y-3">
-                      {certifications.map((item) => (
-                        <div
-                          key={item}
-                          className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-stone-200"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.025] p-6">
-                    <h3 className="text-xl font-semibold text-white">Leadership roles</h3>
-                    <div className="mt-5 space-y-3">
-                      {leadershipRoles.map((item) => (
-                        <div
-                          key={item}
-                          className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-stone-200"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" className="border-t border-white/10 bg-white/[0.03]">
-          <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 md:grid-cols-[0.92fr_1.08fr] md:py-24">
+          <dl className="audience-ledger" aria-label="Areas of work">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-400">
-                Contact
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-                Interested in the pilot, review process, or sponsorship fit?
-              </h2>
-              <p className="mt-6 text-base leading-8 text-stone-300">
-                BurnLens welcomes conversations with county and city partners, resilience
-                organizations, prospective reviewers, and mission-aligned fiscal sponsors interested
-                in practical wildfire planning support.
-              </p>
-              <div className="mt-6 rounded-[1.6rem] border border-white/10 bg-[#1a100c]/95 p-5 text-sm leading-7 text-stone-300">
-                The contact form sends directly when configured. If email delivery is not configured
-                yet and an address is available, BurnLens will fall back to opening an email draft
-                so the conversation does not stall.
+              <dt>01 / Build</dt>
+              <dd>Software &amp; systems</dd>
+            </div>
+            <div>
+              <dt>02 / Observe</dt>
+              <dd>Climate &amp; geospatial</dd>
+            </div>
+            <div>
+              <dt>03 / Govern</dt>
+              <dd>Energy &amp; risk</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="hero-spine hero-spine-desktop">
+          <HeroPrinciple />
+        </div>
+
+        <details className="hero-principle-mobile">
+          <summary>
+            <span>Field note 00</span>
+            <strong>Inspect the working principle</strong>
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div className="hero-principle-panel">
+            <HeroPrinciple />
+          </div>
+        </details>
+      </section>
+
+      <section className="selected-work" id="selected-work" aria-labelledby="selected-title">
+        <div className="shell section-heading">
+          <div>
+            <p className="eyebrow">Selected work / 2026</p>
+            <h2 id="selected-title">Two systems. Different terrain. The same demand for proof.</h2>
+          </div>
+          <p>
+            Each case study begins with the decision and works backward through evidence, tradeoffs,
+            and what the result does not establish.
+          </p>
+        </div>
+
+        <nav className="shell mobile-flagship-index" aria-label="Flagship case studies">
+          <Link href={burnlens.href}>
+            <span>01</span>
+            <strong>{burnlens.title}</strong>
+            <small>Baseline retained · model rejected</small>
+          </Link>
+          <Link href={runbook.href}>
+            <span>02</span>
+            <strong>{runbook.title}</strong>
+            <small>Authority separated · model excluded</small>
+          </Link>
+        </nav>
+
+        <div className="shell flagship-grid">
+          <article className="flagship flagship-burnlens" id="burnlens">
+            <Link className="flagship-media" href={burnlens.href} aria-label={`Read ${burnlens.title} case study`}>
+              <Image
+                src="/media/projects/burnlens/ward-creek-overlay.png"
+                alt="BurnLens Ward Creek evidence map with two bounded RBR footprints and official context."
+                fill
+                sizes="(max-width: 900px) 100vw, 52vw"
+              />
+              <span className="media-index">PLATE B.01</span>
+            </Link>
+            <div className="flagship-copy">
+              <div className="project-meta">
+                <span>Climate · computer vision · GEOINT</span>
+                <span>{burnlens.status}</span>
+              </div>
+              <h3>{burnlens.title}</h3>
+              <p className="project-thesis">{burnlens.thesis}</p>
+              <dl className="proof-line">
+                {burnlens.proof.map((item) => (
+                  <div key={item.label}>
+                    <dt>{item.label}</dt>
+                    <dd>{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="project-links">
+                <Link className="text-link" href={burnlens.href}>
+                  Read case study <span aria-hidden="true">→</span>
+                </Link>
+                <a className="quiet-link" href={burnlens.sourceHref} target="_blank" rel="noreferrer">
+                  Inspect source <span className="sr-only">(opens in a new tab)</span> ↗
+                </a>
               </div>
             </div>
+          </article>
 
-            <form
-              onSubmit={handleSubmit}
-              className="rounded-[2rem] border border-white/10 bg-[#150d0a]/95 p-6 shadow-[0_28px_70px_rgba(0,0,0,0.24)] md:p-7"
+          <article className="flagship flagship-runbook" id="runbook-sentinel">
+            <Link
+              className="flagship-media runbook-media"
+              href={runbook.href}
+              aria-label={`Read ${runbook.title} case study`}
             >
-              <div className="grid gap-5 md:grid-cols-2">
-                <label className="block text-sm text-stone-300">
-                  Name
-                  <input
-                    value={form.name}
-                    onChange={(event) => handleChange("name", event.target.value)}
-                    required
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-[#1c120e] px-4 py-3 text-white outline-none transition placeholder:text-stone-500 focus:border-orange-200/30 focus:bg-[#231610]"
-                    placeholder="Your name"
-                  />
-                </label>
-                <label className="block text-sm text-stone-300">
-                  Email
-                  <input
-                    value={form.email}
-                    onChange={(event) => handleChange("email", event.target.value)}
-                    required
-                    type="email"
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-[#1c120e] px-4 py-3 text-white outline-none transition placeholder:text-stone-500 focus:border-orange-200/30 focus:bg-[#231610]"
-                    placeholder="you@example.org"
-                  />
-                </label>
+              <Image
+                src="/media/projects/runbook-sentinel/dashboard-baseline-0020.png"
+                alt="Runbook Sentinel baseline 0020 dashboard showing evaluation pass, exact coverage metrics, an authenticated external-operator boundary, and disconnected real infrastructure."
+                fill
+                sizes="(max-width: 900px) 100vw, 48vw"
+              />
+              <span className="media-index">TRACE R.20</span>
+            </Link>
+            <div className="flagship-copy">
+              <div className="project-meta">
+                <span>Software · SRE safety · evaluation</span>
+                <span>{runbook.status}</span>
               </div>
-              <label className="mt-5 block text-sm text-stone-300">
-                Organization
-                <input
-                  value={form.organization}
-                  onChange={(event) => handleChange("organization", event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-[#1c120e] px-4 py-3 text-white outline-none transition placeholder:text-stone-500 focus:border-orange-200/30 focus:bg-[#231610]"
-                  placeholder="County, city, nonprofit, fiscal sponsor, or other"
-                />
-              </label>
-              <label className="mt-5 block text-sm text-stone-300">
-                Message
-                <textarea
-                  value={form.message}
-                  onChange={(event) => handleChange("message", event.target.value)}
-                  required
-                  className="mt-2 min-h-40 w-full rounded-2xl border border-white/10 bg-[#1c120e] px-4 py-3 text-white outline-none transition placeholder:text-stone-500 focus:border-orange-200/30 focus:bg-[#231610]"
-                  placeholder="Tell BurnLens what you are interested in exploring."
-                />
-              </label>
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                <button
-                  type="submit"
-                  disabled={status === "sending"}
-                  className="rounded-2xl bg-amber-300 px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {submitLabel}
-                </button>
-                {status === "success" && (
-                  <p className="text-sm text-emerald-200">
-                    Thanks. Your message was sent to the BurnLens inbox.
-                  </p>
-                )}
-                {status === "fallback" && (
-                  <p className="text-sm text-amber-100">
-                    Your email app should open with a draft so you can send the message directly.
-                  </p>
-                )}
-                {status === "error" && (
-                  <p className="text-sm text-red-200">{errorMessage}</p>
-                )}
+              <h3>{runbook.title}</h3>
+              <p className="project-thesis">{runbook.thesis}</p>
+              <dl className="proof-line">
+                {runbook.proof.map((item) => (
+                  <div key={item.label}>
+                    <dt>{item.label}</dt>
+                    <dd>{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="project-links">
+                <Link className="text-link" href={runbook.href}>
+                  Read case study <span aria-hidden="true">→</span>
+                </Link>
+                <a className="quiet-link" href={runbook.sourceHref} target="_blank" rel="noreferrer">
+                  Inspect v0.0.20 source <span className="sr-only">(opens in a new tab)</span> ↗
+                </a>
               </div>
-            </form>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 text-sm text-stone-400 md:flex-row md:items-center md:justify-between">
-          <div className="font-medium text-stone-200">BurnLens</div>
-          <div>Public-interest wildfire planning support for local resilience work.</div>
+            </div>
+          </article>
         </div>
-      </footer>
-    </div>
+      </section>
+
+      <section className="method-section shell" aria-labelledby="method-title">
+        <div className="method-intro">
+          <p className="eyebrow">Working method</p>
+          <h2 id="method-title">Source. Bound. Build. Test. Explain.</h2>
+          <p>
+            I am interested in the part after the demo: what the system can actually support, how it
+            fails, and whether another person can inspect the path to the result.
+          </p>
+        </div>
+        <ol className="method-list">
+          <li><span>01</span><strong>Source</strong><p>Establish provenance, rights, and the exact question.</p></li>
+          <li><span>02</span><strong>Bound</strong><p>Separate evidence, authority, and uncertainty.</p></li>
+          <li><span>03</span><strong>Build</strong><p>Prefer inspectable components and deterministic behavior.</p></li>
+          <li><span>04</span><strong>Test</strong><p>Keep failures, held-out checks, and release evidence visible.</p></li>
+          <li><span>05</span><strong>Explain</strong><p>Design the artifact so technical and public audiences can review it.</p></li>
+        </ol>
+      </section>
+
+      <section className="secondary-section" aria-labelledby="secondary-title">
+        <div className="shell secondary-grid">
+          <div className="secondary-intro">
+            <p className="eyebrow">Adjacent evidence</p>
+            <h2 id="secondary-title">Interaction and governance need evidence too.</h2>
+            <p>
+              Supporting work stays concise until its authorship, rights, implementation, and
+              evaluation can carry a designed case study. These two cleared that bar narrowly.
+            </p>
+          </div>
+          <div className="secondary-list">
+            {projects.secondary.map((project, index) => (
+              <article className="secondary-item" key={project.title}>
+                <span className="item-number">0{index + 1}</span>
+                <div>
+                  <p className="project-kind">{project.kind}</p>
+                  <h3>{project.title}</h3>
+                  <p>{project.thesis}</p>
+                </div>
+                {project.href ? (
+                  <Link href={project.href} aria-label={`Read the ${project.title} case study`}>
+                    Read <span aria-hidden="true">→</span>
+                  </Link>
+                ) : (
+                  <a
+                    href={project.sourceHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Open ${project.title} review evidence in a new tab`}
+                  >
+                    Inspect <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="coursework-shelf-section">
+        <HistoricalCourseworkShelf className="shell" />
+      </div>
+
+      <section className="closing shell" aria-labelledby="closing-title">
+        <p className="plate-label">Next question / collaboration</p>
+        <h2 id="closing-title">Need someone who is comfortable making the limits visible?</h2>
+        <p>
+          I am interested in software, energy, and climate work where reliability and clear technical
+          communication matter as much as the first result.
+        </p>
+        <div className="hero-actions">
+          <Link className="button button-primary" href="/resume">Review the résumé</Link>
+          <a className="button button-secondary" href="https://www.linkedin.com/in/william-baker-843946162/" target="_blank" rel="noreferrer">
+            Connect on LinkedIn <span className="sr-only">(opens in a new tab)</span> ↗
+          </a>
+        </div>
+      </section>
+    </main>
   );
 }

@@ -1,0 +1,57 @@
+.spine {
+  margin: 0;
+  border-top: 2px solid var(--rb-ink);
+}
+
+.spine > div {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(1.15rem, 2.6vw, 1.8rem) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--rb-ink) 32%, transparent);
+}
+
+.spine dt {
+  padding-top: 0.16rem;
+  font-size: 0.75rem;
+  font-weight: 820;
+  letter-spacing: 0.12em;
+}
+
+.spine dd {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 1.55vw, 1.35rem);
+  line-height: 1.35;
+}
+
+.spine dd span {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 780;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.spine [data-kind="claim"] dt,
+.spine [data-kind="claim"] span {
+  color: var(--rb-teal-dark);
+}
+
+.spine [data-kind="evidence"] dt,
+.spine [data-kind="evidence"] span {
+  color: var(--rb-olive-dark);
+}
+
+.spine [data-kind="boundary"] dt,
+.spine [data-kind="boundary"] span {
+  color: var(--rb-clay-dark);
+}
+
+@media (max-width: 560px) {
+  .spine > div {
+    grid-template-columns: 3.2rem minmax(0, 1fr);
+  }
+}
