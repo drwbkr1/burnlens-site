@@ -1,6 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { EvidenceLink } from "@/components/editorial/EvidenceLink";
+import {
+  ProjectFactLedger,
+  type ProjectFact,
+} from "@/components/editorial/ProjectFactLedger";
+import {
+  getProject,
+  getPublicSourceHref,
+  getSupportedEvidence,
+  projectSurfacePlan,
+  targetSurfaceHierarchy,
+  toReaderFirst,
+  type NonEmpty,
+  type ProjectEvidence,
+  type ProjectId,
+  type PublicLinkSourceId,
+} from "@/content/project-model";
+import { historicalCoursework } from "@/content/projects";
 import { getSiteUrl } from "@/lib/site-origin";
+
 import { PrintButton } from "./print-button";
 import styles from "./resume.module.css";
 
@@ -22,68 +42,6 @@ const experience = [
       "Wrote and edited more than 300 technology articles, including energy and residential-solar explainers.",
       "Translated technical and energy topics into accessible material for broad, non-specialist audiences.",
     ],
-  },
-] as const;
-
-const projectEvidence = [
-  {
-    label: "Flagship case study",
-    title: "BurnLens — baseline-first wildfire evidence",
-    status: "Released research workflow",
-    description:
-      "Built a reproducible CV-to-GEOINT workflow for bounded wildfire-screening research. The recorded evaluation accepted the RBR baseline and rejected the U-Net candidate instead of hiding the weaker result.",
-    boundary:
-      "Experimental BurnLens CV output. Not official wildfire information. Not emergency guidance. Not evacuation, routing, tactical, or incident-command support. Official sources govern.",
-    href: "/work/burnlens",
-    linkLabel: "Read the BurnLens case study",
-  },
-  {
-    label: "Flagship case study",
-    title: "Runbook Sentinel",
-    status: "Synthetic safety testbed",
-    description:
-      "Built a deterministic incident-agent safety and reliability testbed with retrieval controls, stale-evidence handling, external approval boundaries, retained failures, and a synthetic executor.",
-    boundary:
-      "Synthetic SRE environment only; it does not connect to real infrastructure or establish production readiness.",
-    href: "/work/runbook-sentinel",
-    linkLabel: "Read the Runbook Sentinel case study",
-  },
-  {
-    label: "Historical coursework",
-    title: "Energy Sector Data Governance",
-    status: "Policy brief · December 2025",
-    description:
-      "A 14-page policy-writing sample by William Baker, retained for its research, risk framing, and documented revision process.",
-    boundary:
-      "Read as a December 2025 writing artifact—not current policy guidance. Agency terminology and time-sensitive claims require correction and fresh verification; no Adobe Stock or Canva imagery is reused here.",
-    href: "https://drive.google.com/file/d/18o2vmdDzz_FN9_Xm-xfBLw8TzlLBxqUU/view?usp=sharing",
-    linkLabel: "Read the public brief",
-  },
-  {
-    label: "Historical coursework",
-    title: "Hierarchical clustering exploration",
-    status: "Repository snapshot · 18 Aug 2025",
-    description:
-      "A public notebook exploration comparing HDBSCAN behavior under Jaccard, Euclidean, and Rogers–Tanimoto distance choices.",
-    boundary:
-      "Not a current reproducible study. The GitHub and Colab versions differ, the historical data source and environment are not reproducibly pinned, and saved outputs are not treated as verified results.",
-    href: "https://github.com/drwbkr1/Grad504-Hierarchical-Cluster-Project/tree/21e9b18b37a0e1acd9f2814cca3456b94849c098",
-    linkLabel: "Inspect the frozen repository snapshot",
-  },
-] as const;
-
-const skillGroups = [
-  {
-    label: "Software and applied AI",
-    text: "Python, model evaluation, LLM and RAG workflows, embeddings, ChromaDB, API and tool integration, prompt design, reproducible evidence.",
-  },
-  {
-    label: "Geospatial and Earth observation",
-    text: "GeoPandas, rioxarray, Google Earth Engine, STAC, Cloud Optimized GeoTIFFs, GIS programming, remote-sensing workflows.",
-  },
-  {
-    label: "Communication and governance",
-    text: "Technical writing, policy analysis, source review, stakeholder-facing documentation, explicit limitations and decision boundaries.",
   },
 ] as const;
 
@@ -109,10 +67,6 @@ const selectedLearning = [
     title: "Kaggle — Feature Engineering",
     href: "https://www.kaggle.com/learn/certification/drewbaker15/feature-engineering",
   },
-  {
-    title: "Mimo — Python Development",
-    href: "https://www.virtualbadge.io/certificate-validator?credential=309dfe20-7aec-47a8-a208-b4622bb1b74c",
-  },
 ] as const;
 
 const leadership = [
@@ -122,18 +76,289 @@ const leadership = [
   ["2011", "Eagle Scout Award"],
 ] as const;
 
+const selectedProjectIds = targetSurfaceHierarchy.resume.selectedProjectIds;
+const selectedProjectHierarchy = targetSurfaceHierarchy.resume.selectedProjectHierarchy;
+
+const selectedSourceIds = {
+  burnlens: "burnlens-pinned-tree",
+  "runbook-sentinel": "rs.git.v0020",
+  "quest-craft": "quest.snapshot",
+} as const satisfies Record<(typeof selectedProjectIds)[number], PublicLinkSourceId>;
+
+const selectedProjects = selectedProjectIds.map((projectId, index) => {
+  const tier = selectedProjectHierarchy[index];
+  if (!tier) throw new Error(`Missing resume hierarchy tier for ${projectId}.`);
+
+  return {
+    project: getProject(projectId),
+    sourceId: selectedSourceIds[projectId],
+    tier,
+  };
+});
+
+const researchSourceIds = {
+  "hierarchical-clustering": "hc.snapshot",
+  "energy-sector-data-governance": "policy.reader",
+  "der-dcp": "der.document",
+} as const satisfies Record<
+  (typeof targetSurfaceHierarchy.resume.researchAndWritingProjectIds)[number],
+  PublicLinkSourceId
+>;
+
+const researchLinkLabels = {
+  "hierarchical-clustering": "Inspect the frozen repository snapshot",
+  "energy-sector-data-governance": "Read the dated policy-writing sample",
+  "der-dcp": "Read the historical proposal",
+} as const satisfies Record<
+  (typeof targetSurfaceHierarchy.resume.researchAndWritingProjectIds)[number],
+  string
+>;
+
+const researchAndWriting = targetSurfaceHierarchy.resume.researchAndWritingProjectIds.map(
+  (projectId) => {
+    const item = historicalCoursework.find((candidate) => candidate.id === projectId);
+    if (!item) throw new Error(`Missing historical resume projection for ${projectId}.`);
+
+    const sourceId = researchSourceIds[projectId];
+    return {
+      context: item.context,
+      date: item.date,
+      dateTime: item.dateTime,
+      linkLabel: researchLinkLabels[projectId],
+      project: getProject(projectId),
+      sourceHref: getPublicSourceHref(sourceId),
+      sourceId,
+    };
+  },
+);
+
+type EvidenceKey = keyof ProjectEvidence<ProjectId>;
+type ResumeField =
+  | "personalRole"
+  | "implementation"
+  | "stack"
+  | "testStrategy"
+  | "outcome"
+  | "limitations"
+  | "maturity";
+
+const resumeFieldLabels: Record<Exclude<ResumeField, "maturity">, string> = {
+  personalRole: "My role",
+  implementation: "What I built",
+  stack: "Methods and technologies",
+  testStrategy: "How I tested it",
+  outcome: "Result",
+  limitations: "Current boundary",
+};
+
+type ResearchResumeField = "problem" | "personalRole" | "outcome" | "limitations" | "maturity";
+
+const researchFieldLabels: Record<ResearchResumeField, string> = {
+  problem: "Artifact",
+  personalRole: "My role",
+  outcome: "Retained result",
+  limitations: "Present boundary",
+  maturity: "Status",
+};
+
+function supported(projectId: ProjectId, field: EvidenceKey) {
+  const evidence = getSupportedEvidence(projectId, field);
+  if (!evidence) throw new Error(`Resume projection requires supported ${projectId}.${field}.`);
+  return evidence;
+}
+
+function resumeReaderFirst(text: string) {
+  return toReaderFirst(text)
+    .replace(/HDBSCAN/g, "density-based clustering (HDBSCAN)")
+    .replace(/SCLA 521 Societal Impacts of AI/g, "Societal Impacts of AI course (SCLA 521)");
+}
+
+function EvidenceValue({
+  field,
+  projectId,
+}: {
+  field: Exclude<ResumeField, "stack">;
+  projectId: ProjectId;
+}) {
+  const evidence = supported(projectId, field);
+  return (
+    <span
+      data-evidence-field={field}
+      data-evidence-owner={`${projectId}.${field}`}
+      data-field-key={field}
+      data-field-owner={field}
+      data-source-ids={evidence.sourceIds.join(" ")}
+    >
+      {resumeReaderFirst(evidence.summary)}
+    </span>
+  );
+}
+
+function TechnologyEvidence({ projectId }: { projectId: "burnlens" | "runbook-sentinel" }) {
+  const evidence = getProject(projectId).evidence.stack;
+  if (evidence.state !== "supported") {
+    throw new Error(`Resume technology projection requires supported ${projectId}.stack.`);
+  }
+
+  return (
+    <div
+      data-evidence-field="stack"
+      data-evidence-owner={`${projectId}.stack`}
+      data-field-key="stack"
+      data-field-owner="stack"
+      data-source-ids={evidence.sourceIds.join(" ")}
+    >
+      <p>{resumeReaderFirst(evidence.summary)}</p>
+      <ul
+        data-project-model-id={projectId}
+        data-source-ids={evidence.sourceIds.join(" ")}
+        data-technology-register={projectId}
+      >
+        {evidence.value.map((item) => (
+          <li
+            data-evidence-field="stack"
+            data-project-model-id={projectId}
+            data-source-ids={evidence.sourceIds.join(" ")}
+            data-technology-binding={item.name}
+            key={item.name}
+          >
+            <strong>{resumeReaderFirst(item.name)}</strong>
+            <span>{resumeReaderFirst(item.purpose)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ResumeProject({
+  entry,
+  index,
+}: {
+  entry: (typeof selectedProjects)[number];
+  index: number;
+}) {
+  const { project, sourceId, tier } = entry;
+  const fields = projectSurfacePlan[project.id].fields.resume as readonly ResumeField[];
+  const maturity = supported(project.id, "maturity");
+  const factFields = fields.filter((field) => field !== "maturity") as readonly Exclude<
+    ResumeField,
+    "maturity"
+  >[];
+  const facts = factFields.map((field): ProjectFact => {
+    if (field === "stack") {
+      if (project.id === "quest-craft") {
+        throw new Error("Quest Craft has no public stack evidence and cannot own a resume stack field.");
+      }
+      return {
+        id: field,
+        term: resumeFieldLabels[field],
+        detail: <TechnologyEvidence projectId={project.id} />,
+      };
+    }
+
+    return {
+      id: field,
+      term: resumeFieldLabels[field],
+      detail: <EvidenceValue field={field} projectId={project.id} />,
+    };
+  });
+
+  const [firstFact, ...remainingFacts] = facts;
+  if (!firstFact) throw new Error(`Resume fact ledger is empty for ${project.id}.`);
+  const projectFacts: NonEmpty<ProjectFact> = [firstFact, ...remainingFacts];
+
+  const tierLabel = tier === "flagship" ? `Flagship ${String(index + 1).padStart(2, "0")}` : "Supporting implementation";
+
+  return (
+    <article
+      className={styles.project}
+      data-project-model-id={project.id}
+      data-resume-project={project.id}
+      data-resume-hierarchy={tier}
+    >
+      <div className={styles.projectIndex}>
+        <span>{tierLabel}</span>
+        <small
+          data-evidence-field="maturity"
+          data-evidence-owner={`${project.id}.maturity`}
+          data-field-key="maturity"
+          data-field-owner="maturity"
+          data-source-ids={maturity.sourceIds.join(" ")}
+        >
+          {resumeReaderFirst(maturity.summary)}
+        </small>
+      </div>
+
+      <div className={styles.projectCopy}>
+        <h3>{project.title}</h3>
+        <ProjectFactLedger
+          className={styles.projectFacts}
+          data-resume-project-facts={project.id}
+          facts={projectFacts}
+        />
+        <div className={styles.projectLinks}>
+          <Link href={project.route}>
+            Read the {tier === "flagship" ? "case study" : "field note"}{" "}
+            <span aria-hidden="true">→</span>
+          </Link>
+          <EvidenceLink
+            sourceId={sourceId}
+            readerLabel={
+              <>
+                Inspect pinned evidence <span className="sr-only">(opens in a new tab)</span>
+                <span aria-hidden="true">↗</span>
+              </>
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+          />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function ResearchEvidence({
+  projectId,
+}: {
+  projectId: (typeof targetSurfaceHierarchy.resume.researchAndWritingProjectIds)[number];
+}) {
+  const fields = projectSurfacePlan[projectId].fields.resume as readonly ResearchResumeField[];
+
+  return (
+    <dl className={styles.researchFacts} data-resume-history-facts={projectId}>
+      {fields.map((field) => {
+        const evidence = supported(projectId, field);
+        return (
+          <div key={field}>
+            <dt>{researchFieldLabels[field]}</dt>
+            <dd
+              data-evidence-field={field}
+              data-evidence-owner={`${projectId}.${field}`}
+              data-source-ids={evidence.sourceIds.join(" ")}
+            >
+              {resumeReaderFirst(evidence.summary)}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
 const siteUrl = getSiteUrl();
+const metadataDescription =
+  "Portfolio of Drew Baker: inspectable software systems, geospatial evidence workflows, bounded model evaluation, and climate-relevant technical work.";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: { absolute: "Resume | William Drew Baker" },
-  description:
-    "Public resume for William Drew Baker: software systems, geospatial evidence, applied AI evaluation, climate work, energy policy, and technical communication.",
+  description: metadataDescription,
   alternates: { canonical: new URL("/resume", siteUrl) },
   openGraph: {
     title: "Resume | William Drew Baker",
-    description:
-      "Software systems, geospatial evidence, risk-aware decision support, and technical communication.",
+    description: metadataDescription,
     url: new URL("/resume", siteUrl),
     siteName: "William Drew Baker",
     type: "website",
@@ -142,7 +367,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Resume | William Drew Baker",
-    description: "Software systems, geospatial evidence, and risk-aware decision support.",
+    description: metadataDescription,
     images: [new URL("/opengraph-image", siteUrl)],
   },
 };
@@ -151,102 +376,80 @@ export default function ResumePage() {
   return (
     <div className={styles.page}>
       <main id="main-content" className={styles.main}>
-        <article className={styles.resume}>
+        <article className={styles.resume} data-resume-surface="public-resume">
           <header className={styles.hero}>
-            <div className={styles.heroCopy}>
-              <p className={styles.eyebrow}>Resume / public edition</p>
+            <div className={styles.heroIdentity}>
+              <p className={styles.eyebrow}>Public résumé / evidence edition</p>
               <h1>William “Drew” Baker</h1>
               <p className={styles.roleLine}>
-                Software development · Geospatial systems · Risk-aware decision support
+                Software engineering · Geospatial evidence · Climate-relevant systems
               </p>
+            </div>
+
+            <div className={styles.heroBrief}>
               <p className={styles.summary}>
-                I build inspectable software and evidence workflows for uncertain, high-consequence
-                settings. My work connects applied AI evaluation, geospatial analysis, reproducible
-                testing, climate and energy research, and plain-language technical communication.
+                Software engineer building inspectable systems, deterministic software authorization
+                boundaries, and geospatial evidence workflows for high-consequence settings. Public
+                projects show bounded model evaluation and release testing; historical coursework
+                adds energy-policy context.
               </p>
-              <div className={styles.profileLinks} aria-label="Public professional profiles">
+              <nav className={styles.profileLinks} aria-label="Public professional profiles">
                 <a
                   href="https://github.com/drwbkr1"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  GitHub <span aria-hidden="true">↗</span>
+                  <strong>GitHub</strong>
+                  <span>github.com/drwbkr1</span>
                 </a>
                 <a
                   href="https://www.linkedin.com/in/william-baker-843946162/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  LinkedIn <span aria-hidden="true">↗</span>
+                  <strong>LinkedIn</strong>
+                  <span>linkedin.com/in/william-baker-843946162</span>
                 </a>
                 <PrintButton className={styles.printButton} />
-              </div>
+              </nav>
             </div>
-
-            <aside className={styles.identityLedger} aria-label="Professional focus">
-              <div>
-                <span>Focus</span>
-                <strong>Evidence before claims</strong>
-              </div>
-              <div>
-                <span>Evidence</span>
-                <strong>Public work, tests, and limits</strong>
-              </div>
-              <div>
-                <span>Privacy</span>
-                <strong>Professional profiles only</strong>
-              </div>
-            </aside>
           </header>
 
           <p className={styles.privacyNote}>
-            <strong>Contact.</strong> For professional inquiries, use LinkedIn. Direct email, phone,
-            and location are intentionally omitted from this public résumé.
+            <span>
+              <strong>Contact.</strong> For professional inquiries, use LinkedIn. Direct email,
+              phone, and location are intentionally omitted from this public résumé.
+            </span>
           </p>
 
           <div className={styles.resumeGrid}>
             <div className={styles.primaryColumn}>
-              <section className={styles.section} aria-labelledby="projects-heading">
+              <section
+                className={styles.section}
+                aria-labelledby="projects-heading"
+                data-resume-lane="selected-project-evidence"
+              >
                 <div className={styles.sectionHeading}>
                   <span>01</span>
-                  <h2 id="projects-heading">Selected project evidence</h2>
+                  <div>
+                    <p>Hiring order / implemented and evaluated work</p>
+                    <h2 id="projects-heading">Selected project evidence</h2>
+                  </div>
                 </div>
                 <div className={styles.projectList}>
-                  {projectEvidence.map((project) => {
-                    const external = project.href.startsWith("http");
-
-                    return (
-                      <article className={styles.project} key={project.title}>
-                        <div className={styles.projectIndex}>
-                          <span>{project.label}</span>
-                          <small>{project.status}</small>
-                        </div>
-                        <div className={styles.projectCopy}>
-                          <h3>{project.title}</h3>
-                          <p>{project.description}</p>
-                          <p className={styles.boundary}>
-                            <strong>Boundary.</strong> {project.boundary}
-                          </p>
-                          {external ? (
-                            <a href={project.href} target="_blank" rel="noopener noreferrer">
-                              {project.linkLabel} <span aria-hidden="true">↗</span>
-                            </a>
-                          ) : (
-                            <Link href={project.href}>
-                              {project.linkLabel} <span aria-hidden="true">→</span>
-                            </Link>
-                          )}
-                        </div>
-                      </article>
-                    );
-                  })}
+                  {selectedProjects.map((entry, index) => (
+                    <ResumeProject entry={entry} index={index} key={entry.project.id} />
+                  ))}
                 </div>
               </section>
 
               <section className={styles.section} aria-labelledby="experience-heading">
                 <div className={styles.sectionHeading}>
                   <span>02</span>
-                  <h2 id="experience-heading">Experience</h2>
+                  <div>
+                    <p>Professional record</p>
+                    <h2 id="experience-heading">Experience</h2>
+                  </div>
                 </div>
                 <div className={styles.timeline}>
                   {experience.map((item) => (
@@ -271,7 +474,10 @@ export default function ResumePage() {
               <section className={styles.section} aria-labelledby="education-heading">
                 <div className={styles.sectionHeading}>
                   <span>03</span>
-                  <h2 id="education-heading">Education</h2>
+                  <div>
+                    <p>Formal study</p>
+                    <h2 id="education-heading">Education</h2>
+                  </div>
                 </div>
                 <article className={styles.educationItem}>
                   <h3>Purdue University</h3>
@@ -289,25 +495,62 @@ export default function ResumePage() {
                 </article>
               </section>
 
-              <section className={styles.section} aria-labelledby="skills-heading">
+              <section
+                className={styles.section}
+                aria-labelledby="research-heading"
+                data-resume-lane="research-and-writing"
+              >
                 <div className={styles.sectionHeading}>
                   <span>04</span>
-                  <h2 id="skills-heading">Working disciplines</h2>
+                  <div>
+                    <p>Dated / historical coursework</p>
+                    <h2 id="research-heading">Research &amp; writing</h2>
+                  </div>
                 </div>
-                <dl className={styles.skillList}>
-                  {skillGroups.map((group) => (
-                    <div key={group.label}>
-                      <dt>{group.label}</dt>
-                      <dd>{group.text}</dd>
-                    </div>
-                  ))}
-                </dl>
+                <ul className={styles.researchList}>
+                  {researchAndWriting.map(
+                    ({ context, date, dateTime, linkLabel, project, sourceHref, sourceId }) => (
+                      <li
+                        data-project-model-id={project.id}
+                        data-resume-history={project.id}
+                        key={project.id}
+                      >
+                        <article>
+                          <div className={styles.researchMeta}>
+                            <span>{context}</span>
+                            <time dateTime={dateTime}>{date}</time>
+                          </div>
+                          <h3>{project.title}</h3>
+                          <ResearchEvidence projectId={project.id} />
+                          <a
+                            data-evidence-source-id={sourceId}
+                            href={sourceHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {linkLabel} <span className="sr-only">(opens in a new tab)</span>
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        </article>
+                      </li>
+                    ),
+                  )}
+                </ul>
+                <p className={styles.capabilityBoundary} data-capability-boundary="energy-ee">
+                  <strong>Audience boundary.</strong> Energy is historical governance context and a
+                  direction of interest—not evidence of an implemented energy system. The current
+                  work does not yet establish electrical engineering, controls, embedded,
+                  power-systems, or hardware implementation experience.
+                </p>
               </section>
 
               <section className={styles.section} aria-labelledby="learning-heading">
                 <div className={styles.sectionHeading}>
                   <span>05</span>
-                  <h2 id="learning-heading">Selected learning</h2>
+                  <div>
+                    <p>Additional study</p>
+                    <h2 id="learning-heading">Selected learning</h2>
+                  </div>
                 </div>
                 <ul className={styles.linkList}>
                   {selectedLearning.map((item) => (
@@ -327,7 +570,10 @@ export default function ResumePage() {
               <section className={styles.section} aria-labelledby="leadership-heading">
                 <div className={styles.sectionHeading}>
                   <span>06</span>
-                  <h2 id="leadership-heading">Leadership</h2>
+                  <div>
+                    <p>Earlier record</p>
+                    <h2 id="leadership-heading">Leadership</h2>
+                  </div>
                 </div>
                 <dl className={styles.leadershipList}>
                   {leadership.map(([year, item]) => (
@@ -342,7 +588,7 @@ export default function ResumePage() {
           </div>
 
           <footer className={styles.resumeFooter}>
-            <span>William Drew Baker / public resume</span>
+            <span>William Drew Baker / public résumé</span>
             <span>Last editorial review: August 2026</span>
           </footer>
         </article>

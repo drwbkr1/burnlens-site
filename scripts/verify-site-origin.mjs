@@ -29,7 +29,7 @@ assert.equal(shouldIndexSite({ VERCEL_ENV: "development" }), false);
 assert.equal(
   shouldIndexSite({
     PORTFOLIO_DEPLOYMENT_CONTEXT: "production",
-    NEXT_PUBLIC_SITE_URL: "https://portfolio.example.com",
+    NEXT_PUBLIC_SITE_URL: "https://burnlensproject.org",
     NEXT_PUBLIC_SITE_INDEXING: "allow",
   }),
   true,
@@ -37,7 +37,7 @@ assert.equal(
 assert.equal(
   shouldIndexSite({
     PORTFOLIO_DEPLOYMENT_CONTEXT: "production",
-    NEXT_PUBLIC_SITE_URL: "https://portfolio.example.com",
+    NEXT_PUBLIC_SITE_URL: "https://burnlensproject.org",
     NEXT_PUBLIC_SITE_INDEXING: "deny",
   }),
   false,
@@ -46,7 +46,7 @@ assert.throws(
   () =>
     shouldIndexSite({
       PORTFOLIO_DEPLOYMENT_CONTEXT: "production",
-      NEXT_PUBLIC_SITE_URL: "https://portfolio.example.com",
+      NEXT_PUBLIC_SITE_URL: "https://burnlensproject.org",
     }),
   /explicit NEXT_PUBLIC_SITE_INDEXING decision/,
 );
@@ -59,7 +59,7 @@ assert.throws(
     shouldIndexSite({
       VERCEL_ENV: "preview",
       PORTFOLIO_DEPLOYMENT_CONTEXT: "production",
-      NEXT_PUBLIC_SITE_URL: "https://portfolio.example.com",
+      NEXT_PUBLIC_SITE_URL: "https://burnlensproject.org",
       NEXT_PUBLIC_SITE_INDEXING: "allow",
     }),
   /must agree with VERCEL_ENV/,

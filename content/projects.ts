@@ -1,6 +1,9 @@
+import { getProject, getPublicSourceHref, type ProjectId } from "./project-model";
+
 type Proof = { label: string; value: string };
 
 type Flagship = {
+  id: ProjectId;
   title: string;
   href: string;
   sourceHref: string;
@@ -10,6 +13,7 @@ type Flagship = {
 };
 
 type SecondaryProject = {
+  id: ProjectId;
   title: string;
   kind: string;
   thesis: string;
@@ -18,6 +22,7 @@ type SecondaryProject = {
 };
 
 type HistoricalCoursework = {
+  id: ProjectId;
   title: string;
   context: string;
   date: string;
@@ -28,12 +33,13 @@ type HistoricalCoursework = {
   sourceLabel: string;
 };
 
-export const burnlensEvidenceBinding = {
-  releaseVersion: "v0.56.0",
-  releaseTag: "v0.56.0-baseline-first-portfolio-release",
-  releaseCommit: "e2e0b778038b2b5cd55258c784951ef2d1473469",
-  snapshotCommit: "a741111d82e69689022d2058118ed8f4b9bf3546",
-} as const;
+const burnlens = getProject("burnlens");
+const runbookSentinel = getProject("runbook-sentinel");
+const questCraft = getProject("quest-craft");
+const openClawShowcase = getProject("openclaw-showcase");
+const hierarchicalClustering = getProject("hierarchical-clustering");
+const derDcp = getProject("der-dcp");
+const energySectorDataGovernance = getProject("energy-sector-data-governance");
 
 export const projects: {
   burnlens: Flagship;
@@ -41,22 +47,35 @@ export const projects: {
   secondary: readonly SecondaryProject[];
 } = {
   burnlens: {
-    title: "BurnLens",
-    href: "/work/burnlens",
-    sourceHref:
-      `https://github.com/drwbkr1/burnlens-deschutes/tree/${burnlensEvidenceBinding.snapshotCommit}`,
-    status: "Release v0.56.0 · post-release evidence",
+    id: burnlens.id,
+    title: burnlens.title,
+    href: burnlens.route,
+    sourceHref: getPublicSourceHref("burnlens-pinned-tree"),
+    status: "Public Phase Six portfolio release · v0.56.0",
     thesis:
-      "A baseline-first wildfire evidence system that keeps accepted analysis, a rejected model, official context, and uncertainty visibly separate.",
+      "BurnLens asks how one bounded experimental computer-vision-to-GEOINT release can become understandable, inspectable, citable, and responsibly interpretable as a coherent whole.",
     proof: [
-      { label: "Selected method", value: "RBR baseline" },
-      { label: "Model decision", value: "U-Net rejected" },
-      { label: "Operating status", value: "Non-operational" },
+      {
+        label: "Role split",
+        value:
+          "Drew set the portfolio thesis, target audience, use boundaries, owner stop conditions, and publication direction, and owned the human decisions; Codex was assigned technical, product, and reliability direction within that owner-defined envelope.",
+      },
+      {
+        label: "Release result",
+        value:
+          "BurnLens reached a public, complete Phase Six portfolio release: v0.56.0-baseline-first-portfolio-release at commit e2e0b778; the later evidence snapshot is a741111d, four commits after the release.",
+      },
+      {
+        label: "Use boundary",
+        value:
+          "BurnLens is experimental portfolio evidence, not official wildfire information, emergency guidance, or operational decision support.",
+      },
     ],
   },
   runbookSentinel: {
-    title: "Runbook Sentinel",
-    href: "/work/runbook-sentinel",
+    id: runbookSentinel.id,
+    title: runbookSentinel.title,
+    href: runbookSentinel.route,
     sourceHref: "https://github.com/drwbkr1/runbook-sentinel/tree/v0.0.20",
     status: "Verified release · v0.0.20",
     thesis:
@@ -69,22 +88,22 @@ export const projects: {
   },
   secondary: [
     {
-      title: "Quest Craft",
+      id: questCraft.id,
+      title: questCraft.title,
       kind: "Designed case · interaction / evaluation",
       thesis:
         "A bounded creative assistant whose public reviewer snapshot preserves the agency loop, 36-row evaluation ledger, corrections, and retained failures.",
-      href: "/work/quest-craft",
-      sourceHref:
-        "https://github.com/drwbkr1/quest-craft-unexpected-choice-assistant-review/tree/bc14c43840aabb11ca35e94df0c8682672f24f3c",
+      href: questCraft.route,
+      sourceHref: getPublicSourceHref("quest.snapshot"),
     },
     {
-      title: "OpenClaw Showcase",
+      id: openClawShowcase.id,
+      title: openClawShowcase.title,
       kind: "Review evidence · agent workflow",
       thesis:
         "A public documentation layer for workflow state, traceability, QA, and human approval—not evidence of the closed runtime itself.",
-      href: "/work/openclaw-showcase",
-      sourceHref:
-        "https://github.com/drwbkr1/openclaw-showcase/tree/3695666f6a44c095674049e64d23f0bdace2fb70",
+      href: openClawShowcase.route,
+      sourceHref: getPublicSourceHref("openclaw.snapshot"),
     },
   ],
 } as const;
@@ -93,33 +112,21 @@ export const allPublishedWork = [projects.burnlens, projects.runbookSentinel, ..
 
 export const historicalCoursework: readonly HistoricalCoursework[] = [
   {
-    title: "Hierarchical clustering exploration",
+    id: hierarchicalClustering.id,
+    title: hierarchicalClustering.title,
     context: "Historical coursework · Jupyter notebook",
     date: "Repository snapshot · 18 Aug 2025",
     dateTime: "2025-08-18",
     summary:
-      "A public notebook exploration comparing HDBSCAN behavior under Jaccard, Euclidean, and Rogers–Tanimoto distance choices.",
+      "A public notebook exploration using a density-based clustering method (HDBSCAN) across three distance measures—Jaccard, Euclidean, and Rogers–Tanimoto.",
     boundary:
-      "Not a current reproducible study. The GitHub and Colab versions differ, the historical data source and environment are not reproducibly pinned, and saved outputs are not treated as verified results.",
-    sourceHref:
-      "https://github.com/drwbkr1/Grad504-Hierarchical-Cluster-Project/tree/21e9b18b37a0e1acd9f2814cca3456b94849c098",
+      "Not a current reproducible study; source variants, data identity, environment, outputs, evaluation, authorship, and rights remain bounded or unresolved.",
+    sourceHref: getPublicSourceHref("hc.snapshot"),
     sourceLabel: "Inspect the frozen repository snapshot",
   },
   {
-    title: "DER Distributed Control Planner",
-    context: "Historical coursework · impact-assessment proposal",
-    date: "Proposal revision · 13 Nov 2025",
-    dateTime: "2025-11-13",
-    summary:
-      "A theoretical impact-assessment proposal by William Baker for SCLA 521 Societal Impacts of AI, exploring governance and evaluation planning for a distributed-energy control concept.",
-    boundary:
-      "No system was implemented or evaluated. Its 2025 compliance framing is not current guidance, and the embedded research log remains excluded.",
-    sourceHref:
-      "https://docs.google.com/document/d/1qOzbX4PMS5vF_WFx7LEY7ls74jDJsI6-SrtdoRcMXZw",
-    sourceLabel: "Read the historical proposal",
-  },
-  {
-    title: "Energy Sector Data Governance",
+    id: energySectorDataGovernance.id,
+    title: energySectorDataGovernance.title,
     context: "Historical coursework · policy brief",
     date: "December 2025",
     dateTime: "2025-12",
@@ -127,8 +134,20 @@ export const historicalCoursework: readonly HistoricalCoursework[] = [
       "A 14-page policy-writing sample by William Baker, retained for its research, risk framing, and documented revision process.",
     boundary:
       "Read as a December 2025 writing artifact—not current policy guidance. Agency terminology and time-sensitive claims require correction and fresh verification; no Adobe Stock or Canva imagery is reused here.",
-    sourceHref:
-      "https://drive.google.com/file/d/18o2vmdDzz_FN9_Xm-xfBLw8TzlLBxqUU/view?usp=sharing",
+    sourceHref: getPublicSourceHref("policy.reader"),
     sourceLabel: "Read the public brief",
+  },
+  {
+    id: derDcp.id,
+    title: derDcp.title,
+    context: "Historical coursework · distributed-energy control proposal",
+    date: "Proposal revision · 13 Nov 2025",
+    dateTime: "2025-11-13",
+    summary:
+      "A theoretical impact-assessment proposal by William Baker for the Societal Impacts of AI course (SCLA 521), exploring governance and evaluation planning for a distributed-energy control concept.",
+    boundary:
+      "No system was implemented or evaluated. Its 2025 compliance framing is not current guidance, and the embedded research log remains excluded.",
+    sourceHref: getPublicSourceHref("der.document"),
+    sourceLabel: "Read the historical proposal",
   },
 ] as const;

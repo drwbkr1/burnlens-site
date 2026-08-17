@@ -51,7 +51,7 @@ export function getSiteUrl(environment: NodeJS.ProcessEnv = process.env) {
       );
     }
 
-    // This keeps local builds deterministic while the owner chooses the release domain.
+    // This keeps local builds deterministic against the selected future portfolio origin.
     return new URL(LOCAL_METADATA_ORIGIN);
   }
 

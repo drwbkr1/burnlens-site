@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async redirects() {
     return [
+      { source: "/burnlens", destination: "/work/burnlens", permanent: true },
       { source: "/gradportfolio", destination: "/", permanent: true },
       { source: "/gradportfolio/resume", destination: "/resume", permanent: true },
       { source: "/usgif", destination: "/", permanent: true },

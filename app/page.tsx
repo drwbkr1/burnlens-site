@@ -1,283 +1,615 @@
-import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { EvidenceSpine } from "@/components/editorial/EvidenceSpine";
-import { HistoricalCourseworkShelf } from "@/components/editorial/HistoricalCourseworkShelf";
-import { projects } from "@/content/projects";
+import {
+  getProject,
+  getProjectSource,
+  getPublicSourceHref,
+  getSupportedEvidence,
+  toReaderFirst,
+  type ProjectEvidence,
+  type ProjectId,
+  type PublicLinkSourceId,
+  type SourceId,
+} from "@/content/project-model";
 import { getSiteOrigin } from "@/lib/site-origin";
 
-const burnlens = projects.burnlens;
-const runbook = projects.runbookSentinel;
+import styles from "./home.module.css";
+
+export const metadata: Metadata = {
+  title: "Drew Baker | Inspectable software systems",
+  description:
+    "Portfolio of Drew Baker: inspectable software systems, human-directed Codex orchestration, geospatial evidence workflows, and climate-relevant technical work.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Drew Baker | Inspectable software systems",
+    description:
+      "Inspectable software systems, human-directed Codex orchestration, geospatial evidence workflows, and climate-relevant technical work.",
+    url: "/",
+    siteName: "Drew Baker Portfolio",
+  },
+};
+
+const burnlens = getProject("burnlens");
+const runbook = getProject("runbook-sentinel");
+const quest = getProject("quest-craft");
+const openclaw = getProject("openclaw-showcase");
+
+type EvidenceKey = keyof ProjectEvidence<ProjectId>;
+
+function evidenceSummary(projectId: ProjectId, field: EvidenceKey) {
+  const evidence = getSupportedEvidence(projectId, field);
+  if (!evidence) {
+    throw new Error(`Homepage projection requires supported ${projectId}.${field}.`);
+  }
+  return toReaderFirst(evidence.summary);
+}
+
+function featuredFailure(projectId: "runbook-sentinel", evidenceId: string) {
+  const supported = getSupportedEvidence(projectId, "failureDividend");
+  const evidence = getProject(projectId).evidence.failureDividend;
+  if (!supported || evidence.state !== "supported") {
+    throw new Error(`Homepage projection requires supported ${projectId} failure evidence.`);
+  }
+
+  const failure = evidence.value.find(
+    (item) => item.id === evidenceId && "featured" in item && item.featured,
+  );
+  if (!failure) {
+    throw new Error(`Homepage projection could not resolve featured turn ${evidenceId}.`);
+  }
+  return failure;
+}
+
+function firstPublicFailureSource(failure: { sourceIds: readonly SourceId[] }) {
+  const sourceId = failure.sourceIds.find((id) => {
+    const source = getProjectSource(id);
+    return source.availability === "public" && "href" in source;
+  });
+
+  if (!sourceId) {
+    throw new Error("Featured homepage turns require a public evidence source.");
+  }
+
+  return {
+    id: sourceId,
+    href: getPublicSourceHref(sourceId as PublicLinkSourceId),
+  };
+}
+
+function readerFirstFailure(canonicalText: string) {
+  return toReaderFirst(canonicalText);
+}
+
+const runbookTurn = featuredFailure("runbook-sentinel", "RS.F03");
+const runbookTurnSource = firstPublicFailureSource(runbookTurn);
+const orchestrationBuildHref =
+  "https://github.com/drwbkr1/burnlens-deschutes/blob/a741111d82e69689022d2058118ed8f4b9bf3546/records/prompt-build-log/2026-07-27-p6o1-t02.md#L26-L69";
+const burnlensReleaseHref = getPublicSourceHref("burnlens-release");
 
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "William (Drew) Baker",
+  alternateName: "Drew Baker",
   url: getSiteOrigin(),
+  description:
+    "Builder of inspectable software systems, human-directed Codex workflows, and geospatial evidence systems.",
   sameAs: [
     "https://github.com/drwbkr1",
     "https://www.linkedin.com/in/william-baker-843946162/",
   ],
   knowsAbout: [
     "software engineering",
-    "geospatial analysis",
+    "Codex orchestration",
+    "geospatial evidence",
     "machine learning evaluation",
-    "climate risk",
-    "energy data governance",
+    "climate-relevant systems",
   ],
 };
 
-function HeroPrinciple() {
+function FeaturedTurn({
+  failure,
+  source,
+}: {
+  failure: typeof runbookTurn;
+  source: typeof runbookTurnSource;
+}) {
+  const conciseSummary =
+    "The tested local model produced 9 of 84 outputs that passed the required structure, so the candidate was excluded and fixed-rule control remained.";
+  const projectLabel = "Runbook Sentinel";
+  const sourceLabel = getProjectSource(source.id).label;
+
   return (
-    <>
-      <p className="plate-label">Field note 00 / working principle</p>
-      <EvidenceSpine
-        id="01"
-        claim="Useful systems should show their work."
-        evidence="Two released, inspectable flagships pair implementation with evaluation evidence."
-        boundary="No production, operational, or real-world authority claim without proof."
-      />
-      <p className="spine-note">
-        Claim, evidence, and boundary travel together throughout this portfolio.
-      </p>
-    </>
+    <aside
+      className={styles.featuredTurn}
+      data-featured-turn
+      data-evidence-id={failure.id}
+      aria-label={`${projectLabel}: failed test that changed the build`}
+    >
+      <p className={styles.turnLabel}>Failed test / earned progress</p>
+      <div className={styles.turnCopy} data-turn-copy>
+        <p className={styles.turnSummary}>{conciseSummary}</p>
+        <dl>
+          <div>
+            <dt>What failed</dt>
+            <dd>{readerFirstFailure(failure.failure)}</dd>
+          </div>
+          <div>
+            <dt>Build change</dt>
+            <dd>{toReaderFirst(failure.buildChange)}</dd>
+          </div>
+          <div>
+            <dt>What that earned</dt>
+            <dd>{toReaderFirst(failure.earnedCapability)}</dd>
+          </div>
+          <div>
+            <dt>Still not proven</dt>
+            <dd data-turn-boundary>{toReaderFirst(failure.boundary)}</dd>
+          </div>
+        </dl>
+      </div>
+      <a
+        className={styles.evidenceLink}
+        href={source.href}
+        target="_blank"
+        rel="noreferrer"
+        data-source-id={source.id}
+      >
+        Inspect {sourceLabel} <span className="sr-only">(opens in a new tab)</span>
+        <span aria-hidden="true"> ↗</span>
+      </a>
+    </aside>
+  );
+}
+
+function AtlasFigure() {
+  return (
+    <figure className={styles.atlasFigure} aria-labelledby="atlas-caption">
+      <div className={styles.atlasGrid} data-atlas-grid>
+        <div className={styles.atlasTransect} data-atlas-transect>
+          <span>Release intent</span>
+          <i aria-hidden="true" />
+          <span>Verified release</span>
+          <i aria-hidden="true" />
+          <span>Later snapshot</span>
+        </div>
+        <dl className={styles.atlasLegend} data-atlas-legend>
+          <div>
+            <dt>Release</dt>
+            <dd>v0.56.0 / exact public checkpoint</dd>
+          </div>
+          <div>
+            <dt>Snapshot</dt>
+            <dd>Four commits after the release</dd>
+          </div>
+          <div>
+            <dt>Boundary</dt>
+            <dd>Experimental / non-operational</dd>
+          </div>
+        </dl>
+      </div>
+      <figcaption id="atlas-caption">
+        A field-atlas reading: the release, later evidence snapshot, and use boundary stay distinct
+        on the same sheet.
+      </figcaption>
+    </figure>
+  );
+}
+
+function ControlTraceFigure() {
+  return (
+    <figure className={styles.traceFigure} aria-labelledby="trace-caption">
+      <div className={styles.traceField}>
+        <ol className={styles.controlRail} data-control-rail aria-label="Reasoning rail">
+          <li>
+            <span>01</span>
+            Read evidence
+          </li>
+          <li>
+            <span>02</span>
+            Diagnose
+          </li>
+          <li>
+            <span>03</span>
+            Propose only
+          </li>
+        </ol>
+
+        <div className={styles.authorityBreak} data-authority-break>
+          <span>Reasoning stops here</span>
+          <strong>Authority is separate</strong>
+        </div>
+
+        <ol className={styles.controlRail} data-control-rail aria-label="Authority rail">
+          <li>
+            <span>A</span>
+            Approve once
+          </li>
+          <li>
+            <span>B</span>
+            Check policy
+          </li>
+          <li>
+            <span>C</span>
+            Mutate synthetic state
+          </li>
+        </ol>
+      </div>
+      <figcaption id="trace-caption">
+        Two rails meet at an explicit authority break; model output never becomes permission.
+      </figcaption>
+    </figure>
   );
 }
 
 export default function HomePage() {
   return (
-    <main id="main-content">
+    <main id="main-content" className={styles.home}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema).replace(/</g, "\\u003c") }}
       />
 
-      <section className="hero shell" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <p className="eyebrow">Software systems · geospatial intelligence · energy &amp; risk</p>
+      <section className={`shell ${styles.hero}`} aria-labelledby="hero-title">
+        <div className={styles.heroCopy}>
+          <p className={styles.identity}>Drew Baker / personal portfolio</p>
+          <p className={styles.eyebrow}>
+            Software engineering · geospatial evidence · climate-relevant systems
+          </p>
           <h1 id="hero-title">
             I build evidence-bound systems <em>for uncertain terrain.</em>
           </h1>
-          <p className="hero-deck">
-            I design and test software, geospatial workflows, and risk-aware decision tools—from
-            wildfire evidence to incident-agent safety and energy policy.
+          <p className={styles.deck}>
+            I build inspectable data pipelines, deterministic software authorization gates, and
+            evidence workflows for climate-relevant and other high-consequence work—and I’m
+            interested in applying that practice to energy infrastructure.
           </p>
-          <div className="hero-actions" aria-label="Primary actions">
-            <a className="button button-primary" href="#selected-work">
-              Explore the work <span aria-hidden="true">↓</span>
+          <div className={styles.actions} aria-label="Primary actions">
+            <a className={styles.primaryAction} href="#selected-work">
+              See the evidence <span aria-hidden="true">↓</span>
             </a>
-            <Link className="button button-secondary" href="/resume">
+            <Link className={styles.secondaryAction} href="/resume">
               Read the résumé <span aria-hidden="true">↗</span>
             </Link>
           </div>
-          <dl className="audience-ledger" aria-label="Areas of work">
+        </div>
+
+        <div className={styles.heroField} aria-label="Evidence hierarchy">
+          <p>Working range / current evidence</p>
+          <dl>
             <div>
-              <dt>01 / Build</dt>
-              <dd>Software &amp; systems</dd>
+              <dt>01 / Proven</dt>
+              <dd>
+                Software systems
+                <span>Designed, implemented, tested, released.</span>
+              </dd>
             </div>
             <div>
-              <dt>02 / Observe</dt>
-              <dd>Climate &amp; geospatial</dd>
+              <dt>02 / Applied</dt>
+              <dd>
+                Climate and geospatial
+                <span>Evidence work, not operational authority.</span>
+              </dd>
             </div>
             <div>
-              <dt>03 / Govern</dt>
-              <dd>Energy &amp; risk</dd>
+              <dt>03 / Context</dt>
+              <dd>
+                Energy governance
+                <span>Historical study and prospective interest.</span>
+              </dd>
             </div>
           </dl>
-        </div>
-
-        <div className="hero-spine hero-spine-desktop">
-          <HeroPrinciple />
-        </div>
-
-        <details className="hero-principle-mobile">
-          <summary>
-            <span>Field note 00</span>
-            <strong>Inspect the working principle</strong>
-            <span aria-hidden="true">+</span>
-          </summary>
-          <div className="hero-principle-panel">
-            <HeroPrinciple />
-          </div>
-        </details>
-      </section>
-
-      <section className="selected-work" id="selected-work" aria-labelledby="selected-title">
-        <div className="shell section-heading">
-          <div>
-            <p className="eyebrow">Selected work / 2026</p>
-            <h2 id="selected-title">Two systems. Different terrain. The same demand for proof.</h2>
-          </div>
-          <p>
-            Each case study begins with the decision and works backward through evidence, tradeoffs,
-            and what the result does not establish.
+          <p className={styles.heroFieldNote}>
+            The portfolio says what changed, what passed, and what remains outside the claim.
           </p>
         </div>
-
-        <nav className="shell mobile-flagship-index" aria-label="Flagship case studies">
-          <Link href={burnlens.href}>
-            <span>01</span>
-            <strong>{burnlens.title}</strong>
-            <small>Baseline retained · model rejected</small>
-          </Link>
-          <Link href={runbook.href}>
-            <span>02</span>
-            <strong>{runbook.title}</strong>
-            <small>Authority separated · model excluded</small>
-          </Link>
-        </nav>
-
-        <div className="shell flagship-grid">
-          <article className="flagship flagship-burnlens" id="burnlens">
-            <Link className="flagship-media" href={burnlens.href} aria-label={`Read ${burnlens.title} case study`}>
-              <Image
-                src="/media/projects/burnlens/ward-creek-overlay.png"
-                alt="BurnLens Ward Creek evidence map with two bounded RBR footprints and official context."
-                fill
-                sizes="(max-width: 900px) 100vw, 52vw"
-              />
-              <span className="media-index">PLATE B.01</span>
-            </Link>
-            <div className="flagship-copy">
-              <div className="project-meta">
-                <span>Climate · computer vision · GEOINT</span>
-                <span>{burnlens.status}</span>
-              </div>
-              <h3>{burnlens.title}</h3>
-              <p className="project-thesis">{burnlens.thesis}</p>
-              <dl className="proof-line">
-                {burnlens.proof.map((item) => (
-                  <div key={item.label}>
-                    <dt>{item.label}</dt>
-                    <dd>{item.value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="project-links">
-                <Link className="text-link" href={burnlens.href}>
-                  Read case study <span aria-hidden="true">→</span>
-                </Link>
-                <a className="quiet-link" href={burnlens.sourceHref} target="_blank" rel="noreferrer">
-                  Inspect source <span className="sr-only">(opens in a new tab)</span> ↗
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <article className="flagship flagship-runbook" id="runbook-sentinel">
-            <Link
-              className="flagship-media runbook-media"
-              href={runbook.href}
-              aria-label={`Read ${runbook.title} case study`}
-            >
-              <Image
-                src="/media/projects/runbook-sentinel/dashboard-baseline-0020.png"
-                alt="Runbook Sentinel baseline 0020 dashboard showing evaluation pass, exact coverage metrics, an authenticated external-operator boundary, and disconnected real infrastructure."
-                fill
-                sizes="(max-width: 900px) 100vw, 48vw"
-              />
-              <span className="media-index">TRACE R.20</span>
-            </Link>
-            <div className="flagship-copy">
-              <div className="project-meta">
-                <span>Software · SRE safety · evaluation</span>
-                <span>{runbook.status}</span>
-              </div>
-              <h3>{runbook.title}</h3>
-              <p className="project-thesis">{runbook.thesis}</p>
-              <dl className="proof-line">
-                {runbook.proof.map((item) => (
-                  <div key={item.label}>
-                    <dt>{item.label}</dt>
-                    <dd>{item.value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="project-links">
-                <Link className="text-link" href={runbook.href}>
-                  Read case study <span aria-hidden="true">→</span>
-                </Link>
-                <a className="quiet-link" href={runbook.sourceHref} target="_blank" rel="noreferrer">
-                  Inspect v0.0.20 source <span className="sr-only">(opens in a new tab)</span> ↗
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
       </section>
 
-      <section className="method-section shell" aria-labelledby="method-title">
-        <div className="method-intro">
-          <p className="eyebrow">Working method</p>
-          <h2 id="method-title">Source. Bound. Build. Test. Explain.</h2>
-          <p>
-            I am interested in the part after the demo: what the system can actually support, how it
-            fails, and whether another person can inspect the path to the result.
-          </p>
+      <header className={`shell ${styles.workIntro}`} id="selected-work">
+        <div className={styles.workIntroHeading}>
+          <p className={styles.eyebrow}>Selected work / two flagships</p>
+          <h2 id="selected-work-title">Failure is useful when it changes the build.</h2>
         </div>
-        <ol className="method-list">
-          <li><span>01</span><strong>Source</strong><p>Establish provenance, rights, and the exact question.</p></li>
-          <li><span>02</span><strong>Bound</strong><p>Separate evidence, authority, and uncertainty.</p></li>
-          <li><span>03</span><strong>Build</strong><p>Prefer inspectable components and deterministic behavior.</p></li>
-          <li><span>04</span><strong>Test</strong><p>Keep failures, held-out checks, and release evidence visible.</p></li>
-          <li><span>05</span><strong>Explain</strong><p>Design the artifact so technical and public audiences can review it.</p></li>
-        </ol>
-      </section>
-
-      <section className="secondary-section" aria-labelledby="secondary-title">
-        <div className="shell secondary-grid">
-          <div className="secondary-intro">
-            <p className="eyebrow">Adjacent evidence</p>
-            <h2 id="secondary-title">Interaction and governance need evidence too.</h2>
-            <p>
-              Supporting work stays concise until its authorship, rights, implementation, and
-              evaluation can carry a designed case study. These two cleared that bar narrowly.
+        <aside
+          className={styles.makingLedger}
+          data-portfolio-making
+          aria-labelledby="portfolio-making-title"
+        >
+          <div className={styles.makingHeading}>
+            <p className={styles.makingKicker}>Portfolio making / bounded orchestration</p>
+            <h3 id="portfolio-making-title">How this portfolio was made</h3>
+            <p className={styles.makingThesis}>
+              I orchestrate Codex through bounded goals, explicit authority, critique,
+              verification, and human gates—not as an authorial stand-in.
             </p>
           </div>
-          <div className="secondary-list">
-            {projects.secondary.map((project, index) => (
-              <article className="secondary-item" key={project.title}>
-                <span className="item-number">0{index + 1}</span>
+
+          <dl className={styles.makingRoles}>
+            <div data-orchestration-marker="D.01">
+              <dt>
+                <span>D.01</span> Drew / Direction and decision
+              </dt>
+              <dd>
+                Set the audience and use boundaries, make product and presentation decisions, and
+                approve the exact public representation when a human gate is required.
+              </dd>
+            </div>
+            <div data-orchestration-marker="C.01">
+              <dt>
+                <span>C.01</span> Codex / Bounded execution
+              </dt>
+              <dd>
+                Decompose milestones, research approved public sources, implement within exact
+                scope, critique the UX, preserve failed attempts, and verify the result.
+              </dd>
+            </div>
+            <div data-orchestration-marker="E.01">
+              <dt>
+                <span>E.01</span> One concrete turn / BurnLens release surface
+              </dt>
+              <dd>
+                For BurnLens, I bounded the release to one repository and directed it to Codex
+                Sites. Codex assembled a canonical reviewer path, rechecked source and claim
+                boundaries, and verified the production result. A local preview and two
+                social-card attempts failed their gates, so they stayed rejected.
+              </dd>
+            </div>
+            <div data-orchestration-marker="B.01">
+              <dt>
+                <span>B.01</span> Verified boundary
+              </dt>
+              <dd>
+                The verified v0.56.0 release shipped without a bespoke social image and without
+                rewriting the underlying evidence.
+              </dd>
+            </div>
+          </dl>
+
+          <p className={styles.makingBoundary}>
+            This demonstrates a bounded human–Codex workflow—not autonomous authorship,
+            independent user testing, or universal design superiority.
+          </p>
+          <nav className={styles.makingLinks} aria-label="Portfolio-making evidence">
+            <a
+              href={orchestrationBuildHref}
+              target="_blank"
+              rel="noreferrer"
+              data-source-id="burnlens-pinned-tree"
+            >
+              Inspect public build record <span className="sr-only">(opens in a new tab)</span>
+              <span aria-hidden="true"> ↗</span>
+            </a>
+            <a
+              href={burnlensReleaseHref}
+              target="_blank"
+              rel="noreferrer"
+              data-source-id="burnlens-release"
+            >
+              Inspect v0.56.0 release <span className="sr-only">(opens in a new tab)</span>
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          </nav>
+        </aside>
+      </header>
+
+      <section data-front-door-flagships aria-labelledby="selected-work-title">
+        <article
+          className={styles.burnlens}
+          data-flagship-teaser="burnlens"
+          data-project-model-id={burnlens.id}
+          data-visual-world={burnlens.visualWorld}
+        >
+          <div className={`shell ${styles.teaserInner}`}>
+            <div className={styles.teaserCopy}>
+              <p className={styles.sequence}>Flagship 01 / release-governance evidence system</p>
+              <p className={styles.maturity}>{evidenceSummary("burnlens", "maturity")}</p>
+              <h3>{burnlens.title}</h3>
+              <p className={styles.problem}>{evidenceSummary("burnlens", "problem")}</p>
+              <dl className={styles.projectLedger}>
                 <div>
-                  <p className="project-kind">{project.kind}</p>
-                  <h3>{project.title}</h3>
-                  <p>{project.thesis}</p>
+                  <dt>My role</dt>
+                  <dd>{evidenceSummary("burnlens", "personalRole")}</dd>
                 </div>
-                {project.href ? (
-                  <Link href={project.href} aria-label={`Read the ${project.title} case study`}>
-                    Read <span aria-hidden="true">→</span>
-                  </Link>
-                ) : (
-                  <a
-                    href={project.sourceHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Open ${project.title} review evidence in a new tab`}
-                  >
-                    Inspect <span aria-hidden="true">↗</span>
-                  </a>
-                )}
-              </article>
-            ))}
+                <div>
+                  <dt>Result</dt>
+                  <dd>{evidenceSummary("burnlens", "outcome")}</dd>
+                </div>
+                <div>
+                  <dt>Limit</dt>
+                  <dd>{evidenceSummary("burnlens", "limitations")}</dd>
+                </div>
+              </dl>
+              <Link
+                className={styles.caseLink}
+                href={burnlens.route}
+                aria-label="Read BurnLens case study"
+              >
+                Read BurnLens case study <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <AtlasFigure />
+          </div>
+        </article>
+
+        <article
+          className={styles.runbook}
+          data-flagship-teaser="runbook-sentinel"
+          data-project-model-id={runbook.id}
+          data-visual-world={runbook.visualWorld}
+        >
+          <div className={`shell ${styles.teaserInner}`}>
+            <div className={styles.teaserCopy}>
+              <p className={styles.sequence}>Flagship 02 / synthetic incident-response testbed</p>
+              <p className={styles.maturity}>{evidenceSummary("runbook-sentinel", "maturity")}</p>
+              <h3>{runbook.title}</h3>
+              <p className={styles.problem}>{evidenceSummary("runbook-sentinel", "problem")}</p>
+              <dl className={styles.projectLedger}>
+                <div>
+                  <dt>My role</dt>
+                  <dd>{evidenceSummary("runbook-sentinel", "personalRole")}</dd>
+                </div>
+                <div>
+                  <dt>Decision</dt>
+                  <dd>{evidenceSummary("runbook-sentinel", "decisionSupported")}</dd>
+                </div>
+                <div>
+                  <dt>Result</dt>
+                  <dd>{evidenceSummary("runbook-sentinel", "outcome")}</dd>
+                </div>
+                <div>
+                  <dt>Limit</dt>
+                  <dd>{evidenceSummary("runbook-sentinel", "limitations")}</dd>
+                </div>
+              </dl>
+              <FeaturedTurn failure={runbookTurn} source={runbookTurnSource} />
+              <Link
+                className={styles.caseLink}
+                href={runbook.route}
+                aria-label="Read Runbook Sentinel case study"
+              >
+                Read Runbook Sentinel case study <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <ControlTraceFigure />
+          </div>
+        </article>
+      </section>
+
+      <section
+        className={`shell ${styles.supporting}`}
+        data-supporting-notes
+        aria-labelledby="supporting-title"
+      >
+        <header>
+          <p className={styles.eyebrow}>Supporting notes / deliberately smaller</p>
+          <h2 id="supporting-title">Two focused studies, without borrowed flagship weight.</h2>
+          <p>
+            These shorter field notes show bounded interaction and documentation work. Each is
+            designed only from what its public evidence supports.
+          </p>
+        </header>
+
+        <div className={styles.supportingList}>
+          <article data-project-model-id={quest.id}>
+            <p className={styles.noteMaturity}>{evidenceSummary("quest-craft", "maturity")}</p>
+            <h3>{quest.title}</h3>
+            <p>{evidenceSummary("quest-craft", "problem")}</p>
+            <dl>
+              <div>
+                <dt>For</dt>
+                <dd>{evidenceSummary("quest-craft", "intendedUser")}</dd>
+              </div>
+              <div>
+                <dt>My role</dt>
+                <dd>{evidenceSummary("quest-craft", "personalRole")}</dd>
+              </div>
+              <div>
+                <dt>Authority</dt>
+                <dd>{evidenceSummary("quest-craft", "decisionSupported")}</dd>
+              </div>
+              <div>
+                <dt>Result</dt>
+                <dd>{evidenceSummary("quest-craft", "outcome")}</dd>
+              </div>
+              <div>
+                <dt>Boundary</dt>
+                <dd>{evidenceSummary("quest-craft", "limitations")}</dd>
+              </div>
+            </dl>
+            <p className={styles.supportBoundary} data-support-boundary>
+              Public reviewer snapshot only. No private stack or general child safety claim is
+              established.
+            </p>
+            <Link href={quest.route} aria-label="Read Quest Craft field note">
+              Read Quest Craft field note →
+            </Link>
+          </article>
+
+          <article data-project-model-id={openclaw.id}>
+            <p className={styles.noteMaturity}>
+              {evidenceSummary("openclaw-showcase", "maturity")}
+            </p>
+            <h3>{openclaw.title}</h3>
+            <p>{evidenceSummary("openclaw-showcase", "problem")}</p>
+            <dl>
+              <div>
+                <dt>My role</dt>
+                <dd>{evidenceSummary("openclaw-showcase", "personalRole")}</dd>
+              </div>
+              <div>
+                <dt>Public boundary</dt>
+                <dd>{evidenceSummary("openclaw-showcase", "decisionSupported")}</dd>
+              </div>
+              <div>
+                <dt>Public artifact</dt>
+                <dd>{evidenceSummary("openclaw-showcase", "implementation")}</dd>
+              </div>
+              <div>
+                <dt>Result</dt>
+                <dd>{evidenceSummary("openclaw-showcase", "outcome")}</dd>
+              </div>
+              <div>
+                <dt>Boundary</dt>
+                <dd>{evidenceSummary("openclaw-showcase", "limitations")}</dd>
+              </div>
+            </dl>
+            <p className={styles.supportBoundary} data-support-boundary>
+              Public documentation artifact only. The private runtime was not inspected or
+              evaluated; no runtime capability, intended user, or failure dividend is established.
+            </p>
+            <Link href={openclaw.route} aria-label="Read OpenClaw Showcase field note">
+              Read OpenClaw Showcase field note →
+            </Link>
+          </article>
+        </div>
+
+        <Link className={styles.archiveLink} href="/work#historical-reading">
+          Earlier coursework stays on the quiet historical reading shelf <span aria-hidden="true">→</span>
+        </Link>
+      </section>
+
+      <section
+        className={styles.capabilityBoundary}
+        data-capability-boundary="energy-ee"
+        aria-labelledby="capability-title"
+      >
+        <div className="shell">
+          <p className={styles.eyebrow}>Hiring direction / evidence boundary</p>
+          <h2 id="capability-title">Software first. Physical-world problems in view.</h2>
+          <div className={styles.boundaryCopy}>
+            <p>
+              I’m looking for software roles where verification, physical-world context, and clear
+              technical communication matter—especially in climate and energy infrastructure.
+            </p>
+            <p>
+              Energy is historical governance context and a direction of interest—not evidence of
+              an implemented energy system. The current work does not yet establish electrical
+              engineering, controls, embedded, power-systems, or hardware implementation experience.
+            </p>
           </div>
         </div>
       </section>
 
-      <div className="coursework-shelf-section">
-        <HistoricalCourseworkShelf className="shell" />
-      </div>
-
-      <section className="closing shell" aria-labelledby="closing-title">
-        <p className="plate-label">Next question / collaboration</p>
-        <h2 id="closing-title">Need someone who is comfortable making the limits visible?</h2>
+      <section className={`shell ${styles.closing}`} aria-labelledby="closing-title">
+        <p className={styles.eyebrow}>Next conversation</p>
+        <h2 id="closing-title">Bring me the system whose limits need to be legible.</h2>
         <p>
-          I am interested in software, energy, and climate work where reliability and clear technical
-          communication matter as much as the first result.
+          The most interesting work is rarely certainty theater. It is the work of making evidence,
+          authority, failure, and recovery inspectable enough for someone else to trust the result.
         </p>
-        <div className="hero-actions">
-          <Link className="button button-primary" href="/resume">Review the résumé</Link>
-          <a className="button button-secondary" href="https://www.linkedin.com/in/william-baker-843946162/" target="_blank" rel="noreferrer">
-            Connect on LinkedIn <span className="sr-only">(opens in a new tab)</span> ↗
+        <div className={styles.actions}>
+          <Link className={styles.primaryAction} href="/resume">
+            Review the résumé
+          </Link>
+          <a
+            className={styles.secondaryAction}
+            href="https://www.linkedin.com/in/william-baker-843946162/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Connect on LinkedIn <span className="sr-only">(opens in a new tab)</span>
+            <span aria-hidden="true"> ↗</span>
           </a>
         </div>
       </section>

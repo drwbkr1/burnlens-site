@@ -1,14 +1,12 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Runbook Sentinel — the model is not the control plane";
+export const alt =
+  "Runbook Sentinel software control trace separating evidence and model output from approval and synthetic execution";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const nodes = [
-  ["01", "MODEL", "signal only"],
-  ["02", "PROPOSAL", "no authority"],
-  ["03", "GATE", "control"],
-];
+const signalNodes = ["EVIDENCE", "BOUNDED AGENT", "PROPOSAL"];
+const authorityNodes = ["SEPARATE APPROVAL", "FIXED GATE", "SYNTHETIC STATE"];
 
 export default function RunbookSentinelOpenGraphImage() {
   return new ImageResponse(
@@ -18,102 +16,129 @@ export default function RunbookSentinelOpenGraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "#F8F5EF",
+          background: "#E9E2D8",
           color: "#222222",
           fontFamily: "Arial, sans-serif",
         }}
       >
         <div
           style={{
-            width: 740,
+            width: 680,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            padding: "60px 66px",
-            borderRight: "1px solid rgba(34,34,34,.24)",
+            padding: "54px 58px",
+            borderRight: "2px solid #222222",
           }}
         >
-          <div style={{ display: "flex", fontSize: 18, letterSpacing: 3.5, color: "#2E4B51" }}>
-            RUNBOOK SENTINEL / CASE 02
+          <div style={{ display: "flex", fontSize: 17, letterSpacing: 3, color: "#314E54" }}>
+            RUNBOOK SENTINEL / SOFTWARE FLAGSHIP
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 21 }}>
-            <div style={{ display: "flex", maxWidth: 610, fontSize: 68, lineHeight: 0.98, letterSpacing: -3.2 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", maxWidth: 570, fontSize: 66, lineHeight: 0.98, letterSpacing: -3 }}>
               The model is not the control plane.
             </div>
-            <div style={{ display: "flex", maxWidth: 590, fontSize: 24, lineHeight: 1.35, color: "#48513F" }}>
-              93 frozen attempts. Exact outcomes. Zero real systems connected.
+            <div style={{ display: "flex", maxWidth: 555, fontSize: 22, lineHeight: 1.35, color: "#48513F" }}>
+              A tested local model failed the fixed contract. Deterministic control stayed.
             </div>
           </div>
-          <div style={{ display: "flex", fontSize: 18, color: "#555A55" }}>
-            DREW BAKER · EVIDENCE-BOUND SYSTEMS
+          <div style={{ display: "flex", fontSize: 16, letterSpacing: 1.5, color: "#454843" }}>
+            VERIFIED SYNTHETIC TESTBED · v0.0.20 · ZERO REAL SYSTEMS
           </div>
         </div>
 
         <div
           style={{
-            width: 460,
+            width: 520,
             display: "flex",
             flexDirection: "column",
-            padding: "54px 45px",
-            background: "#2E4B51",
+            justifyContent: "center",
+            gap: 22,
+            padding: "42px 38px",
+            background: "#222222",
             color: "#FFFFFF",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              paddingBottom: 15,
-              borderBottom: "3px solid #FFFFFF",
-              fontSize: 15,
-              letterSpacing: 2,
-            }}
-          >
-            <span style={{ display: "flex" }}>AUTHORITY ISOLATOR</span>
-            <span style={{ display: "flex", color: "#F0B9A4" }}>OPEN</span>
-          </div>
-
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              gap: 12,
-            }}
-          >
-            {nodes.map(([number, title, note], index) => (
-              <div key={number} style={{ display: "flex", flexDirection: "column" }}>
-                <div
-                  style={{
-                    minHeight: 82,
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "13px 16px",
-                    border: index === 1 ? "2px solid #CB7A5C" : "1px solid rgba(255,255,255,.55)",
-                  }}
-                >
-                  <span style={{ display: "flex", width: 46, color: "#C7CDBF", fontSize: 15 }}>{number}</span>
-                  <span style={{ display: "flex", flex: 1, fontSize: 23, letterSpacing: 1 }}>{title}</span>
-                  <span style={{ display: "flex", color: "#D7DEDB", fontSize: 14 }}>{note}</span>
-                </div>
-                {index < nodes.length - 1 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", color: "#C7CDBF", fontSize: 14, letterSpacing: 2 }}>
+              <span style={{ display: "flex" }}>SIGNAL RAIL</span>
+              <span style={{ display: "flex" }}>MAY INFORM</span>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {signalNodes.map((node, index) => (
+                <div key={node} style={{ display: "flex", alignItems: "center", flex: 1 }}>
                   <div
                     style={{
+                      minHeight: 62,
+                      width: "100%",
                       display: "flex",
-                      alignSelf: "center",
-                      width: 2,
-                      height: 12,
-                      background: index === 1 ? "#CB7A5C" : "#C7CDBF",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px",
+                      border: "2px dashed #C7CDBF",
+                      color: "#FFFFFF",
+                      fontSize: 14,
+                      textAlign: "center",
                     }}
-                  />
-                ) : null}
-              </div>
-            ))}
+                  >
+                    {node}
+                  </div>
+                  {index < signalNodes.length - 1 ? (
+                    <span style={{ display: "flex", padding: "0 2px", color: "#C7CDBF" }}>→</span>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div style={{ display: "flex", fontSize: 14, letterSpacing: 1.5, color: "#C7CDBF" }}>
-            SYNTHETIC STATE ONLY · v0.0.20
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 14,
+              padding: "12px",
+              border: "2px solid #CB7A5C",
+              color: "#FFFFFF",
+              fontSize: 15,
+              letterSpacing: 1.2,
+            }}
+          >
+            <span style={{ display: "flex", color: "#CB7A5C", fontSize: 26 }}>○ ／ ○</span>
+            NO AUTHORITY ALONE
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", color: "#C7CDBF", fontSize: 14, letterSpacing: 2 }}>
+              <span style={{ display: "flex" }}>AUTHORITY RAIL</span>
+              <span style={{ display: "flex" }}>MAY CHANGE SYNTHETIC STATE</span>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {authorityNodes.map((node, index) => (
+                <div key={node} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                  <div
+                    style={{
+                      minHeight: 62,
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px",
+                      border: "2px solid #757F64",
+                      background: index === 2 ? "#C7CDBF" : "#314E54",
+                      color: index === 2 ? "#222222" : "#FFFFFF",
+                      fontSize: 14,
+                      textAlign: "center",
+                    }}
+                  >
+                    {node}
+                  </div>
+                  {index < authorityNodes.length - 1 ? (
+                    <span style={{ display: "flex", padding: "0 2px", color: "#C7CDBF" }}>→</span>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

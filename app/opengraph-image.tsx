@@ -39,13 +39,13 @@ export default function OpenGraphImage() {
           <div style={{ display: "flex", fontSize: 22, fontWeight: 700, letterSpacing: "0.12em" }}>
             WILLIAM DREW BAKER
           </div>
-          <div style={{ color: "#5C757A", display: "flex", fontSize: 17, letterSpacing: "0.2em" }}>
+          <div style={{ color: "#314E54", display: "flex", fontSize: 17, letterSpacing: "0.2em" }}>
             NORDIC FIELD ATLAS / 001
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", maxWidth: 960 }}>
-          <div style={{ color: "#757F64", display: "flex", fontSize: 24, letterSpacing: "0.12em" }}>
+          <div style={{ color: "#48513F", display: "flex", fontSize: 24, letterSpacing: "0.12em" }}>
             SOFTWARE · GEOSPATIAL EVIDENCE · CLIMATE + INFRASTRUCTURE
           </div>
           <div
@@ -62,12 +62,12 @@ export default function OpenGraphImage() {
           </div>
         </div>
 
-        <div style={{ borderTop: "1px solid #757F64", display: "flex", width: "100%" }}>
+        <div style={{ borderTop: "1px solid #48513F", display: "flex", width: "100%" }}>
           {evidenceCells.map(([id, label, text], index) => (
             <div
               key={id}
               style={{
-                borderLeft: index === 0 ? "none" : "1px solid #757F64",
+                borderLeft: index === 0 ? "none" : "1px solid #48513F",
                 display: "flex",
                 flex: 1,
                 flexDirection: "column",
@@ -75,7 +75,7 @@ export default function OpenGraphImage() {
                 padding: index === 0 ? "20px 24px 0 0" : "20px 24px 0",
               }}
             >
-              <div style={{ color: index === 2 ? "#CB7A5C" : "#5C757A", display: "flex", fontSize: 17, fontWeight: 700 }}>
+              <div style={{ color: index === 2 ? "#7A3828" : "#314E54", display: "flex", fontSize: 17, fontWeight: 700 }}>
                 {id} / {label}
               </div>
               <div style={{ display: "flex", fontSize: 22 }}>{text}</div>

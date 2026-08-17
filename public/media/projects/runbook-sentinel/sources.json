@@ -4,7 +4,7 @@
   "source_repository": "https://github.com/drwbkr1/runbook-sentinel",
   "source_commit": "f149ac2408f30b504b78844780b8533bed2ebfdc",
   "release_tag": "v0.0.20",
-  "reuse_boundary": "Owner-directed reuse in Drew Baker's personal portfolio; the source repository has no top-level license, so this manifest does not grant general reuse rights.",
+  "reuse_boundary": "Owner-approved public display of the exact hash-bound asset in Drew Baker's personal portfolio; the source repository has no top-level license, so this manifest does not grant general reuse rights.",
   "assets": [
     {
       "path": "/media/projects/runbook-sentinel/dashboard-baseline-0020.png",
@@ -12,10 +12,10 @@
       "sha256": "66f153bac21c2ce5f5b287115c162e9122a66253be59222dd0195332aa25c80c",
       "bytes": 78862,
       "author": "Drew Baker / Runbook Sentinel project",
-      "reuse_basis": "Owner-directed reuse in Drew Baker's personal portfolio; source repository has no top-level license",
-      "alt": "Runbook Sentinel baseline 0020 dashboard showing evaluation pass, exact coverage metrics, an authenticated external-operator boundary, and disconnected real infrastructure.",
+      "reuse_basis": "Owner-directed reuse of this exact hash-bound asset for public display in Drew Baker's personal portfolio; the source repository has no top-level license and no general reuse right is granted",
+      "alt": "Runbook Sentinel dashboard screenshot showing the frozen evaluation pass, exact test metrics, a launch-scoped loopback approval boundary, and real infrastructure disconnected.",
       "captured_at": "2026-08-08",
-      "status": "approved_for_local_portfolio_build"
+      "status": "approved_for_public_personal_portfolio"
     }
   ],
   "evidence_sources": [

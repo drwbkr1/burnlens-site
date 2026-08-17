@@ -1,11 +1,8 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
-const warning =
-  "Experimental BurnLens CV output. Not official wildfire information. Not emergency guidance. Not evacuation, routing, tactical, or incident-command support. Official sources govern.";
-
 async function readJson(relativePath) {
   return JSON.parse(await readFile(resolve(root, relativePath), "utf8"));
 }
@@ -18,33 +15,21 @@ async function inspectAsset(publicPath) {
   };
 }
 
-const burnlens = await readJson("public/media/projects/burnlens/manifest.json");
-if (burnlens.mandatory_warning !== warning) {
-  throw new Error("BurnLens mandatory warning drifted from the approved exact text.");
-}
-if (burnlens.license?.spdx !== "MIT") {
-  throw new Error("BurnLens portfolio media manifest is missing its MIT reuse record.");
-}
-
 const verified = [];
-for (const entry of burnlens.entries) {
-  const actual = await inspectAsset(entry.public_path);
-  if (actual.sha256 !== entry.copied_sha256 || actual.sha256 !== entry.source_sha256) {
-    throw new Error(`BurnLens media hash mismatch: ${entry.public_path}`);
+for (const removedPath of [
+  "public/media/projects/burnlens/manifest.json",
+  "public/media/projects/burnlens/LICENSE.txt",
+  "public/media/projects/burnlens/baseline-evaluation.png",
+  "public/media/projects/burnlens/model-decision.png",
+  "public/media/projects/burnlens/ward-creek-overlay.png",
+]) {
+  try {
+    await access(resolve(root, removedPath));
+  } catch (error) {
+    if (error?.code === "ENOENT") continue;
+    throw error;
   }
-  if (actual.bytes !== entry.bytes) {
-    throw new Error(`BurnLens media byte-count mismatch: ${entry.public_path}`);
-  }
-  verified.push({ project: "BurnLens", path: entry.public_path, ...actual });
-}
-
-for (const source of burnlens.evidence_sources ?? []) {
-  if (!/^[a-f0-9]{64}$/.test(source.sha256) || !Number.isInteger(source.bytes) || source.bytes <= 0) {
-    throw new Error(`BurnLens evidence identity is invalid: ${source.source_path}`);
-  }
-  if (!/^(samples|records)\//.test(source.source_path ?? "")) {
-    throw new Error(`BurnLens evidence path is not repository-relative: ${source.source_path}`);
-  }
+  throw new Error(`Removed BurnLens governed-media path still exists: ${removedPath}`);
 }
 
 const runbook = await readJson("public/media/projects/runbook-sentinel/sources.json");
@@ -64,6 +49,9 @@ for (const entry of runbook.assets) {
   }
   if (!entry.reuse_basis?.includes("Owner-directed reuse")) {
     throw new Error(`Runbook Sentinel media reuse basis missing: ${entry.path}`);
+  }
+  if (entry.status !== "approved_for_public_personal_portfolio") {
+    throw new Error(`Runbook Sentinel public-display status is invalid: ${entry.path}`);
   }
   verified.push({ project: "Runbook Sentinel", path: entry.path, ...actual });
 }
@@ -99,6 +87,9 @@ for (const entry of questCraft.assets ?? []) {
   }
   if (!entry.reuse_basis?.includes("Owner-directed original portfolio asset")) {
     throw new Error(`Quest Craft media reuse basis missing: ${entry.path}`);
+  }
+  if (entry.status !== "approved_for_public_personal_portfolio") {
+    throw new Error(`Quest Craft public-display status is invalid: ${entry.path}`);
   }
   if (entry.width !== 1200 || entry.height !== 630) {
     throw new Error(`Quest Craft social-preview dimensions are invalid: ${entry.path}`);
@@ -143,4 +134,8 @@ for (const entry of fontLicenses.entries ?? []) {
   verified.push({ project: entry.package, path: entry.path, ...actual });
 }
 
-console.log(JSON.stringify({ status: "pass", verified_assets: verified }, null, 2));
+console.log(JSON.stringify({
+  status: "pass",
+  burnlens_governed_assets: 0,
+  verified_assets: verified,
+}, null, 2));

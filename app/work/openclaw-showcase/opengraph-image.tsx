@@ -1,14 +1,14 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "OpenClaw Showcase — public documentation, approval-gated interpretation, private runtime";
+  "OpenClaw Showcase public documentation folio; the excluded runtime was not inspected or evaluated";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const layers = [
   ["01", "PUBLIC", "workflow · review · limits", "#C7CDBF", "#222222"],
-  ["02", "APPROVAL-GATED", "interpretation · release · claims", "#F0C5B4", "#222222"],
-  ["03", "PRIVATE", "runtime · traces · authority", "#2E4B51", "#FFFFFF"],
+  ["02", "APPROVAL-GATED", "interpretation · release · claims", "#CB7A5C", "#222222"],
+  ["03", "NOT INSPECTED", "excluded runtime · no capability claim", "#314E54", "#FFFFFF"],
 ] as const;
 
 export default function OpenClawShowcaseOpenGraphImage() {
@@ -19,7 +19,7 @@ export default function OpenClawShowcaseOpenGraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "#F8F5EF",
+          background: "#F7F3ED",
           color: "#222222",
           fontFamily: "Arial, sans-serif",
         }}
@@ -31,11 +31,11 @@ export default function OpenClawShowcaseOpenGraphImage() {
             flexDirection: "column",
             justifyContent: "space-between",
             padding: "58px 64px",
-            borderRight: "1px solid rgba(34,34,34,.24)",
+            borderRight: "1px solid #222222",
           }}
         >
-          <div style={{ display: "flex", fontSize: 17, letterSpacing: 3.4, color: "#2E4B51" }}>
-            OPENCLAW SHOWCASE / PUBLIC DOCUMENTATION
+          <div style={{ display: "flex", fontSize: 17, letterSpacing: 3.4, color: "#314E54" }}>
+            OPENCLAW SHOWCASE / PUBLIC DOCUMENTATION ARTIFACT
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
             <div
@@ -47,7 +47,7 @@ export default function OpenClawShowcaseOpenGraphImage() {
                 letterSpacing: -3,
               }}
             >
-              Make the process legible. Keep authority out of frame.
+              The public record stops at the runtime boundary.
             </div>
             <div
               style={{
@@ -58,11 +58,11 @@ export default function OpenClawShowcaseOpenGraphImage() {
                 color: "#48513F",
               }}
             >
-              Documentary workflow patterns—not runtime proof.
+              A conceptual workflow and one sanitized representative receipt—not runtime proof.
             </div>
           </div>
-          <div style={{ display: "flex", fontSize: 17, color: "#555A55" }}>
-            DREW BAKER · EVIDENCE-BOUND SYSTEMS
+          <div style={{ display: "flex", fontSize: 17, color: "#5F5F5F" }}>
+            DREW BAKER · PUBLIC DOCUMENTATION LAYER
           </div>
         </div>
 
@@ -85,8 +85,8 @@ export default function OpenClawShowcaseOpenGraphImage() {
               letterSpacing: 2,
             }}
           >
-            <span style={{ display: "flex" }}>TRANSPARENCY REGISTER</span>
-            <span style={{ display: "flex", color: "#713423" }}>EXACT SNAPSHOT</span>
+            <span style={{ display: "flex" }}>DISCLOSURE FOLIO</span>
+            <span style={{ display: "flex", color: "#7A3828" }}>FROZEN SNAPSHOT</span>
           </div>
 
           <div
@@ -117,7 +117,7 @@ export default function OpenClawShowcaseOpenGraphImage() {
                   style={{
                     display: "flex",
                     width: 42,
-                    color: index === 2 ? "#F0C5B4" : "#713423",
+                    color: index === 2 ? "#C7CDBF" : index === 1 ? "#222222" : "#7A3828",
                     fontSize: 14,
                   }}
                 >
@@ -129,8 +129,8 @@ export default function OpenClawShowcaseOpenGraphImage() {
                 <span
                   style={{
                     display: "flex",
-                    maxWidth: 125,
-                    fontSize: 12,
+                    maxWidth: 138,
+                    fontSize: 13,
                     lineHeight: 1.25,
                     textAlign: "right",
                   }}
@@ -141,8 +141,19 @@ export default function OpenClawShowcaseOpenGraphImage() {
             ))}
           </div>
 
-          <div style={{ display: "flex", fontSize: 13, letterSpacing: 1.4, color: "#555A55" }}>
-            8 PUBLIC DOCUMENTS · 0 RUNTIME ARTIFACTS SHOWN
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              fontSize: 13,
+              lineHeight: 1.25,
+              letterSpacing: 1.2,
+              color: "#5F5F5F",
+            }}
+          >
+            <span style={{ display: "flex" }}>8 PUBLIC DOCUMENTS · 9 CONCEPTUAL DIAGRAMS</span>
+            <span style={{ display: "flex" }}>EXCLUDED RUNTIME NOT INSPECTED OR EVALUATED</span>
           </div>
         </div>
       </div>
