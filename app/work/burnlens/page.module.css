@@ -1,0 +1,474 @@
+.page {
+  background: var(--paper);
+  color: var(--charcoal);
+  font-family: var(--sans);
+}
+
+.atlas {
+  width: min(calc(100% - 2rem), var(--max));
+  margin-inline: auto;
+  border-inline: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.hero {
+  min-height: min(48rem, calc(100svh - 5rem));
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 2rem;
+  align-content: space-between;
+  padding: clamp(1.25rem, 3vw, 3.5rem);
+  border-bottom: 1px solid var(--charcoal);
+  background: var(--sand);
+}
+
+.heroRegister {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--charcoal);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroRegister p,
+.heroTitle p,
+.heroClaims p,
+.sectionIndex p,
+.authorityLedger p,
+.assemblyBody p,
+.boundaryBody p,
+.caseFooter p {
+  margin: 0;
+}
+
+.heroTitle {
+  grid-column: 1 / span 7;
+  align-self: end;
+}
+
+.eyebrow {
+  color: var(--olive-dark);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.heroTitle h1 {
+  max-width: 8ch;
+  margin: 0.35rem 0 0;
+  font-family: var(--serif);
+  font-size: clamp(4rem, 9vw, 8.75rem);
+  font-weight: 520;
+  letter-spacing: -0.065em;
+  line-height: 0.84;
+}
+
+.heroClaims {
+  grid-column: 8 / -1;
+  align-self: end;
+  padding: 1.3rem 0 0 1.5rem;
+  border-top: 0.45rem solid var(--terracotta);
+  border-left: 1px solid var(--charcoal);
+}
+
+.lede {
+  max-width: 31rem;
+  font-family: var(--serif);
+  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.audience {
+  max-width: 38rem;
+  padding-top: 1.4rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.chapterIndex {
+  border-bottom: 1px solid var(--charcoal);
+  background: var(--paper);
+}
+
+.chapterIndex ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chapterIndex li + li {
+  border-left: 1px solid var(--rule);
+}
+
+.chapterIndex a {
+  min-height: 4.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem clamp(0.8rem, 2vw, 1.6rem);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapterIndex a:hover {
+  background: var(--sage);
+}
+
+.chapterIndex a span {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.authority,
+.assembly,
+.boundary {
+  scroll-margin-top: 6rem;
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.6fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 4vw, 4.5rem);
+}
+
+.authority,
+.boundary {
+  background: var(--paper);
+}
+
+.assembly {
+  background: var(--charcoal);
+  color: var(--white);
+}
+
+.sectionIndex {
+  align-self: start;
+}
+
+.recordLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--olive-dark);
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.assembly .recordLabel {
+  color: var(--sage);
+}
+
+.recordLabel span {
+  display: inline-grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  font-family: var(--mono);
+}
+
+.sectionIndex h2 {
+  max-width: 12ch;
+  margin: 1.5rem 0 0;
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 5vw, 5.2rem);
+  font-weight: 520;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+}
+
+.authorityLedger {
+  border-top: 1px solid var(--charcoal);
+}
+
+.authorityLedger article {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem 0 2.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.authorityLedger article > p:last-child {
+  max-width: 46rem;
+  font-family: var(--serif);
+  font-size: clamp(1.35rem, 2.1vw, 1.9rem);
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+}
+
+.ledgerMark {
+  color: var(--olive-dark);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.assemblyBody {
+  min-width: 0;
+}
+
+.decision {
+  max-width: 34ch;
+  font-family: var(--serif);
+  font-size: clamp(1.75rem, 3vw, 3.1rem);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.releaseRecord {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: clamp(3rem, 6vw, 6rem);
+  padding-block: 1.5rem;
+  border-block: 1px solid var(--teal);
+}
+
+.releaseRecord .ledgerMark {
+  color: var(--sage);
+}
+
+.releaseRecord > p:last-child {
+  max-width: 42rem;
+  overflow-wrap: anywhere;
+}
+
+.evidenceLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1.5rem;
+  border: 1px solid var(--sage);
+}
+
+.evidenceLinks a {
+  min-height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.evidenceLinks a + a {
+  border-left: 1px solid var(--sage);
+}
+
+.evidenceLinks a:hover {
+  background: var(--teal-dark);
+}
+
+.assembly a:focus-visible {
+  outline-color: var(--sage);
+}
+
+.boundary {
+  border-bottom: 1px solid var(--charcoal);
+}
+
+.boundaryBody {
+  min-width: 0;
+}
+
+.limit {
+  max-width: 36ch;
+  padding: clamp(1.4rem, 3vw, 2.3rem);
+  border: 1px solid var(--terracotta-dark);
+  color: var(--terracotta-dark);
+  font-family: var(--serif);
+  font-size: clamp(1.45rem, 2.5vw, 2.35rem);
+  letter-spacing: -0.02em;
+  line-height: 1.16;
+}
+
+.lesson {
+  max-width: 29ch;
+  margin-top: clamp(3rem, 6vw, 6rem) !important;
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  font-weight: 520;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+
+.lesson::before {
+  width: 4.5rem;
+  height: 0.5rem;
+  display: block;
+  margin-bottom: 1.4rem;
+  background: var(--olive);
+  content: "";
+}
+
+.caseFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem clamp(1.25rem, 4vw, 4.5rem);
+  background: var(--sand);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.caseFooter a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+}
+
+@media (max-width: 780px) {
+  .atlas {
+    width: min(calc(100% - 1.25rem), var(--max));
+  }
+
+  .hero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding-block: 1.25rem 4rem;
+  }
+
+  .heroRegister,
+  .heroTitle,
+  .heroClaims {
+    grid-column: 1;
+  }
+
+  .heroRegister {
+    align-items: flex-start;
+  }
+
+  .heroRegister p:last-child {
+    max-width: 15rem;
+    text-align: right;
+  }
+
+  .heroTitle h1 {
+    max-width: none;
+    font-size: clamp(4rem, 20vw, 7rem);
+  }
+
+  .heroClaims {
+    max-width: 39rem;
+  }
+
+  .chapterIndex ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chapterIndex li:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .chapterIndex li:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+
+  .authority,
+  .assembly,
+  .boundary {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+    padding-block: 4rem;
+  }
+
+  .sectionIndex h2 {
+    max-width: 15ch;
+  }
+}
+
+@media (max-width: 520px) {
+  .heroRegister {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+
+  .heroRegister p:last-child {
+    max-width: none;
+    text-align: left;
+  }
+
+  .heroClaims {
+    padding-left: 1rem;
+  }
+
+  .authorityLedger article,
+  .releaseRecord {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .evidenceLinks {
+    grid-template-columns: 1fr;
+  }
+
+  .evidenceLinks a + a {
+    border-top: 1px solid var(--sage);
+    border-left: 0;
+  }
+
+  .caseFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  .page,
+  .atlas,
+  .hero,
+  .authority,
+  .boundary,
+  .caseFooter {
+    background: var(--white);
+  }
+
+  .atlas {
+    width: 100%;
+    border: 0;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .chapterIndex,
+  .caseFooter {
+    display: none;
+  }
+
+  .authority,
+  .assembly,
+  .boundary {
+    break-inside: avoid;
+    padding-block: 2rem;
+  }
+
+  .evidenceLinks a {
+    font-size: 13px;
+  }
+}

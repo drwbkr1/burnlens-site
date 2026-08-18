@@ -1,0 +1,17 @@
+{
+  "project": "OpenClaw Showcase",
+  "source_boundary": {
+    "public_snapshot_commit": "3695666f6a44c095674049e64d23f0bdace2fb70",
+    "public_snapshot_tree": "f7629e844aa1e93be622a0b7a9307afd7b3beab5",
+    "note": "The frozen public repository supports a documentary case about workflow, traceability, review, and disclosure boundaries. It does not support claims about the excluded runtime, execution, technical enforcement, reliability, autonomy, deployment, security, or production capability."
+  },
+  "assets": [],
+  "code_native_surfaces": [
+    {
+      "path": "/work/openclaw-showcase/opengraph-image",
+      "kind": "portfolio-native generated-at-build social image",
+      "implementation": "app/work/openclaw-showcase/opengraph-image.tsx",
+      "reuse_basis": "Owner-directed original portfolio composition rendered from local code; no source-project badge, image, private-derived material, or third-party asset was copied."
+    }
+  ]
+}

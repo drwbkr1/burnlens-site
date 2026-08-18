@@ -1,0 +1,1408 @@
+.page {
+  --folio-canvas: var(--sand);
+  --folio-sheet: var(--paper);
+  --folio-ink: var(--charcoal);
+  --folio-copy: var(--ink-soft);
+  --folio-muted: var(--gray);
+  --folio-rule: var(--rule);
+  --folio-reference: var(--olive-dark);
+  --folio-process: var(--teal-dark);
+  --folio-attention: var(--terracotta-dark);
+  --folio-public: var(--sage);
+  --folio-gated: var(--terracotta);
+  --folio-private: var(--charcoal);
+  background: var(--folio-canvas);
+  color: var(--folio-ink);
+  min-width: 0;
+}
+
+.page * {
+  box-sizing: border-box;
+}
+
+.page article,
+.page section,
+.page header,
+.page div,
+.page aside,
+.page nav,
+.page figure,
+.page dl,
+.page ol,
+.page ul {
+  min-width: 0;
+}
+
+.page a {
+  color: inherit;
+}
+
+.page a:focus-visible,
+.page summary:focus-visible {
+  outline: 3px solid var(--folio-attention);
+  outline-offset: 4px;
+}
+
+.page h1,
+.page h2,
+.page h3,
+.page p,
+.page dl,
+.page dd,
+.page figure,
+.page ol,
+.page ul {
+  margin: 0;
+}
+
+.page ol,
+.page ul {
+  padding: 0;
+}
+
+.page p,
+.page dd,
+.page li,
+.page a,
+.page small,
+.page strong,
+.page em,
+.page span {
+  overflow-wrap: anywhere;
+}
+
+.page p,
+.page dd {
+  max-width: 68ch;
+}
+
+.disclosureMovement,
+.workflowMovement,
+.boundaryMovement {
+  scroll-margin-top: 5rem;
+}
+
+.disclosureMovement {
+  padding: clamp(3rem, 6vw, 5rem) max(1.25rem, calc((100vw - var(--max)) / 2));
+}
+
+.hero {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  grid-template-columns: minmax(0, 1.06fr) minmax(20rem, 0.94fr);
+  margin: 0 auto;
+  max-width: var(--max);
+  align-items: start;
+}
+
+.heroCopy {
+  padding-top: clamp(0.25rem, 2vw, 1.5rem);
+}
+
+.kicker,
+.movementLabel {
+  color: var(--folio-reference);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 5.5vw, 4.5rem);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  margin-top: clamp(1.2rem, 3vw, 2.25rem);
+  max-width: 9.8ch;
+}
+
+.hero h1 span {
+  color: var(--folio-process);
+  display: block;
+  font-size: clamp(1.55rem, 3vw, 3rem);
+  font-style: italic;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  margin-top: 1.1rem;
+  max-width: 17ch;
+}
+
+.dek {
+  color: var(--folio-copy);
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.62;
+  margin-top: clamp(1.5rem, 3vw, 2.4rem);
+  max-width: 45rem;
+}
+
+.snapshotAction {
+  align-items: center;
+  border-bottom: 2px solid var(--folio-attention);
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 800;
+  gap: 0.7rem;
+  letter-spacing: 0.07em;
+  margin-top: 1.8rem;
+  min-height: 44px;
+  padding: 0.45rem 0;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.snapshotAction:hover {
+  color: var(--folio-attention);
+}
+
+.heroFolio {
+  background: var(--folio-sheet);
+  border: 1px solid var(--folio-ink);
+  display: grid;
+  gap: 1.4rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  position: relative;
+}
+
+.heroFolio::before {
+  border: 1px solid var(--folio-ink);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(0.65rem, 0.65rem);
+  z-index: 0;
+}
+
+.heroFolio > * {
+  position: relative;
+  z-index: 1;
+}
+
+.heroFolio > header {
+  border-bottom: 1px solid var(--folio-ink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  justify-content: space-between;
+  padding-bottom: 0.8rem;
+}
+
+.heroFolio > header span,
+.heroFolio > header strong {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.heroFolio > header strong {
+  color: var(--folio-muted);
+  font-weight: 600;
+}
+
+.folioLayers {
+  display: grid;
+  gap: 0.65rem;
+  list-style: none;
+}
+
+.folioLayers li {
+  align-items: center;
+  border-left: 0.6rem solid var(--folio-reference);
+  display: grid;
+  gap: 0.25rem 0.8rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 4.35rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.folioLayers li[data-layer="public"] {
+  background: var(--folio-public);
+  border-left-color: var(--folio-reference);
+}
+
+.folioLayers li[data-layer="gated"] {
+  background: var(--folio-gated);
+  border-left-color: var(--folio-attention);
+}
+
+.folioLayers li[data-layer="private"] {
+  background: var(--folio-private);
+  border-left-color: var(--folio-process);
+  color: var(--white);
+}
+
+.folioLayers li > span {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  grid-row: 1 / span 2;
+}
+
+.folioLayers strong {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.folioLayers small {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.folioResult {
+  border-left: 0.3rem solid var(--folio-reference);
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 0.35rem 0 0.35rem 1rem;
+}
+
+.firstScreenLedger {
+  border-bottom: 1px solid var(--folio-ink);
+  border-top: 1px solid var(--folio-ink);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: clamp(3rem, 6vw, 5rem) auto 0;
+  max-width: var(--max);
+}
+
+.firstScreenLedger > div {
+  border-bottom: 1px solid var(--folio-rule);
+  border-right: 1px solid var(--folio-rule);
+  min-height: 8rem;
+  padding: 1.25rem clamp(1rem, 2vw, 1.6rem);
+}
+
+.firstScreenLedger > div:nth-child(3n) {
+  border-right: 0;
+}
+
+.firstScreenLedger > div:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.firstScreenLedger dt {
+  color: var(--folio-attention);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.firstScreenLedger dd {
+  font-family: var(--serif);
+  font-size: clamp(1.08rem, 1.5vw, 1.28rem);
+  line-height: 1.6;
+  margin-top: 0.75rem;
+}
+
+.movementLead,
+.movementHeader {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 0.65fr);
+}
+
+.movementLead {
+  margin: clamp(3.5rem, 6vw, 5rem) auto clamp(2rem, 4vw, 3rem);
+  max-width: var(--max);
+}
+
+.movementLead h2,
+.movementHeader h2 {
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  margin-top: 0.9rem;
+  max-width: 13ch;
+}
+
+.movementLead > p:last-child,
+.movementHeader > p {
+  align-self: end;
+  border-top: 1px solid var(--folio-ink);
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding-top: 1rem;
+}
+
+.layerRegister {
+  display: grid;
+  gap: clamp(0.85rem, 1.6vw, 1.35rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: var(--max);
+}
+
+.layerRegister details {
+  background: var(--folio-sheet);
+  border: 1px solid var(--folio-ink);
+}
+
+.layerRegister details[data-disclosure-layer="public"] {
+  border-top: 0.55rem solid var(--folio-reference);
+}
+
+.layerRegister details[data-disclosure-layer="approval-gated"] {
+  border-top: 0.55rem solid var(--folio-attention);
+}
+
+.layerRegister details[data-disclosure-layer="private"] {
+  border-top: 0.55rem solid var(--folio-private);
+}
+
+.layerRegister summary {
+  align-items: center;
+  cursor: pointer;
+  display: grid;
+  gap: 0.35rem 0.75rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 4.5rem;
+  padding: 0.9rem 1rem;
+}
+
+.layerRegister summary::marker {
+  color: var(--folio-attention);
+}
+
+.layerRegister summary > span {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  grid-row: 1 / span 2;
+}
+
+.layerRegister summary strong {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  line-height: 1.05;
+}
+
+.layerRegister summary em {
+  color: var(--folio-muted);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.layerRegister details[open] summary {
+  border-bottom: 1px solid var(--folio-rule);
+}
+
+.layerBody {
+  padding: 1rem;
+}
+
+.layerContentsLabel {
+  color: var(--folio-muted);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.layerBody ul {
+  display: grid;
+  gap: 0.45rem;
+  list-style: none;
+  margin-top: 0.8rem;
+}
+
+.layerBody li {
+  border-bottom: 1px solid var(--folio-rule);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 0 0 0.45rem 1rem;
+  position: relative;
+}
+
+.layerBody li::before {
+  color: var(--folio-reference);
+  content: "·";
+  font-size: 1.4rem;
+  left: 0;
+  line-height: 1;
+  position: absolute;
+  top: 0;
+}
+
+.layerBoundary {
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-top: 1.25rem !important;
+}
+
+.formatBoundary {
+  border-left: 0.3rem solid var(--folio-process);
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 1.5rem auto 0 !important;
+  max-width: var(--max);
+  padding: 0.5rem 0 0.5rem 1rem;
+}
+
+.workflowMovement {
+  background: var(--folio-sheet);
+  border-bottom: 1px solid var(--folio-ink);
+  border-top: 1px solid var(--folio-ink);
+  padding: clamp(3rem, 7vw, 5rem) max(1.25rem, calc((100vw - var(--max)) / 2));
+}
+
+.movementHeader {
+  margin: 0 auto;
+  max-width: var(--max);
+}
+
+.conceptualWorkflow {
+  border-bottom: 1px solid var(--folio-ink);
+  border-top: 1px solid var(--folio-ink);
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(12rem, 0.3fr) minmax(0, 1fr);
+  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+  max-width: var(--max);
+  padding: 1.5rem 0;
+}
+
+.modelWarning {
+  align-self: start;
+  color: var(--folio-attention);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.conceptualWorkflow > ol {
+  counter-reset: workflow;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  list-style: none;
+}
+
+.conceptualWorkflow > ol > li {
+  border-left: 1px solid var(--folio-ink);
+  min-height: 13rem;
+  padding: 0 1rem 1rem;
+  position: relative;
+}
+
+.conceptualWorkflow > ol > li::after {
+  background: var(--folio-process);
+  bottom: 0;
+  content: "";
+  height: 0.35rem;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.conceptualWorkflow > ol > li:last-child::after {
+  background: var(--folio-attention);
+}
+
+.conceptualWorkflow > ol > li > span {
+  color: var(--folio-muted);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+}
+
+.conceptualWorkflow h3 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  line-height: 1.1;
+  margin-top: 2.8rem;
+}
+
+.conceptualWorkflow li p {
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-top: 0.75rem;
+}
+
+.workflowBoundary {
+  border-left: 0.3rem solid var(--folio-attention);
+  color: var(--folio-copy);
+  font-size: 1rem;
+  grid-column: 2;
+  line-height: 1.6;
+  padding-left: 1rem;
+}
+
+.receiptAnatomy {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(14rem, 0.34fr) minmax(0, 1fr);
+  margin: clamp(3rem, 6vw, 5rem) auto 0;
+  max-width: var(--max);
+}
+
+.receiptAnatomy > header {
+  align-self: start;
+}
+
+.receiptAnatomy > header h3,
+.sourceSection > header h3,
+.evidenceGaps > h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  margin-top: 0.85rem;
+}
+
+.receiptAnatomy > header > p:last-child {
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-top: 1.25rem;
+}
+
+.receiptFigure {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.2fr) minmax(13rem, 0.6fr);
+}
+
+.receiptPaper {
+  border: 1px solid var(--folio-ink);
+  padding: clamp(1rem, 2.5vw, 1.8rem);
+}
+
+.receiptPaper > header {
+  align-items: start;
+  border-bottom: 2px solid var(--folio-ink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+}
+
+.receiptPaper > header div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.receiptPaper > header span,
+.receiptPaper > header em {
+  color: var(--folio-muted);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-style: normal;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.receiptPaper > header strong {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+}
+
+.receiptPaper > dl > div {
+  border-bottom: 1px solid var(--folio-rule);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(8rem, 0.35fr) minmax(0, 1fr);
+  padding: 0.85rem 0;
+}
+
+.receiptPaper dt {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.receiptPaper dt span {
+  color: var(--folio-attention);
+  margin-right: 0.6rem;
+}
+
+.receiptPaper dd {
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.redactionBand {
+  background: var(--folio-private);
+  color: var(--white);
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.redactionBand span {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.redactionBand i {
+  background: var(--folio-muted);
+  display: block;
+  height: 0.55rem;
+  max-width: 100%;
+}
+
+.redactionBand i:nth-of-type(1) {
+  width: 82%;
+}
+
+.redactionBand i:nth-of-type(2) {
+  width: 64%;
+}
+
+.redactionBand i:nth-of-type(3) {
+  width: 73%;
+}
+
+.receiptWarnings {
+  align-self: end;
+  background: var(--folio-canvas);
+  border-top: 0.55rem solid var(--folio-attention);
+  padding: 1rem;
+}
+
+.receiptWarnings > strong {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.receiptWarnings dl {
+  margin-top: 1rem;
+}
+
+.receiptWarnings dl > div {
+  border-top: 1px solid var(--folio-rule);
+  padding: 0.8rem 0;
+}
+
+.receiptWarnings dt {
+  color: var(--folio-attention);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.receiptWarnings dd {
+  color: var(--folio-copy);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-top: 0.35rem;
+}
+
+.receiptFigure figcaption {
+  color: var(--folio-muted);
+  font-size: 1rem;
+  grid-column: 1 / -1;
+  line-height: 1.6;
+}
+
+.boundaryMovement {
+  padding: clamp(3rem, 7vw, 5rem) max(1.25rem, calc((100vw - var(--max)) / 2));
+}
+
+.boundarySpread {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  grid-template-columns: 1fr;
+  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+  max-width: var(--max);
+}
+
+.boundaryPanel {
+  background: var(--folio-private);
+  color: var(--white);
+  display: grid;
+  gap: 1.25rem clamp(1.5rem, 4vw, 4rem);
+  grid-template-columns: minmax(14rem, 0.55fr) minmax(0, 1fr);
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.boundaryPanel > p {
+  color: var(--sage);
+  font-family: var(--serif);
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  line-height: 1.22;
+}
+
+.boundaryPanel ul {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin-top: 0;
+}
+
+.boundaryPanel li {
+  border-top: 1px solid var(--folio-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 0.8rem 0 0.8rem 1.35rem;
+  position: relative;
+}
+
+.boundaryPanel li::before {
+  color: var(--terracotta);
+  content: "×";
+  font-family: var(--mono);
+  font-size: 1rem;
+  left: 0;
+  position: absolute;
+  top: 0.75rem;
+}
+
+.missingBoundary {
+  border-top: 1px solid var(--folio-muted);
+  color: var(--sage) !important;
+  font-size: 1rem !important;
+  grid-column: 1 / -1;
+  line-height: 1.6 !important;
+  margin-top: 1rem !important;
+  padding-top: 1rem;
+}
+
+.sourceSection {
+  border-top: 1px solid var(--folio-ink);
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  grid-template-columns: minmax(13rem, 0.35fr) minmax(0, 1fr);
+  margin: clamp(3rem, 6vw, 5rem) auto 0;
+  max-width: var(--max);
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.sourceFolio {
+  border-bottom: 1px solid var(--folio-ink);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sourceFolio a {
+  border-left: 1px solid var(--folio-ink);
+  border-top: 1px solid var(--folio-ink);
+  display: grid;
+  gap: 0.25rem 0.8rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 7.5rem;
+  padding: 1rem;
+  text-decoration: none;
+}
+
+.sourceFolio a:nth-child(-n + 2) {
+  border-top: 0;
+}
+
+.sourceFolio a:nth-child(2n) {
+  border-right: 1px solid var(--folio-ink);
+}
+
+.sourceFolio a:hover {
+  background: var(--folio-public);
+}
+
+.sourceFolio a > span {
+  color: var(--folio-attention);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  grid-row: 1 / span 2;
+}
+
+.sourceFolio a > strong {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.sourceFolio a > small {
+  color: var(--folio-copy);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.rightsNote {
+  color: var(--folio-muted);
+  font-size: 1rem;
+  grid-column: 2;
+  line-height: 1.6;
+}
+
+.returnLink {
+  border-top: 1px solid var(--folio-rule);
+  margin: clamp(2rem, 4vw, 3rem) auto 0;
+  max-width: var(--max);
+  padding-top: 1.25rem;
+}
+
+.returnLink a {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 800;
+  gap: 0.7rem;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.returnLink a:hover {
+  color: var(--folio-attention);
+}
+
+.returnLink a span {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 1120px) {
+  .hero {
+    gap: 2.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.82fr);
+  }
+
+  .conceptualWorkflow {
+    grid-template-columns: 1fr;
+  }
+
+  .conceptualWorkflow > ol,
+  .workflowBoundary {
+    grid-column: 1;
+  }
+
+  .conceptualWorkflow > ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .conceptualWorkflow > ol > li:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .receiptFigure {
+    grid-template-columns: 1fr;
+  }
+
+  .receiptWarnings {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(12rem, 0.35fr) minmax(0, 1fr);
+  }
+
+  .receiptWarnings dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 0;
+  }
+
+  .receiptWarnings dl > div {
+    border-left: 1px solid var(--folio-rule);
+    border-top: 0;
+    padding: 0 0.75rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .hero,
+  .movementLead,
+  .movementHeader,
+  .receiptAnatomy,
+  .sourceSection {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    max-width: 10.5ch;
+  }
+
+  .heroFolio {
+    margin-right: 0.65rem;
+  }
+
+  .firstScreenLedger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .firstScreenLedger > div:nth-child(3n) {
+    border-right: 1px solid var(--folio-rule);
+  }
+
+  .firstScreenLedger > div:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .firstScreenLedger > div:nth-last-child(-n + 3) {
+    border-bottom: 1px solid var(--folio-rule);
+  }
+
+  .firstScreenLedger > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .movementLead > p:last-child,
+  .movementHeader > p {
+    max-width: 42rem;
+  }
+
+  .layerRegister {
+    grid-template-columns: 1fr;
+  }
+
+  .layerRegister summary {
+    min-height: 4.75rem;
+  }
+
+  .layerBody {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
+  }
+
+  .layerBody ul {
+    margin-top: 0;
+  }
+
+  .layerBoundary {
+    border-top: 1px solid var(--folio-rule);
+    grid-column: 1 / -1;
+    margin-top: 0 !important;
+    padding-top: 1rem;
+  }
+
+  .receiptAnatomy > header {
+    max-width: 42rem;
+  }
+
+  .sourceFolio,
+  .rightsNote {
+    grid-column: 1;
+  }
+
+  .sourceSection > header {
+    max-width: 28rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .disclosureMovement,
+  .workflowMovement,
+  .boundaryMovement {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .disclosureMovement,
+  .workflowMovement,
+  .boundaryMovement {
+    padding-bottom: 3.5rem;
+    padding-top: 3.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 12vw, 3.8rem);
+    line-height: 0.98;
+  }
+
+  .hero h1 span {
+    font-size: clamp(1.45rem, 8vw, 2.15rem);
+  }
+
+  .firstScreenLedger {
+    grid-template-columns: 1fr;
+  }
+
+  .firstScreenLedger > div,
+  .firstScreenLedger > div:nth-child(3n),
+  .firstScreenLedger > div:nth-child(2n),
+  .firstScreenLedger > div:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--folio-rule);
+    border-right: 0;
+    min-height: 0;
+  }
+
+  .firstScreenLedger > div:last-child {
+    border-bottom: 0;
+  }
+
+  .movementLead,
+  .movementHeader {
+    gap: 1.5rem;
+  }
+
+  .movementLead h2,
+  .movementHeader h2 {
+    font-size: clamp(2.15rem, 11vw, 3.2rem);
+  }
+
+  .layerBody {
+    display: block;
+  }
+
+  .layerBody ul {
+    margin-top: 0.8rem;
+  }
+
+  .layerBoundary {
+    margin-top: 1rem !important;
+  }
+
+  .conceptualWorkflow > ol {
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
+  .conceptualWorkflow > ol > li {
+    border-left: 0;
+    border-top: 1px solid var(--folio-rule);
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    min-height: 0;
+    padding: 1rem 0 1.2rem;
+  }
+
+  .conceptualWorkflow > ol > li::after {
+    height: 0.25rem;
+  }
+
+  .conceptualWorkflow h3 {
+    margin-top: 0;
+  }
+
+  .conceptualWorkflow li p {
+    margin-top: 0.35rem;
+  }
+
+  .receiptPaper > dl > div {
+    grid-template-columns: 1fr;
+  }
+
+  .receiptWarnings {
+    grid-template-columns: 1fr;
+  }
+
+  .receiptWarnings dl {
+    grid-template-columns: 1fr;
+  }
+
+  .receiptWarnings dl > div {
+    border-left: 0;
+    border-top: 1px solid var(--folio-rule);
+    padding: 0.75rem 0;
+  }
+
+  .boundarySpread {
+    grid-template-columns: 1fr;
+  }
+
+  .boundaryPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .missingBoundary {
+    grid-column: 1;
+  }
+
+  .sourceFolio {
+    grid-template-columns: 1fr;
+  }
+
+  .sourceFolio a,
+  .sourceFolio a:nth-child(-n + 2),
+  .sourceFolio a:nth-child(2n) {
+    border-left: 1px solid var(--folio-ink);
+    border-right: 1px solid var(--folio-ink);
+    border-top: 1px solid var(--folio-ink);
+    min-height: 0;
+  }
+
+  .sourceFolio a:first-child {
+    border-top: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .heroFolio {
+    padding: 1rem;
+  }
+
+  .folioLayers li {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+  }
+
+  .layerRegister summary {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .boundaryPanel {
+    padding: 1.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .page a:focus-visible,
+  .page summary:focus-visible {
+    outline-color: Highlight;
+  }
+
+  .heroFolio,
+  .layerRegister details,
+  .receiptPaper,
+  .boundaryPanel,
+  .receiptWarnings,
+  .sourceFolio a {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .folioLayers li,
+  .redactionBand {
+    background: Canvas;
+    border: 1px solid CanvasText;
+    color: CanvasText;
+  }
+
+  .conceptualWorkflow > ol > li::after {
+    background: CanvasText;
+  }
+}
+
+@media print {
+  .page {
+    background: var(--white);
+  }
+
+  .disclosureMovement,
+  .workflowMovement,
+  .boundaryMovement {
+    background: var(--white);
+    padding: 1.5rem 0;
+  }
+
+  .hero,
+  .movementLead,
+  .movementHeader,
+  .receiptAnatomy,
+  .boundarySpread,
+  .sourceSection {
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+  }
+
+  .hero h1 span {
+    font-size: 1.5rem;
+  }
+
+  .heroFolio::before {
+    display: none;
+  }
+
+  .firstScreenLedger {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .firstScreenLedger > div {
+    min-height: 0;
+    padding: 0.7rem 1rem;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .firstScreenLedger dd {
+    margin-top: 0.4rem;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .firstScreenLedger > div,
+  .firstScreenLedger > div:nth-child(2n),
+  .firstScreenLedger > div:nth-child(3n),
+  .firstScreenLedger > div:nth-last-child(-n + 2),
+  .firstScreenLedger > div:nth-last-child(-n + 3) {
+    border-bottom: 1px solid var(--folio-rule);
+    border-right: 1px solid var(--folio-rule);
+  }
+
+  .firstScreenLedger > div:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .firstScreenLedger > div:nth-last-child(-n + 3) {
+    border-bottom: 0;
+  }
+
+  .layerRegister {
+    grid-template-columns: 1fr;
+  }
+
+  .layerRegister details {
+    break-inside: avoid;
+  }
+
+  .boundaryMovement .movementHeader {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .layerBody li {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .layerRegister details:not([open]) > :not(summary) {
+    content-visibility: visible !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .layerRegister details::details-content {
+    content-visibility: visible !important;
+    display: block !important;
+  }
+
+  .conceptualWorkflow > ol {
+    grid-template-columns: 1fr;
+  }
+
+  .conceptualWorkflow > ol > li {
+    border-left: 0;
+    border-top: 1px solid var(--folio-rule);
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    min-height: 0;
+    padding: 0.65rem 0;
+  }
+
+  .receiptFigure,
+  .receiptWarnings dl,
+  .sourceFolio {
+    grid-template-columns: 1fr;
+  }
+
+  .receiptWarnings dl > div {
+    border-left: 0;
+    border-top: 1px solid var(--folio-rule);
+    padding: 0.75rem 0;
+  }
+
+  .receiptFigure,
+  .receiptPaper,
+  .receiptWarnings,
+  .receiptWarnings dl,
+  .receiptWarnings dl > div,
+  .sourceFolio,
+  .sourceFolio a {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .receiptAnatomy > header,
+  .sourceSection > header {
+    break-inside: avoid-page;
+    break-after: avoid-page;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+  }
+
+  .receiptPaper,
+  .sourceFolio a:first-child {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .sourceFolio {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .receiptPaper > dl > div,
+  .receiptWarnings,
+  .receiptWarnings dl {
+    grid-template-columns: 1fr;
+  }
+
+  .sourceFolio a,
+  .sourceFolio a:nth-child(-n + 2),
+  .sourceFolio a:nth-child(2n) {
+    border-left: 1px solid var(--folio-ink);
+    border-right: 1px solid var(--folio-ink);
+    border-top: 1px solid var(--folio-ink);
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .boundaryPanel,
+  .redactionBand {
+    background: var(--white);
+    border: 1px solid var(--folio-ink);
+    color: var(--folio-ink);
+  }
+
+  .boundaryPanel > p {
+    color: var(--folio-ink);
+  }
+
+  .missingBoundary {
+    color: var(--folio-ink) !important;
+  }
+
+  .returnLink {
+    display: none;
+  }
+
+  .page a[href^="http"]::after {
+    content: " [" attr(href) "]";
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .sourceFolio a::after {
+    display: block;
+    grid-column: 1 / -1;
+    max-width: 100%;
+    min-width: 0;
+  }
+}

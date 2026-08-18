@@ -1,0 +1,22 @@
+{
+  "manifest_version": "nordic-field-atlas-license-notices-v1",
+  "source": "Exact license files bundled with the locked Fontsource packages",
+  "entries": [
+    {
+      "package": "@fontsource-variable/manrope",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "path": "/media/licenses/manrope-OFL-1.1.txt",
+      "bytes": 4383,
+      "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+    },
+    {
+      "package": "@fontsource-variable/newsreader",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "path": "/media/licenses/newsreader-OFL-1.1.txt",
+      "bytes": 4520,
+      "sha256": "26028ec4e13b650065fa525a09532176f8a668b76ff849ea01c564a7480f91e7"
+    }
+  ]
+}

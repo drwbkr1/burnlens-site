@@ -7,6 +7,9 @@
 
 # production
 /build
+/test-results/
+/playwright-report/
+/work-server.*.log
 
 # misc
 .DS_Store
