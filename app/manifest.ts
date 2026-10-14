@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Software systems, geospatial evidence, and risk-aware decision tools for uncertain, high-consequence settings.",
     start_url: "/",
     display: "standalone",
-    background_color: "#E9E2D8",
-    theme_color: "#222222",
+    background_color: "#12232F",
+    theme_color: "#12232F",
     categories: ["portfolio", "technology", "education"],
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
   };

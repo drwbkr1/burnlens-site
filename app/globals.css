@@ -1,7 +1,29 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "./";
+@source "../components";
+@source "../lib";
+@source "../content";
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+  /* Polar-night presentation roles. The original values below remain available
+     for recorded figures, deliberate neutral surfaces and print output. */
+  --color-page: #12232f;
+  --color-panel: #19313f;
+  --color-panel-alt: #264957;
+  --color-deep: #0b1821;
+  --color-ink: #f0f9fc;
+  --color-soft: #bdd3df;
+  --color-accent: #a7e0f1;
+  --color-rule: #4b7182;
+  --color-rule-strong: #78a9bd;
+  --color-focus: #a7e0f1;
+  --color-button: #a7e0f1;
+  --color-button-ink: #12232f;
+  --color-caution: #f0c8ab;
+  --color-caution-panel: #493a34;
+  --color-plot-surface: #e9e2d8;
+  --color-plot-ink: #222222;
   --olive: #757f64;
   --terracotta: #cb7a5c;
   --sand: #e9e2d8;
@@ -28,16 +50,16 @@
 }
 
 html {
-  background: var(--sand);
-  scroll-behavior: smooth;
+  background: var(--color-page);
+  scroll-behavior: auto;
   scroll-padding-top: 5rem;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--sand);
-  color: var(--charcoal);
+  background: var(--color-page);
+  color: var(--color-ink);
   font-family: var(--sans);
   font-size: 1rem;
   line-height: 1.6;
@@ -60,13 +82,13 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid var(--terracotta-dark);
+  outline: 3px solid var(--color-focus);
   outline-offset: 4px;
 }
 
 ::selection {
-  background: var(--terracotta);
-  color: var(--charcoal);
+  background: var(--color-button);
+  color: var(--color-button-ink);
 }
 
 .skip-link {
@@ -76,8 +98,8 @@ a {
   left: 0.75rem;
   translate: 0 -180%;
   padding: 0.7rem 1rem;
-  background: var(--charcoal);
-  color: var(--white);
+  background: var(--color-button);
+  color: var(--color-button-ink);
   font-weight: 750;
 }
 
@@ -106,8 +128,8 @@ a {
   position: sticky;
   z-index: 50;
   top: 0;
-  border-bottom: 1px solid var(--rule);
-  background: var(--sand);
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-page);
 }
 
 .header-inner {
@@ -139,7 +161,7 @@ a {
 .brand-mark i {
   width: 1.8rem;
   height: 2px;
-  background: var(--terracotta);
+  background: var(--color-accent);
 }
 
 .desktop-nav {
@@ -157,11 +179,16 @@ a {
 .footer-links a {
   text-decoration-thickness: 1px;
   text-underline-offset: 0.35em;
+  transition: color 180ms ease;
 }
 
 .desktop-nav a:hover,
 .mobile-menu a:hover,
-.footer-links a:hover {
+.footer-links a:hover,
+.desktop-nav a:focus-visible,
+.mobile-menu a:focus-visible,
+.footer-links a:focus-visible {
+  color: var(--color-accent);
   text-decoration-line: underline;
 }
 
@@ -169,14 +196,14 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--olive-dark);
+  color: var(--color-soft);
 }
 
 .nav-status::before {
   width: 0.48rem;
   height: 0.48rem;
   border-radius: 50%;
-  background: var(--olive);
+  background: var(--color-accent);
   content: "";
 }
 
@@ -190,7 +217,7 @@ a {
   min-height: 3rem;
   display: grid;
   place-items: center;
-  border: 1px solid var(--charcoal);
+  border: 1px solid var(--color-rule);
   cursor: pointer;
   font-size: 0.8125rem;
   font-weight: 760;
@@ -210,14 +237,13 @@ a {
   min-width: min(18rem, calc(100vw - 2rem));
   display: grid;
   padding: 0.6rem;
-  border: 1px solid var(--charcoal);
-  background: var(--paper);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--color-rule);
+  background: var(--color-panel);
 }
 
 .mobile-menu nav a {
   padding: 0.9rem;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--color-rule);
   font-size: 0.8125rem;
   font-weight: 720;
 }
@@ -227,12 +253,13 @@ a {
 }
 
 .site-footer {
-  background: var(--charcoal);
-  color: var(--white);
+  border-top: 1px solid var(--color-rule);
+  background: var(--color-deep);
+  color: var(--color-ink);
 }
 
 .site-footer a:focus-visible {
-  outline-color: var(--sage);
+  outline-color: var(--color-focus);
 }
 
 .footer-inner {
@@ -254,7 +281,7 @@ a {
 .footer-note {
   max-width: 32rem;
   margin: 1rem 0 0;
-  color: var(--sage);
+  color: var(--color-soft);
 }
 
 .footer-links {
@@ -265,6 +292,55 @@ a {
   font-weight: 760;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* The reef stylesheet is part of the scientific display record. Only its
+   outer editorial landmarks adopt the night theme; #maps, its class legend,
+   habitat bars, unknown hatch and source images retain their neutral surface. */
+@media screen {
+  main:has([data-reef-map]) {
+    background: var(--color-page);
+    color: var(--color-ink);
+  }
+
+  main:has([data-reef-map]) > #maps {
+    color: var(--charcoal);
+    color-scheme: light;
+  }
+
+  main:has([data-reef-map]) > #maps :focus-visible {
+    outline-color: var(--terracotta-dark);
+  }
+
+  main:has([data-reef-map]) > header > p:first-child,
+  main:has([data-reef-map]) > header h1 em,
+  main:has([data-reef-map]) > header dt,
+  main:has([data-reef-map]) > header a,
+  main:has([data-reef-map]) > section:not(#maps) > header > p:first-child,
+  main:has([data-reef-map]) > section:not(#maps) h2 em,
+  main:has([data-reef-map]) > section[aria-labelledby="decisions-title"] article > span,
+  main:has([data-reef-map]) > section[aria-labelledby="finding-title"] > p:first-child,
+  main:has([data-reef-map]) > footer > p:first-child,
+  main:has([data-reef-map]) > footer a {
+    color: var(--color-accent);
+  }
+
+  main:has([data-reef-map]) > section[aria-labelledby="decisions-title"] article p,
+  main:has([data-reef-map]) > section[aria-labelledby="next-title"] article p,
+  main:has([data-reef-map]) > footer > p:not(:first-child) {
+    color: var(--color-soft);
+  }
+
+  main:has([data-reef-map]) > header > dl,
+  main:has([data-reef-map]) > section[aria-labelledby="decisions-title"] article,
+  main:has([data-reef-map]) > section[aria-labelledby="next-title"] article,
+  main:has([data-reef-map]) > footer {
+    border-color: var(--color-rule);
+  }
+
+  main:has([data-reef-map]) > section[aria-labelledby="finding-title"] {
+    background: var(--color-panel);
+  }
 }
 
 @media (max-width: 880px) {
@@ -302,6 +378,24 @@ a {
 }
 
 @media print {
+  :root {
+    color-scheme: light;
+    --color-page: #ffffff;
+    --color-panel: #ffffff;
+    --color-panel-alt: #f7f3ed;
+    --color-deep: #ffffff;
+    --color-ink: #222222;
+    --color-soft: #454843;
+    --color-accent: #314e54;
+    --color-rule: rgba(34, 34, 34, 0.18);
+    --color-rule-strong: #222222;
+    --color-focus: #7a3828;
+    --color-button: #314e54;
+    --color-button-ink: #ffffff;
+    --color-caution: #7a3828;
+    --color-caution-panel: #f7f3ed;
+  }
+
   .site-header,
   .site-footer,
   .skip-link {
@@ -310,5 +404,6 @@ a {
 
   body {
     background: var(--white);
+    color: var(--charcoal);
   }
 }

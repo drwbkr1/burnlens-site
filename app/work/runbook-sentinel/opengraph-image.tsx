@@ -104,7 +104,7 @@ export default function RunbookSentinelOpenGraphImage() {
               letterSpacing: 1.2,
             }}
           >
-            <span style={{ display: "flex", color: "#CB7A5C", fontSize: 26 }}>○ ／ ○</span>
+            <span style={{ display: "flex", color: "#CB7A5C", fontSize: 26 }}>○ / ○</span>
             NO AUTHORITY ALONE
           </div>
 

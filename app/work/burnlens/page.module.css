@@ -1,25 +1,24 @@
 .page {
-  background: var(--paper);
-  color: var(--charcoal);
+  background: var(--color-panel);
+  color: var(--color-ink);
   font-family: var(--sans);
 }
 
 .atlas {
   width: min(calc(100% - 2rem), var(--max));
   margin-inline: auto;
-  border-inline: 1px solid var(--rule);
-  background: var(--paper);
+  border-inline: 1px solid var(--color-rule);
+  background: var(--color-panel);
 }
 
 .hero {
-  min-height: min(48rem, calc(100svh - 5rem));
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 2rem;
-  align-content: space-between;
+  align-content: start;
   padding: clamp(1.25rem, 3vw, 3.5rem);
-  border-bottom: 1px solid var(--charcoal);
-  background: var(--sand);
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-page);
 }
 
 .heroRegister {
@@ -28,7 +27,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.8rem;
-  border-bottom: 1px solid var(--charcoal);
+  border-bottom: 1px solid var(--color-rule);
   font-family: var(--mono);
   font-size: 0.75rem;
   font-weight: 700;
@@ -38,7 +37,9 @@
 
 .heroRegister p,
 .heroTitle p,
-.heroClaims p,
+.heroContribution p,
+.decisionExample p,
+.frameBody p,
 .sectionIndex p,
 .authorityLedger p,
 .assemblyBody p,
@@ -48,12 +49,12 @@
 }
 
 .heroTitle {
-  grid-column: 1 / span 7;
-  align-self: end;
+  grid-column: 1 / span 6;
+  align-self: start;
 }
 
 .eyebrow {
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.8rem;
   font-weight: 760;
   letter-spacing: 0.14em;
@@ -70,32 +71,95 @@
   line-height: 0.84;
 }
 
-.heroClaims {
-  grid-column: 8 / -1;
-  align-self: end;
-  padding: 1.3rem 0 0 1.5rem;
-  border-top: 0.45rem solid var(--terracotta);
-  border-left: 1px solid var(--charcoal);
-}
-
 .lede {
-  max-width: 31rem;
-  font-family: var(--serif);
-  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
-  letter-spacing: -0.025em;
-  line-height: 1.12;
+  max-width: 38rem;
+  font-size: clamp(1.0625rem, 1.6vw, 1.35rem);
+  line-height: 1.5;
 }
 
 .audience {
   max-width: 38rem;
   padding-top: 1.4rem;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 0.95rem;
 }
 
+.heroContribution {
+  grid-column: 1 / span 6;
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+.heroContribution h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.7rem, 2.5vw, 2.5rem);
+  font-weight: 520;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.heroContribution p {
+  max-width: 52rem;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+.decisionExample {
+  grid-column: 7 / -1;
+  grid-row: 2 / span 2;
+  align-self: start;
+  padding: 1.25rem 0 0 1.5rem;
+  border-top: 0.45rem solid var(--color-accent);
+  border-left: 1px solid var(--color-rule);
+}
+
+.decisionExample h2 {
+  margin: 0 0 1.25rem;
+  color: var(--color-accent);
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.decisionExample p {
+  font-size: clamp(1.0625rem, 1.6vw, 1.35rem);
+  line-height: 1.5;
+}
+
+.decisionExample .exampleBoundary {
+  margin-top: 1.25rem;
+  color: var(--color-soft);
+  font-size: 0.9375rem;
+}
+
+.frame {
+  scroll-margin-top: 6rem;
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.6fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 4.5rem);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.frame .sectionIndex h2 {
+  max-width: 17ch;
+  font-size: clamp(2rem, 3vw, 3.5rem);
+}
+
+.frameBody {
+  min-width: 0;
+}
+
+.frameBody .decision {
+  margin-top: 1.5rem;
+  font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+}
+
 .chapterIndex {
-  border-bottom: 1px solid var(--charcoal);
-  background: var(--paper);
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-panel);
 }
 
 .chapterIndex ol {
@@ -107,7 +171,7 @@
 }
 
 .chapterIndex li + li {
-  border-left: 1px solid var(--rule);
+  border-left: 1px solid var(--color-rule);
 }
 
 .chapterIndex a {
@@ -123,7 +187,7 @@
 }
 
 .chapterIndex a:hover {
-  background: var(--sage);
+  background: var(--color-panel-alt);
 }
 
 .chapterIndex a span {
@@ -138,17 +202,17 @@
   display: grid;
   grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.6fr);
   gap: clamp(2rem, 6vw, 7rem);
-  padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 4vw, 4.5rem);
+  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 4.5rem);
 }
 
 .authority,
 .boundary {
-  background: var(--paper);
+  background: var(--color-panel);
 }
 
 .assembly {
-  background: var(--charcoal);
-  color: var(--white);
+  background: var(--color-deep);
+  color: var(--color-ink);
 }
 
 .sectionIndex {
@@ -159,7 +223,7 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.78rem;
   font-weight: 760;
   letter-spacing: 0.1em;
@@ -167,7 +231,7 @@
 }
 
 .assembly .recordLabel {
-  color: var(--sage);
+  color: var(--color-soft);
 }
 
 .recordLabel span {
@@ -184,14 +248,14 @@
   max-width: 12ch;
   margin: 1.5rem 0 0;
   font-family: var(--serif);
-  font-size: clamp(2.4rem, 5vw, 5.2rem);
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
   font-weight: 520;
   letter-spacing: -0.045em;
   line-height: 0.94;
 }
 
 .authorityLedger {
-  border-top: 1px solid var(--charcoal);
+  border-top: 1px solid var(--color-rule);
 }
 
 .authorityLedger article {
@@ -199,7 +263,7 @@
   grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr);
   gap: 1.5rem;
   padding: 1.5rem 0 2.4rem;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .authorityLedger article > p:last-child {
@@ -211,7 +275,7 @@
 }
 
 .ledgerMark {
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-family: var(--mono);
   font-size: 0.75rem;
   font-weight: 700;
@@ -235,25 +299,27 @@
   display: grid;
   grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr);
   gap: 1.5rem;
-  margin-top: clamp(3rem, 6vw, 6rem);
+  margin-top: 0;
   padding-block: 1.5rem;
-  border-block: 1px solid var(--teal);
+  border-block: 1px solid var(--color-accent);
 }
 
 .releaseRecord .ledgerMark {
-  color: var(--sage);
+  color: var(--color-soft);
 }
 
 .releaseRecord > p:last-child {
   max-width: 42rem;
   overflow-wrap: anywhere;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  line-height: 1.5;
 }
 
 .evidenceLinks {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 1.5rem;
-  border: 1px solid var(--sage);
+  border: 1px solid var(--color-rule);
 }
 
 .evidenceLinks a {
@@ -263,7 +329,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.2rem;
-  color: var(--white);
+  color: var(--color-ink);
   font-size: 0.78rem;
   font-weight: 760;
   letter-spacing: 0.06em;
@@ -271,19 +337,19 @@
 }
 
 .evidenceLinks a + a {
-  border-left: 1px solid var(--sage);
+  border-left: 1px solid var(--color-rule);
 }
 
 .evidenceLinks a:hover {
-  background: var(--teal-dark);
+  background: var(--color-panel-alt);
 }
 
 .assembly a:focus-visible {
-  outline-color: var(--sage);
+  outline-color: var(--color-focus);
 }
 
 .boundary {
-  border-bottom: 1px solid var(--charcoal);
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .boundaryBody {
@@ -293,8 +359,8 @@
 .limit {
   max-width: 36ch;
   padding: clamp(1.4rem, 3vw, 2.3rem);
-  border: 1px solid var(--terracotta-dark);
-  color: var(--terracotta-dark);
+  border: 1px solid var(--color-caution);
+  color: var(--color-caution);
   font-family: var(--serif);
   font-size: clamp(1.45rem, 2.5vw, 2.35rem);
   letter-spacing: -0.02em;
@@ -302,13 +368,13 @@
 }
 
 .lesson {
-  max-width: 29ch;
-  margin-top: clamp(3rem, 6vw, 6rem) !important;
+  max-width: 41ch;
+  margin-top: 1.5rem !important;
   font-family: var(--serif);
-  font-size: clamp(2.2rem, 5vw, 5rem);
+  font-size: clamp(1.4rem, 2.4vw, 2.5rem);
   font-weight: 520;
-  letter-spacing: -0.05em;
-  line-height: 0.98;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
 .lesson::before {
@@ -316,7 +382,7 @@
   height: 0.5rem;
   display: block;
   margin-bottom: 1.4rem;
-  background: var(--olive);
+  background: var(--color-accent);
   content: "";
 }
 
@@ -326,7 +392,7 @@
   justify-content: space-between;
   gap: 1.5rem;
   padding: 1.25rem clamp(1.25rem, 4vw, 4.5rem);
-  background: var(--sand);
+  background: var(--color-page);
   font-size: 0.78rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -347,14 +413,16 @@
   .hero {
     min-height: auto;
     grid-template-columns: 1fr;
-    gap: 3rem;
-    padding-block: 1.25rem 4rem;
+    gap: 1.5rem;
+    padding-block: 1.25rem 1.5rem;
   }
 
   .heroRegister,
   .heroTitle,
-  .heroClaims {
+  .heroContribution,
+  .decisionExample {
     grid-column: 1;
+    grid-row: auto;
   }
 
   .heroRegister {
@@ -371,8 +439,23 @@
     font-size: clamp(4rem, 20vw, 7rem);
   }
 
-  .heroClaims {
-    max-width: 39rem;
+  .heroContribution {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding-top: 1.25rem;
+  }
+
+  .heroContribution p {
+    font-size: 0.9375rem;
+  }
+
+  .decisionExample {
+    padding-top: 1.25rem;
+  }
+
+  .frame {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .chapterIndex ol {
@@ -384,15 +467,15 @@
   }
 
   .chapterIndex li:nth-child(n + 3) {
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--color-rule);
   }
 
   .authority,
   .assembly,
   .boundary {
     grid-template-columns: 1fr;
-    gap: 3.5rem;
-    padding-block: 4rem;
+    gap: 2rem;
+    padding-block: 2.5rem;
   }
 
   .sectionIndex h2 {
@@ -412,7 +495,7 @@
     text-align: left;
   }
 
-  .heroClaims {
+  .decisionExample {
     padding-left: 1rem;
   }
 
@@ -427,7 +510,7 @@
   }
 
   .evidenceLinks a + a {
-    border-top: 1px solid var(--sage);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 
@@ -441,6 +524,7 @@
   .page,
   .atlas,
   .hero,
+  .frame,
   .authority,
   .boundary,
   .caseFooter {
@@ -456,11 +540,17 @@
     min-height: auto;
   }
 
+  .heroContribution,
+  .decisionExample {
+    break-inside: avoid;
+  }
+
   .chapterIndex,
   .caseFooter {
     display: none;
   }
 
+  .frame,
   .authority,
   .assembly,
   .boundary {

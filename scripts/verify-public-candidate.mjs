@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { lstat, readdir, readFile, realpath, stat } from "node:fs/promises";
 import { dirname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,6 +45,13 @@ function assertSafeRelativePath(path) {
 const explicitDeletions = [...manifest.explicit_deletions];
 const explicitExclusions = [...manifest.explicit_exclusions];
 
+for (const path of [...listed, ...manifest.root_files, ...manifest.script_files, ...manifest.include_trees]) {
+  assertSafeRelativePath(path);
+}
+if (!manifest.include_trees.includes("public")) {
+  throw new Error("The complete public tree must be included in candidate discovery.");
+}
+
 for (const path of explicitDeletions) {
   assertSafeRelativePath(path);
   if (listed.includes(path)) {
@@ -74,6 +82,9 @@ for (const path of explicitExclusions) {
 
 async function listTree(directory) {
   const absoluteDirectory = resolve(root, directory);
+  if (!(await lstat(absoluteDirectory)).isDirectory()) {
+    throw new Error(`Candidate tree is not a regular directory: ${directory}`);
+  }
   const entries = await readdir(absoluteDirectory, { withFileTypes: true });
   const files = [];
 
@@ -107,6 +118,74 @@ if (JSON.stringify(discovered) !== JSON.stringify(listed)) {
   );
 }
 
+async function verifyGitIndexScope() {
+  try {
+    const gitMarker = await lstat(resolve(root, ".git"));
+    if (!gitMarker.isDirectory() && !gitMarker.isFile()) {
+      throw new Error("The candidate Git marker must be a regular file or directory.");
+    }
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      // Allowlist-only release snapshots intentionally contain no repository.
+      return { status: "not_applicable_no_repository", index_entries: 0 };
+    }
+    throw error;
+  }
+
+  for (const name of [
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+  ]) {
+    if (process.env[name] !== undefined) {
+      throw new Error(`Git routing override prevents exact candidate index verification: ${name}`);
+    }
+  }
+  const gitEnvironment = {
+    ...Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^GIT_/iu.test(name))),
+    GIT_OPTIONAL_LOCKS: "0",
+    GIT_CONFIG_NOSYSTEM: "1",
+    GIT_CONFIG_GLOBAL: process.platform === "win32" ? "NUL" : "/dev/null",
+  };
+  const git = (args) => {
+    try {
+      return execFileSync("git", ["--no-optional-locks", "-C", root, ...args], {
+        encoding: "utf8",
+        env: gitEnvironment,
+        stdio: ["ignore", "pipe", "pipe"],
+        maxBuffer: 16 * 1024 * 1024,
+      });
+    } catch {
+      throw new Error("Cannot inspect the candidate Git index; scope verification failed closed.");
+    }
+  };
+  const gitRoot = await realpath(git(["rev-parse", "--show-toplevel"]).trim());
+  if (gitRoot !== await realpath(root)) {
+    throw new Error("Git index belongs to a different candidate root.");
+  }
+
+  // Inspect the entire prospective index, including staged additions hidden by ignores.
+  // NUL delimiters preserve tabs/newlines in paths; no index command here writes Git state.
+  const entries = git(["ls-files", "--stage", "-z"]).split("\0").filter(Boolean);
+  const listedSet = new Set(listed);
+  for (const entry of entries) {
+    const match = /^([0-7]{6}) ([0-9a-f]+) ([0-3])\t([\s\S]+)$/u.exec(entry);
+    if (!match) throw new Error("Unrecognized Git index entry; scope verification failed closed.");
+    const [, mode, , stage, path] = match;
+    assertSafeRelativePath(path);
+    if (stage !== "0") throw new Error(`Unmerged path in candidate Git index: ${path}`);
+    if (mode !== "100644" && mode !== "100755") {
+      throw new Error(`Link or special entry in candidate Git index: ${path}`);
+    }
+    if (!listedSet.has(path)
+      || explicitExclusions.some((excluded) => path === excluded || path.startsWith(`${excluded}/`))) {
+      throw new Error(`Excluded or unallowlisted path in candidate Git index: ${path}`);
+    }
+  }
+  return { status: "pass", index_entries: entries.length };
+}
+
+const gitIndexScope = await verifyGitIndexScope();
+
 const allowedEmails = new Set(["test@example.com"]);
 const allowedCredentialUrls = new Map([
   [
@@ -119,6 +198,7 @@ const textExtensions = new Set([
   ".env",
   ".html",
   ".js",
+  ".jsx",
   ".json",
   ".md",
   ".mjs",
@@ -127,6 +207,38 @@ const textExtensions = new Set([
   ".tsx",
   ".txt",
 ]);
+// Exact reviewed generated dashboard tuple. Keep normal text/privacy scanning;
+// only eight non-secret vendor CSS identifiers are redacted on byte-exact HTML.
+// Any HTML, snapshot or build-manifest alteration fails before this exception.
+const reviewedDashboard = new Map([
+  ["public/dashboard/explore/index.html", { bytes: 2_859_454, sha256: "ee2687c4b8acdcaeb0751291bcea55cc6d4f2b396295bae598ff99a11f5bb66a" }],
+  ["public/dashboard/explore/snapshot.591dd3b8ea5ef905b3d90fb0bbc1b5610054629024ccb4837957aadd0a711ea3.json", { bytes: 7209, sha256: "591dd3b8ea5ef905b3d90fb0bbc1b5610054629024ccb4837957aadd0a711ea3" }],
+  ["public/dashboard/explore/data-app-build.json", { bytes: 591, sha256: "ceb27b72ede820c24a4d6b26bab279bad2b751c84c83edcd00bf61c2eb113c8e" }],
+]);
+const hasReviewedDashboard = [...reviewedDashboard.keys()].some(path => listed.includes(path));
+if (hasReviewedDashboard && ![...reviewedDashboard.keys()].every(path => listed.includes(path))) {
+  throw new Error("Reviewed dashboard requires the exact HTML, snapshot and build-manifest tuple.");
+}
+function redactReviewedDashboardCss(path, text) {
+  if (path !== "public/dashboard/explore/index.html") return text;
+  const names = [
+    [["dashboard", "ask", "header", "return", "anchor"], 2, false],
+    [["dashboard", "ask", "header", "unmorph", "duration"], 6, true],
+    [["dashboard", "ask", "header", "morph", "duration"], 2, true],
+    [["dashboard", "ask", "trigger", "border", "width"], 2, true],
+    [["dashboard", "ask", "trigger", "border", "color"], 2, true],
+    [["dashboard", "ask", "compose", "padding", "left"], 2, true],
+    [["dashboard", "ask", "compose", "padding", "right"], 1, true],
+    [["dashboard", "ask", "compose", "padding", "bottom"], 1, true],
+  ];
+  let result = text;
+  for (const [index, [parts, count, variable]] of names.entries()) {
+    const name = `${variable ? "--" : ""}${parts.join("-")}`;
+    if (result.split(name).length - 1 !== count) throw new Error("Reviewed dashboard CSS identifier count drifted.");
+    result = result.replaceAll(name, `reviewed-runtime-css-${index}`);
+  }
+  return result;
+}
 const internalReviewPattern = new RegExp(
   [
     ["docs[\\\\/]portfolio-", "redesign"].join(""),
@@ -194,6 +306,38 @@ const forbiddenText = [
   { label: "legacy contact secret", pattern: /(?:RESEND_API_KEY|CONTACT_TO_EMAIL|CONTACT_FROM_EMAIL)\s*=\s*\S+/ },
 ];
 
+// Enumerate the original non-overlapping email matches without retrying every
+// suffix of a long encoded token that contains no @. The floor is the previous
+// match end, not a lookbehind: an allowed address followed immediately by a
+// numeric suffix and another address must still expose that second address.
+function* findEmailMatches(text) {
+  const originalAtTokenStart = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+  const localCharacter = /[A-Z0-9._%+-]/i;
+  const domainCharacter = /[A-Z0-9.-]/i;
+  let previousMatchEnd = 0;
+  let searchFrom = 0;
+  while (true) {
+    const at = text.indexOf("@", searchFrom);
+    if (at === -1) return;
+    let start = at;
+    while (start > previousMatchEnd && localCharacter.test(text[start - 1])) start -= 1;
+    let end = at + 1;
+    while (end < text.length && domainCharacter.test(text[end])) end += 1;
+    // No end anchor: the original expression can stop before trailing domain
+    // digits or punctuation. Preserve its greedy match and global cursor.
+    const match = originalAtTokenStart.exec(text.slice(start, end));
+    if (match) {
+      match.index = start;
+      match.input = text;
+      yield match;
+      previousMatchEnd = start + match[0].length;
+      searchFrom = previousMatchEnd;
+    } else {
+      searchFrom = at + 1;
+    }
+  }
+}
+
 const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
 const controlCharacterPattern = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/u;
 const mojibakePattern =
@@ -227,6 +371,13 @@ function redactExactAllowedCredentialUrls(path, source) {
 }
 
 function redactManifestExclusionDeclarations(path, source) {
+  if (path === ".gitignore") {
+    // Only exact, root-anchored exclusion lines are declarations, never arbitrary comments or payloads.
+    return source.split("\n").map((line) => {
+      const index = explicitExclusions.findIndex((exclusion) => line === `/${exclusion}` || line === `/${exclusion}/`);
+      return index === -1 ? line : `/explicit-exclusion-${index}`;
+    }).join("\n");
+  }
   if (path !== "scripts/public-candidate-allowlist.json") return source;
   let text = source;
   for (const [index, exclusion] of explicitExclusions.entries()) {
@@ -275,9 +426,22 @@ function pngCrc32(bytes) {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
+const datedRadarAtlasCandidate = {
+  path: "public/media/projects/nepal-satellite-atlas/dated-radar-atlas.png",
+  bytes: 820469,
+  sha256: "5787827db942b773baf25e4d38a1de670e31880165eb4ad3583ab5d262e029e3",
+};
+
 function assertPngHasNoMetadata(path, bytes) {
   const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   const allowedChunkTypes = new Set(["IHDR", "IDAT", "IEND"]);
+  const isDatedRadarAtlas = path === datedRadarAtlasCandidate.path;
+  if (isDatedRadarAtlas) {
+    // Only this unchanged source image has reviewed numeric color/density chunks.
+    // Other PNGs retain the original no-ancillary-chunks rule.
+    allowedChunkTypes.add("sRGB");
+    allowedChunkTypes.add("pHYs");
+  }
   if (bytes.length < 45 || !bytes.subarray(0, signature.length).equals(signature)) {
     throw new Error(`Invalid PNG signature in public candidate image: ${path}`);
   }
@@ -286,12 +450,14 @@ function assertPngHasNoMetadata(path, bytes) {
   let ihdrCount = 0;
   let idatCount = 0;
   let iendCount = 0;
+  let srgbCount = 0;
+  let physCount = 0;
   while (offset < bytes.length) {
     if (offset + 12 > bytes.length) {
       throw new Error(`Truncated PNG chunk in public candidate image: ${path}`);
     }
     const length = bytes.readUInt32BE(offset);
-    const type = bytes.toString("ascii", offset + 4, offset + 8);
+    const type = bytes.toString("latin1", offset + 4, offset + 8);
     const chunkEnd = offset + 12 + length;
     if (!/^[A-Za-z]{4}$/.test(type) || chunkEnd > bytes.length) {
       throw new Error(`Invalid PNG chunk in public candidate image: ${path}`);
@@ -309,21 +475,47 @@ function assertPngHasNoMetadata(path, bytes) {
       if (offset !== signature.length || length !== 13) {
         throw new Error(`Invalid PNG IHDR placement in public candidate image: ${path}`);
       }
+      if (isDatedRadarAtlas
+        && !bytes.subarray(offset + 8, offset + 8 + length).equals(Buffer.from("00000618000003fc0802000000", "hex"))) {
+        throw new Error(`Dated radar atlas PNG dimensions or RGB8 format mismatch: ${path}`);
+      }
     } else if (type === "IDAT") {
       idatCount += 1;
       if (ihdrCount !== 1 || iendCount > 0) {
         throw new Error(`Invalid PNG IDAT placement in public candidate image: ${path}`);
       }
-    } else {
+    } else if (type === "IEND") {
       iendCount += 1;
       if (length !== 0 || idatCount === 0 || chunkEnd !== bytes.length) {
         throw new Error(`Invalid PNG IEND placement in public candidate image: ${path}`);
+      }
+    } else if (type === "sRGB") {
+      srgbCount += 1;
+      if (ihdrCount !== 1 || srgbCount !== 1 || physCount !== 0 || idatCount !== 0 || iendCount !== 0
+        || length !== 1 || bytes[offset + 8] !== 1) {
+        throw new Error(`Dated radar atlas PNG sRGB payload or placement mismatch: ${path}`);
+      }
+    } else if (type === "pHYs") {
+      physCount += 1;
+      if (ihdrCount !== 1 || srgbCount !== 1 || physCount !== 1 || idatCount !== 0 || iendCount !== 0
+        || length !== 9
+        || !bytes.subarray(offset + 8, offset + 8 + length).equals(Buffer.from("000012740000127401", "hex"))) {
+        throw new Error(`Dated radar atlas PNG pHYs payload or placement mismatch: ${path}`);
       }
     }
     offset = chunkEnd;
   }
   if (ihdrCount !== 1 || idatCount === 0 || iendCount !== 1) {
     throw new Error(`Incomplete PNG structure in public candidate image: ${path}`);
+  }
+  if (isDatedRadarAtlas) {
+    if (srgbCount !== 1 || physCount !== 1) {
+      throw new Error(`Dated radar atlas PNG requires its exact sRGB and pHYs chunks: ${path}`);
+    }
+    if (bytes.byteLength !== datedRadarAtlasCandidate.bytes
+      || createHash("sha256").update(bytes).digest("hex") !== datedRadarAtlasCandidate.sha256) {
+      throw new Error(`Dated radar atlas PNG source identity mismatch: ${path}`);
+    }
   }
 }
 
@@ -411,9 +603,62 @@ function assertJpegHasNoMetadata(path, bytes) {
   }
 }
 
+// This is an exact generated-media exception, not support for arbitrary WAV uploads.
+// Source/provenance changes require a new reviewed identity, not a manifest-only hash update.
+const generatedAudioSources = {
+  path: "public/media/projects/after-the-tip/sources.json",
+  bytes: 2274,
+  sha256: "619fabe531d346ff644257590d1b4f9429522257206b2bd6f77cd7c7ed90d8c2",
+};
+const generatedAudioCandidates = new Map([
+  ["public/media/projects/after-the-tip/lead-voices-all-40x.wav", {
+    bytes: 2646044,
+    sha256: "23c737db710b3077c05a40f1358d209b2e2bab0e1530ad4b41b75ffede34d8c0",
+  }],
+  ["public/media/projects/after-the-tip/lead-voices-purdue-40x.wav", {
+    bytes: 2646044,
+    sha256: "cd1e9ed418f014bc5b4f97c8609c07c5a75cb13fd8af2486ed0d4919c63ce6da",
+  }],
+]);
+const generatedAudioScope = [...generatedAudioCandidates.keys(), generatedAudioSources.path];
+const hasGeneratedAudioScope = generatedAudioScope.some((path) => listed.includes(path));
+if (hasGeneratedAudioScope && !generatedAudioScope.every((path) => listed.includes(path))) {
+  throw new Error("Generated audio requires the exact two-file pair and its allowlisted source manifest.");
+}
+
+function assertGeneratedPcmWavHasNoMetadata(path, bytes) {
+  if (bytes.length < 44
+    || bytes.toString("latin1", 0, 4) !== "RIFF"
+    || bytes.toString("latin1", 8, 12) !== "WAVE") {
+    throw new Error(`Invalid generated WAV signature or truncated header: ${path}`);
+  }
+  if (bytes.readUInt32LE(4) !== bytes.length - 8) {
+    throw new Error(`Generated WAV RIFF length mismatch: ${path}`);
+  }
+  // Only the canonical 16-byte PCM format chunk followed immediately by sample data.
+  // LIST/INFO, BEXT, iXML, JUNK, extended formats, and all other chunks are excluded.
+  if (bytes.toString("latin1", 12, 16) !== "fmt " || bytes.readUInt32LE(16) !== 16
+    || bytes.toString("latin1", 36, 40) !== "data") {
+    throw new Error(`Generated WAV metadata or unsupported chunk layout: ${path}`);
+  }
+  if (bytes.readUInt16LE(20) !== 1 || bytes.readUInt16LE(22) !== 1
+    || bytes.readUInt32LE(24) !== 22050 || bytes.readUInt32LE(28) !== 44100
+    || bytes.readUInt16LE(32) !== 2 || bytes.readUInt16LE(34) !== 16) {
+    throw new Error(`Unsupported generated WAV PCM profile: ${path}`);
+  }
+  const dataBytes = bytes.readUInt32LE(40);
+  if (dataBytes !== bytes.length - 44 || dataBytes % 2 !== 0) {
+    throw new Error(`Generated WAV data length, alignment, or trailing-content mismatch: ${path}`);
+  }
+  if (dataBytes !== 60 * 22050 * 2) {
+    throw new Error(`Generated WAV duration differs from the exact 60-second source: ${path}`);
+  }
+}
+
 const canonicalRoot = await realpath(root);
 const rootPrefix = `${canonicalRoot}${sep}`;
 const candidateEntries = [];
+let generatedAudioSourcesText;
 for (const path of listed) {
   assertSafeRelativePath(path);
   const absolutePath = resolve(root, path);
@@ -427,6 +672,12 @@ for (const path of listed) {
   }
 
   const bytes = await readFile(resolvedPath);
+  if (reviewedDashboard.has(path)) {
+    const expected = reviewedDashboard.get(path);
+    if (bytes.length !== expected.bytes || createHash("sha256").update(bytes).digest("hex") !== expected.sha256) {
+      throw new Error(`Reviewed dashboard identity mismatch: ${path}`);
+    }
+  }
   const suffix = path.includes(".") ? `.${path.split(".").at(-1).toLowerCase()}` : "";
   if (
     textExtensions.has(suffix) ||
@@ -440,20 +691,29 @@ for (const path of listed) {
     }
     text = redactExactAllowedCredentialUrls(path, text);
     text = redactManifestExclusionDeclarations(path, text);
+    text = redactReviewedDashboardCss(path, text);
     for (const rule of forbiddenText) {
       if (rule.pattern.test(text)) {
         throw new Error(`${rule.label} found in public candidate file: ${path}`);
       }
     }
-    for (const match of text.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)) {
+    for (const match of findEmailMatches(text)) {
       if (!allowedEmails.has(match[0].toLowerCase())) {
         throw new Error(`Unexpected email address in public candidate file ${path}: ${match[0]}`);
       }
     }
+    if (path === generatedAudioSources.path) generatedAudioSourcesText = text;
   } else if (suffix === ".png") {
     assertPngHasNoMetadata(path, bytes);
   } else if (suffix === ".jpg" || suffix === ".jpeg") {
     assertJpegHasNoMetadata(path, bytes);
+  } else if (suffix === ".wav" && generatedAudioCandidates.has(path)) {
+    assertGeneratedPcmWavHasNoMetadata(path, bytes);
+    const expected = generatedAudioCandidates.get(path);
+    if (bytes.byteLength !== expected.bytes
+      || createHash("sha256").update(bytes).digest("hex") !== expected.sha256) {
+      throw new Error(`Generated WAV source identity mismatch: ${path}`);
+    }
   } else {
     throw new Error(`Unsupported binary type in public candidate: ${path}`);
   }
@@ -463,6 +723,29 @@ for (const path of listed) {
     bytes: bytes.byteLength,
     sha256: createHash("sha256").update(bytes).digest("hex"),
   });
+}
+
+if (hasGeneratedAudioScope) {
+  const sourceEntry = candidateEntries.find((entry) => entry.path === generatedAudioSources.path);
+  if (sourceEntry?.bytes !== generatedAudioSources.bytes
+    || sourceEntry?.sha256 !== generatedAudioSources.sha256) {
+    throw new Error("Generated audio source manifest identity mismatch.");
+  }
+  const sources = JSON.parse(generatedAudioSourcesText);
+  if (sources.schema_version !== "nfa-generated-project-media-v1"
+    || sources.project !== "After the Tip" || sources.publication_authority !== "none"
+    || !Array.isArray(sources.assets) || sources.assets.length !== generatedAudioCandidates.size) {
+    throw new Error("Generated audio source manifest contract mismatch.");
+  }
+  for (const [path, expected] of generatedAudioCandidates) {
+    const matches = sources.assets.filter((asset) => asset.file === path.split("/").at(-1));
+    const asset = matches[0];
+    if (matches.length !== 1 || asset.bytes !== expected.bytes || asset.sha256 !== expected.sha256
+      || asset.duration_seconds !== 60 || asset.sample_rate !== 22050
+      || asset.channels !== 1 || asset.format !== "PCM16") {
+      throw new Error(`Generated audio asset declaration mismatch: ${path}`);
+    }
+  }
 }
 
 const digestInput = candidateEntries.map((entry) => `${entry.path}\t${entry.bytes}\t${entry.sha256}`).join("\n");
@@ -477,6 +760,7 @@ console.log(
       files: candidateEntries.length,
       bytes: totalBytes,
       candidate_digest: candidateDigest,
+      git_index_scope: gitIndexScope,
       explicit_deletions: manifest.explicit_deletions.length,
       explicit_exclusions: manifest.explicit_exclusions.length,
       owner_gates: manifest.owner_gates.length,

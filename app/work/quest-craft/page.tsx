@@ -182,6 +182,7 @@ export default function QuestCraftCaseStudy() {
                   <div className={styles.path} key={path}>
                     <p className={styles.pathLabel}>Path {path}</p>
                     <div
+                      role="group"
                       aria-label={`Path ${path}: four-beat structural trace`}
                       className={styles.pathBeats}
                       data-path-trace={path}

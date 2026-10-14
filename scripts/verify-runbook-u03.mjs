@@ -130,6 +130,7 @@ const publicSourceIds = [
   "rs.trace_gap.0016",
   "rs.trace.0020.attempt003",
   "rs.milestone.0020",
+  "rs.status.v0020",
 ];
 for (const sourceId of publicSourceIds) {
   const source = getProjectSource(sourceId);
@@ -151,9 +152,34 @@ for (const hook of [
   'data-governed-figure="runbook-dashboard"',
   "data-media-conditions",
   'data-source-ledger="runbook-sentinel"',
+  'data-next-threshold="runbook-sentinel"',
 ]) {
   assert.ok(pageSource.includes(hook), `Missing Runbook U03 hook: ${hook}`);
 }
+
+assert.equal(
+  project.evidence.nextStep.summary,
+  "At this release, the separately declared v0.1.0 threshold required at least 48 frozen scenarios.",
+  "The historical next threshold must retain its exact canonical statement.",
+);
+assert.deepEqual(project.evidence.nextStep.sourceIds, ["rs.status.v0020", "rs.milestone.0020"]);
+const nextThresholdSections = [...pageSource.matchAll(
+  /<section\b[^>]*data-next-threshold="runbook-sentinel"[^>]*>([\s\S]*?)<\/section>/g,
+)];
+assert.equal(nextThresholdSections.length, 1, "Render one explicit historical next-threshold section.");
+const nextThreshold = nextThresholdSections[0][0];
+const normalizedNextThreshold = nextThreshold.replace(/\s+/g, " ");
+assert.match(nextThreshold, /data-project-field="nextStep"/);
+assert.match(nextThreshold, /aria-labelledby="next-threshold-heading"/);
+assert.match(nextThreshold, /<h3 id="next-threshold-heading">Next threshold at this release<\/h3>/);
+assert.ok(nextThreshold.includes("{project.evidence.nextStep.summary}"), "Render the canonical summary directly.");
+assert.ok(nextThreshold.includes('data-source-ids={project.evidence.nextStep.sourceIds.join(" ")}'));
+assert.ok(nextThreshold.includes("project.evidence.nextStep.sourceIds.map((sourceId) => ("));
+assert.ok(nextThreshold.includes("readerLabel={getProjectSource(sourceId).label}"));
+assert.ok(nextThreshold.includes("sourceId={sourceId}"));
+assert.match(nextThreshold, /aria-label="Pinned next-threshold evidence"/);
+assert.ok(normalizedNextThreshold.includes("The 31 frozen scenarios reported here remained below that threshold."));
+assert.ok(normalizedNextThreshold.includes("This is the v0.0.20 record, not a current roadmap or a production-readiness claim."));
 
 const expectedRails = {
   signalRail: [

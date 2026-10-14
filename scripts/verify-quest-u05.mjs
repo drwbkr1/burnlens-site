@@ -25,6 +25,21 @@ const publicAllowlist = JSON.parse(
 );
 const project = getProject("quest-craft");
 
+// NFA-073 changes only the reviewed presentation, not the frozen Quest source or media.
+const predecessorCssIdentity = {
+  bytes: 24_324,
+  sha256: "25b90be3e7e6647a5004c593dd21c75222e5c2870c873fd13ae94dd350f125a3",
+};
+const acceptedNfa073Css = {
+  bytes: 24_697,
+  sha256: "4745f99cf82b207bc2bc39f4df6c7830bd117d50642e5741fc46f6129c7bb6bc",
+};
+// NFA-080 changes only rejected-cell foreground contrast; retain the073 identity.
+const currentNfa080Css = {
+  bytes: 24_693,
+  sha256: "dcb69a1c251ae010d430554df149d6f1f3ee4f2e87d1d84de186ee625bbc26cc",
+};
+
 const routeFields = [
   "problem",
   "intendedUser",
@@ -129,6 +144,26 @@ for (const field of routeFields) {
 }
 assert.equal(project.evidence.stack.state, "missing");
 assert.equal(project.evidence.nextStep.state, "missing");
+const cssBytes = readFileSync(resolve(root, cssPath));
+assert.equal(cssBytes.byteLength, currentNfa080Css.bytes,
+  `${cssPath}: current NFA-080 contrast repair byte length drifted.`);
+assert.equal(sha256(cssBytes), currentNfa080Css.sha256,
+  `${cssPath}: current NFA-080 contrast repair identity drifted.`);
+const rejectedForeground = /(\.evaluationLedger td\[data-kind="rejected"\] \{[\s\S]*?  color: )var\(--color-ink\);/g;
+assert.equal([...cssSource.matchAll(rejectedForeground)].length, 1,
+  `${cssPath}: exactly one rejected-cell ink foreground must be reversible.`);
+const restoredNfa073Css = Buffer.from(
+  cssSource.replace(rejectedForeground, "$1var(--color-caution);"), "utf8",
+);
+assert.equal(restoredNfa073Css.byteLength, acceptedNfa073Css.bytes,
+  `${cssPath}: reversing only foreground must restore the073 byte length.`);
+assert.equal(sha256(restoredNfa073Css), acceptedNfa073Css.sha256,
+  `${cssPath}: reversing only foreground must restore the entire073 identity.`);
+const rejectedCellBody = ruleBody('\\.evaluationLedger td\\[data-kind="rejected"\\]', cssPath);
+requireCss(rejectedCellBody, /color:\s*var\(--color-ink\);/, cssPath, "rejected-cell foreground uses existing ink");
+requireCss(rejectedCellBody, /repeating-linear-gradient\(/, cssPath, "rejected-cell stripes remain");
+requireCss(rejectedCellBody, /color-mix\(in srgb, var\(--color-caution\) 16%, transparent\)/, cssPath, "stripe color remains unchanged");
+requireCss(rejectedCellBody, /color-mix\(in srgb, var\(--color-caution\) 26%, var\(--color-panel\)\)/, cssPath, "base background remains unchanged");
 
 const expectedCorrections = [
   {
@@ -512,8 +547,8 @@ for (const [selector, label] of [
   ["\\.tableScroll:focus-visible", "Quest table scroller"],
 ]) {
   const rule = ruleBody(selector, label);
-  requireCss(rule, /outline\s*:\s*3px\s+solid\s+var\(--terracotta-dark\)\s*;/,
-    label, "focus ring must be 3px terracotta-dark");
+  requireCss(rule, /outline\s*:\s*3px\s+solid\s+var\(--color-focus\)\s*;/,
+    label, "focus ring must be 3px in the reviewed semantic focus color");
   requireCss(rule, /outline-offset\s*:\s*4px\s*;/,
     label, "focus ring must sit 4px outside the target");
 }
@@ -580,4 +615,6 @@ console.log(JSON.stringify({
   socialMediaSha256: asset.sha256,
   pageSha256: sha256(readFileSync(resolve(root, pagePath))),
   cssSha256: sha256(readFileSync(resolve(root, cssPath))),
+  predecessorCssIdentity,
+  acceptedNfa073Css,
 }));

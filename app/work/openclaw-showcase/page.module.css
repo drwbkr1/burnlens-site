@@ -1,16 +1,17 @@
 .page {
-  --folio-canvas: var(--sand);
-  --folio-sheet: var(--paper);
-  --folio-ink: var(--charcoal);
-  --folio-copy: var(--ink-soft);
-  --folio-muted: var(--gray);
-  --folio-rule: var(--rule);
-  --folio-reference: var(--olive-dark);
-  --folio-process: var(--teal-dark);
-  --folio-attention: var(--terracotta-dark);
-  --folio-public: var(--sage);
-  --folio-gated: var(--terracotta);
-  --folio-private: var(--charcoal);
+  --folio-canvas: var(--color-page);
+  --folio-sheet: var(--color-panel);
+  --folio-ink: var(--color-ink);
+  --folio-copy: var(--color-soft);
+  --folio-muted: var(--color-soft);
+  --folio-rule: var(--color-rule);
+  --folio-edge: var(--color-rule);
+  --folio-reference: var(--color-accent);
+  --folio-process: var(--color-accent);
+  --folio-attention: var(--color-caution);
+  --folio-public: var(--color-panel-alt);
+  --folio-gated: var(--color-caution-panel);
+  --folio-private: var(--color-deep);
   background: var(--folio-canvas);
   color: var(--folio-ink);
   min-width: 0;
@@ -161,7 +162,7 @@
 
 .heroFolio {
   background: var(--folio-sheet);
-  border: 1px solid var(--folio-ink);
+  border: 1px solid var(--folio-edge);
   display: grid;
   gap: 1.4rem;
   padding: clamp(1.25rem, 3vw, 2rem);
@@ -169,7 +170,7 @@
 }
 
 .heroFolio::before {
-  border: 1px solid var(--folio-ink);
+  border: 1px solid var(--folio-edge);
   content: "";
   inset: 0;
   pointer-events: none;
@@ -184,7 +185,7 @@
 }
 
 .heroFolio > header {
-  border-bottom: 1px solid var(--folio-ink);
+  border-bottom: 1px solid var(--folio-edge);
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem 1rem;
@@ -265,8 +266,8 @@
 }
 
 .firstScreenLedger {
-  border-bottom: 1px solid var(--folio-ink);
-  border-top: 1px solid var(--folio-ink);
+  border-bottom: 1px solid var(--folio-edge);
+  border-top: 1px solid var(--folio-edge);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: clamp(3rem, 6vw, 5rem) auto 0;
@@ -331,7 +332,7 @@
 .movementLead > p:last-child,
 .movementHeader > p {
   align-self: end;
-  border-top: 1px solid var(--folio-ink);
+  border-top: 1px solid var(--folio-edge);
   color: var(--folio-copy);
   font-size: 1rem;
   line-height: 1.6;
@@ -348,7 +349,7 @@
 
 .layerRegister details {
   background: var(--folio-sheet);
-  border: 1px solid var(--folio-ink);
+  border: 1px solid var(--folio-edge);
 }
 
 .layerRegister details[data-disclosure-layer="public"] {
@@ -458,8 +459,8 @@
 
 .workflowMovement {
   background: var(--folio-sheet);
-  border-bottom: 1px solid var(--folio-ink);
-  border-top: 1px solid var(--folio-ink);
+  border-bottom: 1px solid var(--folio-edge);
+  border-top: 1px solid var(--folio-edge);
   padding: clamp(3rem, 7vw, 5rem) max(1.25rem, calc((100vw - var(--max)) / 2));
 }
 
@@ -469,8 +470,8 @@
 }
 
 .conceptualWorkflow {
-  border-bottom: 1px solid var(--folio-ink);
-  border-top: 1px solid var(--folio-ink);
+  border-bottom: 1px solid var(--folio-edge);
+  border-top: 1px solid var(--folio-edge);
   display: grid;
   gap: 1.5rem;
   grid-template-columns: minmax(12rem, 0.3fr) minmax(0, 1fr);
@@ -498,7 +499,7 @@
 }
 
 .conceptualWorkflow > ol > li {
-  border-left: 1px solid var(--folio-ink);
+  border-left: 1px solid var(--folio-edge);
   min-height: 13rem;
   padding: 0 1rem 1rem;
   position: relative;
@@ -584,13 +585,13 @@
 }
 
 .receiptPaper {
-  border: 1px solid var(--folio-ink);
+  border: 1px solid var(--folio-edge);
   padding: clamp(1rem, 2.5vw, 1.8rem);
 }
 
 .receiptPaper > header {
   align-items: start;
-  border-bottom: 2px solid var(--folio-ink);
+  border-bottom: 2px solid var(--folio-edge);
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
@@ -747,7 +748,7 @@
 }
 
 .boundaryPanel > p {
-  color: var(--sage);
+  color: var(--color-soft);
   font-family: var(--serif);
   font-size: clamp(1.35rem, 2.2vw, 2rem);
   line-height: 1.22;
@@ -769,7 +770,7 @@
 }
 
 .boundaryPanel li::before {
-  color: var(--terracotta);
+  color: var(--color-caution);
   content: "×";
   font-family: var(--mono);
   font-size: 1rem;
@@ -780,7 +781,7 @@
 
 .missingBoundary {
   border-top: 1px solid var(--folio-muted);
-  color: var(--sage) !important;
+  color: var(--color-soft) !important;
   font-size: 1rem !important;
   grid-column: 1 / -1;
   line-height: 1.6 !important;
@@ -789,7 +790,7 @@
 }
 
 .sourceSection {
-  border-top: 1px solid var(--folio-ink);
+  border-top: 1px solid var(--folio-edge);
   display: grid;
   gap: clamp(1.5rem, 3vw, 2.5rem);
   grid-template-columns: minmax(13rem, 0.35fr) minmax(0, 1fr);
@@ -799,14 +800,14 @@
 }
 
 .sourceFolio {
-  border-bottom: 1px solid var(--folio-ink);
+  border-bottom: 1px solid var(--folio-edge);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .sourceFolio a {
-  border-left: 1px solid var(--folio-ink);
-  border-top: 1px solid var(--folio-ink);
+  border-left: 1px solid var(--folio-edge);
+  border-top: 1px solid var(--folio-edge);
   display: grid;
   gap: 0.25rem 0.8rem;
   grid-template-columns: auto minmax(0, 1fr);
@@ -820,7 +821,7 @@
 }
 
 .sourceFolio a:nth-child(2n) {
-  border-right: 1px solid var(--folio-ink);
+  border-right: 1px solid var(--folio-edge);
 }
 
 .sourceFolio a:hover {
@@ -1133,9 +1134,9 @@
   .sourceFolio a,
   .sourceFolio a:nth-child(-n + 2),
   .sourceFolio a:nth-child(2n) {
-    border-left: 1px solid var(--folio-ink);
-    border-right: 1px solid var(--folio-ink);
-    border-top: 1px solid var(--folio-ink);
+    border-left: 1px solid var(--folio-edge);
+    border-right: 1px solid var(--folio-edge);
+    border-top: 1px solid var(--folio-edge);
     min-height: 0;
   }
 
@@ -1203,6 +1204,19 @@
 
 @media print {
   .page {
+    --folio-canvas: var(--sand);
+    --folio-sheet: var(--paper);
+    --folio-ink: var(--charcoal);
+    --folio-copy: var(--ink-soft);
+    --folio-muted: var(--gray);
+    --folio-rule: var(--rule);
+    --folio-edge: var(--charcoal);
+    --folio-reference: var(--olive-dark);
+    --folio-process: var(--teal-dark);
+    --folio-attention: var(--terracotta-dark);
+    --folio-public: var(--sage);
+    --folio-gated: var(--terracotta);
+    --folio-private: var(--charcoal);
     background: var(--white);
   }
 

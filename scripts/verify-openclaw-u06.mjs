@@ -26,10 +26,20 @@ const publicAllowlist = JSON.parse(
 );
 const project = getProject("openclaw-showcase");
 
-const expectedTargetHashes = {
+// Preserve the exact U06 identities; NFA-073 changes presentation CSS only.
+const predecessorTargetHashes = {
   [pagePath]: "0d84b95d21edf86ae99f1c4f8bff237744e74726d8a3a5d5ff705b6a50a8ee80",
   [cssPath]: "d9d1511633968c6c6b2259676a41944f7511accd9261bc8661ba5e4fba527d57",
   [ogPath]: "ecc4216222b0bff86bf02672b21d63debd606040bb5d6298f24e847a11e9c658",
+};
+const acceptedNfa073Css = {
+  predecessorBytes: 26_506,
+  bytes: 27_100,
+  sha256: "8ce93dcbbfbc6740cd63ce0a11a2aa614e99b4f1ea4f2ab844748c19e7429122",
+};
+const expectedTargetHashes = {
+  ...predecessorTargetHashes,
+  [cssPath]: acceptedNfa073Css.sha256,
 };
 const routeFields = [
   "problem",
@@ -283,8 +293,10 @@ for (const field of ["intendedUser", "testStrategy", "failureDividend", "nextSte
 }
 
 for (const [path, expectedHash] of Object.entries(expectedTargetHashes)) {
-  assert.equal(sha256(readFileSync(resolve(root, path))), expectedHash, `${path}: frozen U06 target drifted.`);
+  assert.equal(sha256(readFileSync(resolve(root, path))), expectedHash, `${path}: frozen accepted target drifted.`);
 }
+assert.equal(readFileSync(resolve(root, cssPath)).byteLength, acceptedNfa073Css.bytes,
+  `${cssPath}: reviewed NFA-073 presentation byte length drifted.`);
 
 requireText(pageSource, 'getProject("openclaw-showcase")', pagePath);
 for (const field of routeFields) {
@@ -664,4 +676,6 @@ console.log(JSON.stringify({
   receiptFields: expectedReceipt.map(([label]) => label),
   sources: expectedSources.map(({ id }) => id),
   targetHashes: expectedTargetHashes,
+  predecessorTargetHashes,
+  acceptedNfa073Css,
 }));

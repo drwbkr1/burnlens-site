@@ -27,7 +27,8 @@
     "verify:media": "node scripts/verify-media-manifests.mjs",
     "verify:origin": "node --experimental-strip-types scripts/verify-site-origin.mjs",
     "verify:public-scope": "node scripts/verify-public-candidate.mjs",
-    "check": "npm run typecheck && npm run lint && npm run verify:project-model && npm run verify:burnlens-u02 && npm run verify:runbook-u03 && npm run verify:front-door-u04 && npm run verify:quest-u05 && npm run verify:openclaw-u06 && npm run verify:media && npm run verify:resume-u07 && npm run verify:integrated-u08 && npm run verify:origin && npm run verify:public-scope && npm run build",
+    "test:public-scope": "node --test scripts/test-public-candidate.mjs",
+    "check": "npm run typecheck && npm run lint && npm run verify:project-model && npm run verify:burnlens-u02 && npm run verify:runbook-u03 && npm run verify:front-door-u04 && npm run verify:quest-u05 && npm run verify:openclaw-u06 && npm run verify:media && npm run verify:resume-u07 && npm run verify:integrated-u08 && npm run verify:origin && npm run verify:public-scope && npm run test:public-scope && npm run build",
     "postbuild": "node scripts/clean-generated-next-env.mjs",
     "test:site": "playwright test",
     "verify": "npm run check && npm run test:site",
@@ -36,7 +37,7 @@
   "dependencies": {
     "@fontsource-variable/manrope": "5.3.0",
     "@fontsource-variable/newsreader": "5.3.0",
-    "next": "16.3.0",
+    "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
@@ -48,9 +49,14 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.8",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.4",
     "typescript": "6.0.3"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "fast-glob": "npm:tinyglobby@0.2.17"
+    }
   }
 }

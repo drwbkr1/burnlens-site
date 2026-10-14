@@ -1,0 +1,29 @@
+{
+  "schema_version": "portfolio-media-provenance-v1",
+  "project": "Wildfire Response",
+  "status": "local case-study candidate; publication not authorized",
+  "credit": "Application and captures from Drew Baker's Codex-assisted game project. Terrain art generated with imagegen; no claim of hand illustration.",
+  "rights_scope": "Owner-project application screenshots for this portfolio candidate. No general redistribution license is granted; third-party rights are not inferred.",
+  "assets": [
+    {
+      "file": "planning-v027.jpg",
+      "source_capture": "V27_CONTROL_GAME.jpg",
+      "sha256": "2b8c87a20281397e10d1e0ab9900e1fc28acdd4cc4dbb321b4c0bf927c304fcc",
+      "bytes": 179076,
+      "width": 1279,
+      "height": 631,
+      "version": "0.27.0",
+      "scope": "Actual production client displaying a historical synthetic fixture; gameplay disabled; fake F2700 code; no personal data visible."
+    },
+    {
+      "file": "saved-plan-v024.jpg",
+      "source_capture": "V24_PLAN_DETAILS_DESKTOP_FINAL.jpg",
+      "sha256": "ebc95dbce4d43a6a23072de7749c32c76b414b94e68f84afb43c1026be19bc63",
+      "bytes": 142654,
+      "width": 1265,
+      "height": 712,
+      "version": "0.24.0",
+      "scope": "Paused synthetic historical fixture; mocked planning commands; no mission/fire execution; fake F2400; original test frame retained."
+    }
+  ]
+}

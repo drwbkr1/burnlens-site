@@ -5,7 +5,7 @@ export function SiteFooter() {
         <div>
           <p className="footer-name">William “Drew” Baker</p>
           <p className="footer-note">
-            Software, geospatial intelligence, and risk-aware tools for work where the limits matter.
+            Software, maps and interactive experiences—shaped by curiosity and product decisions.
           </p>
         </div>
         <nav className="footer-links" aria-label="External profile links">
