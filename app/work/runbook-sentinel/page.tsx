@@ -10,6 +10,7 @@ import {
 } from "@/components/editorial/ProjectFactLedger";
 import {
   getProject,
+  getProjectSource,
   getPublicSourceHref,
   type NonEmpty,
   type PublicLinkSourceId,
@@ -605,6 +606,7 @@ export default function RunbookSentinelCaseStudy() {
                 <Image
                   alt={runbookMedia.assets[0].alt}
                   height={1000}
+                  loading="eager"
                   sizes="(max-width: 760px) 100vw, (max-width: 1200px) 78vw, 720px"
                   src={runbookMedia.assets[0].path}
                   width={1440}
@@ -656,11 +658,32 @@ export default function RunbookSentinelCaseStudy() {
                   {project.evidence.limitations.value.map((limit) => (
                     <li key={limit}>{limit}</li>
                   ))}
-                  <li>
-                    At v0.0.20, 31 fixed cases remained below the separately declared
-                    48-case threshold.
-                  </li>
                 </ul>
+                <section
+                  className={styles.nextThreshold}
+                  data-project-field="nextStep"
+                  data-next-threshold="runbook-sentinel"
+                  data-source-ids={project.evidence.nextStep.sourceIds.join(" ")}
+                  aria-labelledby="next-threshold-heading"
+                >
+                  <h3 id="next-threshold-heading">Next threshold at this release</h3>
+                  <p>{project.evidence.nextStep.summary}</p>
+                  <p>
+                    The 31 frozen scenarios reported here remained below that threshold.
+                    This is the v0.0.20 record, not a current roadmap or a
+                    production-readiness claim.
+                  </p>
+                  <nav aria-label="Pinned next-threshold evidence">
+                    {project.evidence.nextStep.sourceIds.map((sourceId) => (
+                      <EvidenceLink
+                        data-source-id={sourceId}
+                        key={sourceId}
+                        readerLabel={getProjectSource(sourceId).label}
+                        sourceId={sourceId}
+                      />
+                    ))}
+                  </nav>
+                </section>
               </div>
               <div className={styles.sourceFolio} data-source-ledger="runbook-sentinel">
                 <h3>Inspect the frozen record</h3>

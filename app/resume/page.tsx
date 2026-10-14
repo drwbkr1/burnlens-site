@@ -239,6 +239,14 @@ function ResumeProject({
   index: number;
 }) {
   const { project, sourceId, tier } = entry;
+  const labels = project.id === "burnlens"
+    ? {
+        ...resumeFieldLabels,
+        personalRole: "Role split",
+        implementation: "Release constraint",
+        testStrategy: "Reliability lesson",
+      }
+    : resumeFieldLabels;
   const fields = projectSurfacePlan[project.id].fields.resume as readonly ResumeField[];
   const maturity = supported(project.id, "maturity");
   const factFields = fields.filter((field) => field !== "maturity") as readonly Exclude<
@@ -252,14 +260,14 @@ function ResumeProject({
       }
       return {
         id: field,
-        term: resumeFieldLabels[field],
+        term: labels[field],
         detail: <TechnologyEvidence projectId={project.id} />,
       };
     }
 
     return {
       id: field,
-      term: resumeFieldLabels[field],
+      term: labels[field],
       detail: <EvidenceValue field={field} projectId={project.id} />,
     };
   });
@@ -300,13 +308,17 @@ function ResumeProject({
         <div className={styles.projectLinks}>
           <Link href={project.route}>
             Read the {tier === "flagship" ? "case study" : "field note"}{" "}
+            <span className="sr-only">for {project.title} </span>
             <span aria-hidden="true">→</span>
           </Link>
           <EvidenceLink
             sourceId={sourceId}
             readerLabel={
               <>
-                Inspect pinned evidence <span className="sr-only">(opens in a new tab)</span>
+                Inspect pinned evidence{" "}
+                <span className="sr-only">
+                  for {project.title} (opens in a new tab)
+                </span>
                 <span aria-hidden="true">↗</span>
               </>
             }
@@ -401,6 +413,7 @@ export default function ResumePage() {
                 >
                   <strong>GitHub</strong>
                   <span>github.com/drwbkr1</span>
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
                 <a
                   href="https://www.linkedin.com/in/william-baker-843946162/"
@@ -409,6 +422,7 @@ export default function ResumePage() {
                 >
                   <strong>LinkedIn</strong>
                   <span>linkedin.com/in/william-baker-843946162</span>
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
                 <PrintButton className={styles.printButton} />
               </nav>
@@ -557,7 +571,8 @@ export default function ResumePage() {
                     <li key={item.title}>
                       {item.href ? (
                         <a href={item.href} target="_blank" rel="noopener noreferrer">
-                          {item.title} <span aria-hidden="true">↗</span>
+                          {item.title} <span className="sr-only">(opens in a new tab)</span>
+                          <span aria-hidden="true">↗</span>
                         </a>
                       ) : (
                         <span className={styles.learningLabel}>{item.title}</span>

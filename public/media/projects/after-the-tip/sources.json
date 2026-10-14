@@ -1,0 +1,17 @@
+{
+  "schema_version": "nfa-generated-project-media-v1",
+  "project": "After the Tip",
+  "status": "local exploratory prototype; not submitted or publicly hosted",
+  "attribution": "Official Purdue/BTAA competition dataset distributed from SportsDataverse/wehoop ESPN records, 2025–26 screened season",
+  "intended_use": "Local portfolio display of generated visualization and synthesized audio only; no underlying dataset redistribution",
+  "publication_authority": "none",
+  "rights_evidence": ["https://www.purdue.edu/idata/lovedata/", "https://btaa.org/technology/love-data-week/data-viz-student-championship"],
+  "rights_verified_at_utc": "2026-10-07T21:45:39Z",
+  "restrictions": ["No open-data license implied", "No raw source, per-game catalogue or copied profile JSON", "Not a broadcast recording", "No award, entry or listener-outcome claim"],
+  "figure_derivation": {"input_filename": "leads.json", "input_bytes": 27182, "input_sha256": "2426f4ecf6a7bce770adb6ba540170f8a347230a57c93a2e05c98fa543277212", "output": "app/work/after-the-tip/lead-figures.ts", "transformation": "Step-held SVG areas from inclusive ten-second snapshots, matching the source chart's H/V semantics; shared14-point extent; geometry rounded to0.001 design pixel, end-of-quarter readings rounded to0.01 point. Source JSON is not copied."},
+  "assets": [
+    {"file": "lead-voices-all-40x.wav", "bytes": 2646044, "sha256": "23c737db710b3077c05a40f1358d209b2e2bab0e1530ad4b41b75ffede34d8c0", "duration_seconds": 60, "sample_rate": 22050, "channels": 1, "format": "PCM16", "meaning": "6002 screened games, Home/Away lead contributions"},
+    {"file": "lead-voices-purdue-40x.wav", "bytes": 2646044, "sha256": "cd1e9ed418f014bc5b4f97c8609c07c5a75cb13fd8af2486ed0d4919c63ce6da", "duration_seconds": 60, "sample_rate": 22050, "channels": 1, "format": "PCM16", "meaning": "30 Purdue games, Purdue/Opponent lead contributions"}
+  ],
+  "analytical_limits": ["Purdue is part of the full-season cohort", "Different side orientations, not direct team strength", "Mean positive lead contributions, not signed mean margin or confidence intervals", "Regulation only; timestamps are screened, not independently validated", "Current fixed-pitch Lead voices mode; F–H pitch auditions remain separate"]
+}

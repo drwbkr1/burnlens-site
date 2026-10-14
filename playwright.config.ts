@@ -19,7 +19,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: `npm run start -- -p ${testPort}`,
+    command: `npm run start -- --hostname 127.0.0.1 -p ${testPort}`,
     url: testOrigin,
     reuseExistingServer: false,
     timeout: 30_000,

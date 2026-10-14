@@ -1925,7 +1925,6 @@ export const projectSurfacePlan = {
         "personalRole",
         "decisionSupported",
         "outcome",
-        "failureDividend",
         "limitations",
         "maturity"
       ],
@@ -1964,9 +1963,7 @@ export const projectSurfacePlan = {
       ]
     },
     "featuredFailureIds": {
-      "homepage": [
-        "RS.F03"
-      ],
+      "homepage": [],
       "workIndex": [],
       "resume": [],
       "projectRoute": [

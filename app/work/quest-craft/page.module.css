@@ -1,10 +1,10 @@
 .page {
-  background: var(--sand);
-  color: var(--charcoal);
+  background: var(--color-page);
+  color: var(--color-ink);
 }
 
 .page a:focus-visible {
-  outline: 3px solid var(--terracotta-dark);
+  outline: 3px solid var(--color-focus);
   outline-offset: 4px;
 }
 
@@ -13,24 +13,24 @@
 .boundaryMovement {
   width: min(calc(100% - 2rem), var(--max));
   margin-inline: auto;
-  border-inline: 1px solid var(--charcoal);
+  border-inline: 1px solid var(--color-rule);
 }
 
 .openingMovement {
-  border-top: 1px solid var(--charcoal);
+  border-top: 1px solid var(--color-rule);
   background:
     repeating-linear-gradient(
       0deg,
       transparent 0 3.45rem,
-      color-mix(in srgb, var(--charcoal) 5%, transparent) 3.5rem
+      color-mix(in srgb, var(--color-deep) 5%, transparent) 3.5rem
     ),
-    var(--paper);
+    var(--color-panel);
 }
 
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(20rem, 0.88fr);
-  border-bottom: 1px solid var(--charcoal);
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .heroHeading,
@@ -43,14 +43,14 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  border-left: 1px solid var(--charcoal);
-  background: color-mix(in srgb, var(--sage) 72%, var(--paper));
+  border-left: 1px solid var(--color-rule);
+  background: color-mix(in srgb, var(--color-panel-alt) 72%, var(--color-panel));
 }
 
 .kicker,
 .movementLabel {
   margin: 0;
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.11em;
@@ -71,7 +71,7 @@
 .hero h1 span {
   display: block;
   margin-top: 1.15rem;
-  color: var(--teal-dark);
+  color: var(--color-accent);
   font-size: 0.45em;
   font-style: italic;
   font-weight: 470;
@@ -90,8 +90,8 @@
 .heroIntroduction .authorityStatement {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 2px solid var(--charcoal);
-  color: var(--ink-soft);
+  border-top: 2px solid var(--color-rule);
+  color: var(--color-soft);
   font-family: var(--sans);
   font-size: 1rem;
   line-height: 1.6;
@@ -102,8 +102,8 @@
   margin: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-bottom: 1px solid var(--charcoal);
-  background: var(--sand);
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-page);
 }
 
 .firstScreenLedger > div {
@@ -113,7 +113,7 @@
 }
 
 .firstScreenLedger > div + div {
-  border-left: 1px solid var(--charcoal);
+  border-left: 1px solid var(--color-rule);
 }
 
 .firstScreenLedger > div:nth-child(4) {
@@ -121,11 +121,11 @@
 }
 
 .firstScreenLedger > div:nth-child(n + 4) {
-  border-top: 1px solid var(--charcoal);
+  border-top: 1px solid var(--color-rule);
 }
 
 .firstScreenLedger dt {
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -135,7 +135,7 @@
 .firstScreenLedger dd {
   min-width: 0;
   margin: 1rem 0 0;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 1rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -160,7 +160,7 @@
 .manuscriptLead > p:last-child {
   max-width: 42rem;
   margin: 1.5rem 0 0;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 1rem;
   line-height: 1.62;
 }
@@ -175,8 +175,8 @@
 .agencyScore legend {
   width: 100%;
   padding: 0 0 0.8rem;
-  border-bottom: 2px solid var(--charcoal);
-  color: var(--ink-soft);
+  border-bottom: 2px solid var(--color-rule);
+  color: var(--color-soft);
   font-size: 0.8125rem;
   font-weight: 780;
   letter-spacing: 0.08em;
@@ -187,8 +187,8 @@
   min-width: 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid var(--charcoal);
-  background: var(--paper);
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-panel);
 }
 
 .beatControls label {
@@ -205,18 +205,18 @@
 }
 
 .beatControls label + label {
-  border-left: 1px solid var(--charcoal);
+  border-left: 1px solid var(--color-rule);
 }
 
 .beatControls input {
   width: 1.1rem;
   height: 1.1rem;
   margin: 0.1rem 0 0;
-  accent-color: var(--teal-dark);
+  accent-color: var(--color-focus);
 }
 
 .beatControls label > span {
-  color: var(--teal-dark);
+  color: var(--color-accent);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -233,22 +233,22 @@
 
 .beatControls label > small {
   grid-column: 2 / -1;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 0.8125rem;
   line-height: 1.55;
   overflow-wrap: break-word;
 }
 
 .beatControls label:has(input:checked) {
-  border-bottom-color: var(--teal-dark);
-  background: color-mix(in srgb, var(--sage) 72%, var(--paper));
+  border-bottom-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-panel-alt) 72%, var(--color-panel));
 }
 
 .beatControls label:has(input:checked)::after {
   content: "Selected";
   grid-column: 2 / -1;
   justify-self: end;
-  color: var(--teal-dark);
+  color: var(--color-accent);
   font-size: 0.8125rem;
   font-weight: 780;
   letter-spacing: 0.07em;
@@ -256,7 +256,7 @@
 }
 
 .beatControls label:has(input:focus-visible) {
-  outline: 3px solid var(--terracotta-dark);
+  outline: 3px solid var(--color-focus);
   outline-offset: 4px;
 }
 
@@ -270,8 +270,8 @@
   width: 94%;
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr);
-  border-block: 1px solid var(--charcoal);
-  background: var(--paper);
+  border-block: 1px solid var(--color-rule);
+  background: var(--color-panel);
 }
 
 .path + .path {
@@ -291,9 +291,9 @@
   padding: 1rem;
   display: flex;
   align-items: center;
-  border-right: 1px solid var(--charcoal);
-  background: var(--teal-dark);
-  color: var(--white);
+  border-right: 1px solid var(--color-rule);
+  background: var(--color-panel-alt);
+  color: var(--color-ink);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.09em;
@@ -317,11 +317,11 @@
 }
 
 .pathBeat + .pathBeat {
-  border-left: 1px solid var(--rule);
+  border-left: 1px solid var(--color-rule);
 }
 
 .pathBeat > span {
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -342,8 +342,8 @@
 .agencyScore:has(input[value="effect"]:checked) .pathBeat[data-beat="effect"],
 .agencyScore:has(input[value="return"]:checked) .pathBeat[data-beat="return"],
 .agencyScore:has(input[value="carry"]:checked) .pathBeat[data-beat="carry"] {
-  border-top-color: var(--teal-dark);
-  background: color-mix(in srgb, var(--sage) 68%, var(--paper));
+  border-top-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-panel-alt) 68%, var(--color-panel));
 }
 
 .agencyScore:has(input[value="honor"]:checked) .pathBeat[data-beat="honor"]::after,
@@ -354,7 +354,7 @@
   position: absolute;
   top: 0.65rem;
   right: 0.7rem;
-  color: var(--teal-dark);
+  color: var(--color-accent);
   font-size: 1rem;
   font-weight: 800;
 }
@@ -366,8 +366,8 @@
   display: grid;
   grid-template-columns: minmax(12rem, 0.42fr) minmax(0, 1fr);
   gap: 1.5rem;
-  border-block: 1px solid var(--charcoal);
-  background: var(--sage);
+  border-block: 1px solid var(--color-rule);
+  background: var(--color-panel-alt);
 }
 
 .authorityRail span {
@@ -389,8 +389,8 @@
 
 .evidenceMovement {
   padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 4.5rem);
-  border-top: 1px solid var(--charcoal);
-  background: var(--sage);
+  border-top: 1px solid var(--color-rule);
+  background: var(--color-panel-alt);
 }
 
 .movementHeader {
@@ -403,7 +403,7 @@
 .movementHeader > p {
   max-width: 38rem;
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 1rem;
   line-height: 1.62;
 }
@@ -411,7 +411,7 @@
 .scrollCue {
   margin-top: clamp(3rem, 6vw, 5rem);
   margin-bottom: 0.75rem;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 0.8125rem;
   font-weight: 780;
   letter-spacing: 0.06em;
@@ -421,7 +421,7 @@
 .scrollCue span {
   display: inline-block;
   margin-left: 0.35rem;
-  color: var(--teal-dark);
+  color: var(--color-accent);
   font-size: 1rem;
 }
 
@@ -431,7 +431,7 @@
 }
 
 .tableScroll:focus-visible {
-  outline: 3px solid var(--terracotta-dark);
+  outline: 3px solid var(--color-focus);
   outline-offset: 4px;
 }
 
@@ -440,13 +440,13 @@
   min-width: 56rem;
   table-layout: fixed;
   border-collapse: collapse;
-  background: var(--paper);
+  background: var(--color-panel);
   text-align: left;
 }
 
 .evaluationLedger caption {
   padding: 0.8rem 1rem;
-  border: 1px solid var(--charcoal);
+  border: 1px solid var(--color-rule);
   border-bottom: 0;
   font-family: var(--serif);
   font-size: 1.25rem;
@@ -457,13 +457,13 @@
 .evaluationLedger th,
 .evaluationLedger td {
   padding: 0.72rem 0.85rem;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--color-rule);
   font-size: 0.8125rem;
 }
 
 .evaluationLedger thead th {
-  background: var(--charcoal);
-  color: var(--white);
+  background: var(--color-deep);
+  color: var(--color-ink);
   font-weight: 780;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -480,8 +480,8 @@
 }
 
 .evaluationLedger td {
-  background: color-mix(in srgb, var(--sage) 55%, var(--paper));
-  color: var(--olive-dark);
+  background: color-mix(in srgb, var(--color-panel-alt) 55%, var(--color-panel));
+  color: var(--color-accent);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-align: center;
@@ -493,19 +493,19 @@
     repeating-linear-gradient(
       135deg,
       transparent 0 0.55rem,
-      color-mix(in srgb, var(--terracotta-dark) 16%, transparent) 0.55rem 0.8rem
+      color-mix(in srgb, var(--color-caution) 16%, transparent) 0.55rem 0.8rem
     ),
-    color-mix(in srgb, var(--terracotta) 26%, var(--paper));
-  color: var(--terracotta-dark);
+    color-mix(in srgb, var(--color-caution) 26%, var(--color-panel));
+  color: var(--color-ink);
 }
 
 .evaluationSummary {
   margin: 2rem 0 0;
   padding: 1.1rem 1.25rem;
-  border-block: 1px solid var(--charcoal);
-  border-left: 0.35rem solid var(--olive-dark);
-  background: color-mix(in srgb, var(--paper) 72%, transparent);
-  color: var(--ink-soft);
+  border-block: 1px solid var(--color-rule);
+  border-left: 0.35rem solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-panel) 72%, transparent);
+  color: var(--color-soft);
   font-family: var(--serif);
   font-size: 1rem;
   line-height: 1.6;
@@ -518,7 +518,7 @@
   display: grid;
   grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr);
   gap: clamp(2.5rem, 5vw, 5rem);
-  border-top: 2px solid var(--charcoal);
+  border-top: 2px solid var(--color-rule);
 }
 
 .registerIntroduction {
@@ -538,7 +538,7 @@
 
 .registerIntroduction > p:last-child {
   margin: 1.2rem 0 0;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 1rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -554,9 +554,9 @@
 
 .corrections article {
   min-width: 0;
-  border-block: 1px solid var(--charcoal);
-  border-left: 0.4rem solid var(--terracotta-dark);
-  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  border-block: 1px solid var(--color-rule);
+  border-left: 0.4rem solid var(--color-caution);
+  background: color-mix(in srgb, var(--color-panel) 72%, transparent);
 }
 
 .corrections article:last-child {
@@ -567,20 +567,20 @@
   position: relative;
   min-width: 0;
   padding: 1.3rem;
-  border-bottom: 2px solid var(--charcoal);
+  border-bottom: 2px solid var(--color-rule);
 }
 
 .proofmark {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  color: var(--terracotta-dark);
+  color: var(--color-caution);
   font-size: 1.45rem;
 }
 
 .corrections header p {
   margin: 0;
-  color: var(--terracotta-dark);
+  color: var(--color-caution);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.09em;
@@ -607,11 +607,11 @@
 .corrections dl > div {
   min-width: 0;
   padding-block: 1rem;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .corrections dt {
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -619,7 +619,7 @@
 }
 
 .corrections dl > div:first-child dt {
-  color: var(--terracotta-dark);
+  color: var(--color-caution);
 }
 
 .corrections dd {
@@ -644,17 +644,17 @@
   font-size: 0.8125rem;
   font-weight: 780;
   text-decoration: underline;
-  text-decoration-color: var(--terracotta-dark);
+  text-decoration-color: var(--color-caution);
   text-underline-offset: 0.25rem;
   overflow-wrap: anywhere;
 }
 
 .corrections footer a + a {
-  border-left: 1px solid var(--charcoal);
+  border-left: 1px solid var(--color-rule);
 }
 
 .corrections footer a:hover {
-  background: var(--sage);
+  background: var(--color-panel-alt);
 }
 
 .attemptRegister {
@@ -664,7 +664,7 @@
   display: grid;
   grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr);
   gap: clamp(2.5rem, 5vw, 5rem);
-  border-top: 2px solid var(--charcoal);
+  border-top: 2px solid var(--color-rule);
 }
 
 .attemptRegister header,
@@ -675,10 +675,10 @@
 .attemptSummary {
   margin: 0;
   padding: 1rem 1.2rem;
-  border-block: 1px solid var(--charcoal);
-  border-left: 0.35rem solid var(--terracotta-dark);
-  background: color-mix(in srgb, var(--paper) 68%, transparent);
-  color: var(--ink-soft);
+  border-block: 1px solid var(--color-rule);
+  border-left: 0.35rem solid var(--color-caution);
+  background: color-mix(in srgb, var(--color-panel) 68%, transparent);
+  color: var(--color-soft);
   font-size: 1rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -688,17 +688,17 @@
   font-size: 1rem;
   font-weight: 560;
   text-decoration: underline;
-  text-decoration-color: var(--terracotta-dark);
+  text-decoration-color: var(--color-caution);
   text-underline-offset: 0.25rem;
   overflow-wrap: anywhere;
 }
 
 .boundaryMovement {
   padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 4.5rem) 0;
-  border-block: 1px solid var(--charcoal);
+  border-block: 1px solid var(--color-rule);
   background:
-    linear-gradient(90deg, transparent 49.9%, color-mix(in srgb, var(--charcoal) 7%, transparent) 50%, transparent 50.1%),
-    var(--sand);
+    linear-gradient(90deg, transparent 49.9%, color-mix(in srgb, var(--color-deep) 7%, transparent) 50%, transparent 50.1%),
+    var(--color-page);
 }
 
 .boundarySpread {
@@ -735,7 +735,7 @@
 .boundaryNotes > p:first-child {
   margin: 0;
   padding-left: 1.2rem;
-  border-left: 0.35rem solid var(--olive-dark);
+  border-left: 0.35rem solid var(--color-accent);
   font-family: var(--serif);
   font-size: 1.25rem;
   line-height: 1.6;
@@ -746,14 +746,14 @@
   padding: 0;
   list-style: none;
   counter-reset: boundary;
-  border-top: 1px solid var(--charcoal);
+  border-top: 1px solid var(--color-rule);
 }
 
 .boundaryNotes li {
   position: relative;
   padding: 1rem 0 1rem 3rem;
-  border-bottom: 1px solid var(--rule);
-  color: var(--ink-soft);
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-soft);
   font-size: 1rem;
   line-height: 1.6;
   counter-increment: boundary;
@@ -765,7 +765,7 @@
   position: absolute;
   left: 0;
   top: 1rem;
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -773,8 +773,8 @@
 .mediaRecord {
   margin: 2rem 0 0;
   padding: 1rem 0 0;
-  border-top: 2px solid var(--charcoal);
-  color: var(--ink-soft);
+  border-top: 2px solid var(--color-rule);
+  color: var(--color-soft);
   font-size: 0.8125rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -786,7 +786,7 @@
   align-items: center;
   width: fit-content;
   margin-bottom: 0.55rem;
-  color: var(--teal-dark);
+  color: var(--color-accent);
   font-weight: 800;
   text-decoration: underline;
   text-underline-offset: 0.25rem;
@@ -794,8 +794,8 @@
 }
 
 .sourceFolio {
-  border-block: 2px solid var(--charcoal);
-  background: color-mix(in srgb, var(--paper) 68%, transparent);
+  border-block: 2px solid var(--color-rule);
+  background: color-mix(in srgb, var(--color-panel) 68%, transparent);
 }
 
 .sourceFolio a {
@@ -808,15 +808,15 @@
 }
 
 .sourceFolio a + a {
-  border-top: 1px solid var(--charcoal);
+  border-top: 1px solid var(--color-rule);
 }
 
 .sourceFolio a:hover {
-  background: var(--sage);
+  background: var(--color-panel-alt);
 }
 
 .sourceFolio a > span {
-  color: var(--olive-dark);
+  color: var(--color-accent);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -830,7 +830,7 @@
 
 .sourceFolio a > p {
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--color-soft);
   font-size: 0.8125rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -838,7 +838,7 @@
 
 .returnLink {
   margin-top: clamp(3rem, 6vw, 5rem);
-  border-top: 1px solid var(--charcoal);
+  border-top: 1px solid var(--color-rule);
 }
 
 .returnLink a {
@@ -849,12 +849,12 @@
   font-family: var(--serif);
   font-size: clamp(1.5rem, 3vw, 2.5rem);
   text-decoration: underline;
-  text-decoration-color: var(--teal-dark);
+  text-decoration-color: var(--color-accent);
   text-underline-offset: 0.35rem;
 }
 
 .returnLink a:hover {
-  color: var(--teal-dark);
+  color: var(--color-accent);
 }
 
 @media (max-width: 1000px) {
@@ -867,7 +867,7 @@
   }
 
   .heroIntroduction {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 
@@ -880,16 +880,16 @@
   }
 
   .beatControls label:nth-child(3) {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 
   .beatControls label:nth-child(4) {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
   }
 
   .firstScreenLedger > div:nth-child(4) {
-    border-left: 1px solid var(--charcoal);
+    border-left: 1px solid var(--color-rule);
   }
 
   .firstScreenLedger > div:nth-child(3),
@@ -898,7 +898,7 @@
   }
 
   .firstScreenLedger > div:nth-child(n + 3) {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
   }
 
   .path {
@@ -919,19 +919,19 @@
   }
 
   .pathBeat:nth-child(3) {
-    border-top-color: var(--rule);
+    border-top-color: var(--color-rule);
     border-left: 0;
   }
 
   .pathBeat:nth-child(4) {
-    border-top-color: var(--rule);
+    border-top-color: var(--color-rule);
   }
 
   .agencyScore:has(input[value="honor"]:checked) .pathBeat[data-beat="honor"],
   .agencyScore:has(input[value="effect"]:checked) .pathBeat[data-beat="effect"],
   .agencyScore:has(input[value="return"]:checked) .pathBeat[data-beat="return"],
   .agencyScore:has(input[value="carry"]:checked) .pathBeat[data-beat="carry"] {
-    border-top-color: var(--teal-dark);
+    border-top-color: var(--color-accent);
   }
 
   .movementHeader {
@@ -975,7 +975,7 @@
   .firstScreenLedger > div:nth-child(4),
   .firstScreenLedger > div:nth-child(5) {
     min-height: auto;
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 
@@ -992,12 +992,12 @@
   }
 
   .beatControls label:nth-child(3) {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 
   .beatControls label:nth-child(4) {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
   }
 
   .path {
@@ -1012,7 +1012,7 @@
   .pathLabel {
     min-height: 3rem;
     border-right: 0;
-    border-bottom: 1px solid var(--charcoal);
+    border-bottom: 1px solid var(--color-rule);
   }
 
   .authorityRail {
@@ -1086,7 +1086,7 @@
   }
 
   .corrections footer a + a {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 }
@@ -1102,7 +1102,7 @@
 
   .beatControls label + label,
   .beatControls label:nth-child(4) {
-    border-top: 1px solid var(--charcoal);
+    border-top: 1px solid var(--color-rule);
     border-left: 0;
   }
 }

@@ -30,16 +30,35 @@ const publicAllowlist = JSON.parse(
   readFileSync(resolve(root, "scripts/public-candidate-allowlist.json"), "utf8"),
 );
 
-const expectedTargetHashes = {
-  [pagePath]: "43bbe9476841c55750cc56f56631c779bd063dd2ed9c93d79fbc353039259b54",
+// Preserve predecessor identities; the NFA-073 migration is presentation-only.
+const predecessorTargetHashes = {
+  [pagePath]: "3c1147a921ce0c8d1a94958331425d9cc96c994021eb6e8f14f2114c93e13ee1",
   [cssPath]: "3a61192574d4c2109a012043ee8b7efd3c20d24d32c79ab3b049af109e7cc994",
   [compatibilityPath]: "f387814bc38945860d3173f2020354beb3ef16371fbb8295c10dab7b2021b43d",
 };
-const acceptedU06Targets = {
+const acceptedNfa073Css = {
+  predecessorBytes: 17_507,
+  bytes: 17_754,
+  sha256: "72a733e20cf3b8de1403c0371d142031757203f0957c314df86bf92c0bb6f171",
+};
+const expectedTargetHashes = {
+  ...predecessorTargetHashes,
+  [cssPath]: acceptedNfa073Css.sha256,
+};
+const acceptedResumeBeforeSemanticRepair = {
+  bytes: 21_425,
+  sha256: "43bbe9476841c55750cc56f56631c779bd063dd2ed9c93d79fbc353039259b54",
+};
+const predecessorU06Targets = {
   "app/work/openclaw-showcase/page.tsx": "0d84b95d21edf86ae99f1c4f8bff237744e74726d8a3a5d5ff705b6a50a8ee80",
   "app/work/openclaw-showcase/page.module.css": "d9d1511633968c6c6b2259676a41944f7511accd9261bc8661ba5e4fba527d57",
   "app/work/openclaw-showcase/opengraph-image.tsx": "ecc4216222b0bff86bf02672b21d63debd606040bb5d6298f24e847a11e9c658",
   "scripts/verify-openclaw-u06.mjs": "576f37d6b04e25d5a88e74260a8b27f7f6903d8afb4e0c0a2dc1914a1292be18",
+};
+const acceptedU06Targets = {
+  ...predecessorU06Targets,
+  "app/work/openclaw-showcase/page.module.css": "8ce93dcbbfbc6740cd63ce0a11a2aa614e99b4f1ea4f2ab844748c19e7429122",
+  "scripts/verify-openclaw-u06.mjs": "02c1f086a084a5069cebececfd62cfd0494542aeaaa265df0904da129192197c",
 };
 const acceptedU06BrowserBlock = {
   bytes: 36_753,
@@ -350,6 +369,10 @@ function between(source, start, end, location) {
   return source.slice(startIndex, endIndex);
 }
 
+function countOccurrences(source, value) {
+  return source.split(value).length - 1;
+}
+
 function ruleBody(selectorPattern, location) {
   const match = cssSource.match(new RegExp(`${selectorPattern}\\s*\\{([^}]*)\\}`, "s"));
   assert.ok(match, `${location}: required CSS rule is missing.`);
@@ -365,6 +388,97 @@ function cssNumber(body, property, location) {
 for (const [path, expectedHash] of Object.entries({ ...expectedTargetHashes, ...acceptedU06Targets })) {
   assert.equal(sha256(read(path)), expectedHash, `${path}: frozen target identity drifted.`);
 }
+assert.equal(readFileSync(resolve(root, cssPath)).byteLength, acceptedNfa073Css.bytes,
+  `${cssPath}: reviewed NFA-073 presentation byte length drifted.`);
+const projectLinksBlock = between(
+  pageSource,
+  '<div className={styles.projectLinks}>',
+  "</div>",
+  `${pagePath} selected-project links`,
+);
+assert.equal(countOccurrences(projectLinksBlock, "for {project.title}"), 2,
+  "Each repeated selected-project link type must include the canonical project title in its accessible name.");
+requireText(
+  projectLinksBlock,
+  '<span className="sr-only">for {project.title} </span>',
+  `${pagePath} case-study and field-note link context`,
+);
+requireText(
+  projectLinksBlock,
+  "for {project.title} (opens in a new tab)",
+  `${pagePath} pinned-evidence link context`,
+);
+const profileLinksBlock = between(
+  pageSource,
+  '<nav className={styles.profileLinks} aria-label="Public professional profiles">',
+  '<PrintButton className={styles.printButton} />',
+  `${pagePath} profile links`,
+);
+assert.equal(countOccurrences(profileLinksBlock, "target=\"_blank\""), 2,
+  "The public-profile block must retain exactly two external links.");
+assert.equal(
+  countOccurrences(profileLinksBlock, '<span className="sr-only"> (opens in a new tab)</span>'),
+  2,
+  "Exactly the two public-profile links must expose new-tab notices.",
+);
+const selectedLearningRender = between(
+  pageSource,
+  "{selectedLearning.map((item) => (",
+  "</ul>",
+  `${pagePath} selected-learning render`,
+);
+assert.equal(
+  countOccurrences(
+    selectedLearningRender,
+    '<span className="sr-only">(opens in a new tab)</span>',
+  ),
+  1,
+  "The linked selected-learning branch must expose one notice that renders for its four linked items only.",
+);
+requireText(
+  selectedLearningRender,
+  '{item.title} <span className="sr-only">(opens in a new tab)</span>',
+  `${pagePath} selected-learning external-link name`,
+);
+// NFA-047 changes only BurnLens labels; retain exact predecessor reconstruction.
+const burnlensLabelOverride = `  const labels = project.id === "burnlens"
+    ? {
+        ...resumeFieldLabels,
+        personalRole: "Role split",
+        implementation: "Release constraint",
+        testStrategy: "Reliability lesson",
+      }
+    : resumeFieldLabels;
+`;
+requireText(pageSource, burnlensLabelOverride, `${pagePath} BurnLens evidence labels`);
+assert.equal(countOccurrences(pageSource, "term: labels[field]"), 2,
+  "Both résumé fact branches must consume the project-specific labels.");
+const resumeBeforeLabelRepair = pageSource
+  .replace(burnlensLabelOverride, "")
+  .replaceAll("term: labels[field]", "term: resumeFieldLabels[field]");
+assert.equal(Buffer.byteLength(resumeBeforeLabelRepair), 21_794);
+assert.equal(sha256(resumeBeforeLabelRepair),
+  "586eb15c01f995419d18700f37cf01af9fcc851ca91eb61bc76417db81c60762",
+  "The NFA-047 label correction must preserve all predecessor claims and semantic repairs.");
+const resumeBeforeSemanticRepair = resumeBeforeLabelRepair
+  .replace('            <span className="sr-only">for {project.title} </span>\n', "")
+  .replace(
+    `                Inspect pinned evidence{" "}
+                <span className="sr-only">
+                  for {project.title} (opens in a new tab)
+                </span>`,
+    '                Inspect pinned evidence <span className="sr-only">(opens in a new tab)</span>',
+  )
+  .replaceAll('                  <span className="sr-only"> (opens in a new tab)</span>\n', "")
+  .replace(
+    `                          {item.title} <span className="sr-only">(opens in a new tab)</span>
+                          <span aria-hidden="true">↗</span>`,
+    '                          {item.title} <span aria-hidden="true">↗</span>',
+  );
+assert.equal(Buffer.byteLength(resumeBeforeSemanticRepair), acceptedResumeBeforeSemanticRepair.bytes,
+  "The semantic repair must reconstruct the exact accepted résumé source byte length.");
+assert.equal(sha256(resumeBeforeSemanticRepair), acceptedResumeBeforeSemanticRepair.sha256,
+  "The résumé repair must preserve every accepted source byte outside the exact hidden semantic additions.");
 const u06Start = 'test("OpenClaw is exactly three documentary movements with canonical ownership"';
 const u06End = 'test("historical coursework forms a bounded reading shelf outside the case-study lane"';
 const u06BrowserBlock = between(testsSource, u06Start, u06End, testsPath);
@@ -515,7 +629,7 @@ for (const value of [
   requireText(cssSource, value, cssPath);
 }
 const focusRule = ruleBody("\\.page a:focus-visible,[\\s\\n]*\\.page button:focus-visible", "résumé focus rule");
-assert.match(focusRule, /outline\s*:\s*3px\s+solid\s+var\(--terracotta-dark\)\s*;/);
+assert.match(focusRule, /outline\s*:\s*3px\s+solid\s+var\(--color-focus\)\s*;/);
 assert.match(focusRule, /outline-offset\s*:\s*4px\s*;/);
 const pageRule = ruleBody("\\.page", "résumé page rule");
 assert.ok(cssNumber(pageRule, "font-size", "résumé page rule") >= 1);
@@ -617,6 +731,10 @@ console.log(JSON.stringify({
   researchAndWriting: expectedHierarchy.researchAndWritingProjectIds,
   omittedSelected: expectedHierarchy.omittedSelectedProjectIds,
   targetHashes: expectedTargetHashes,
+  predecessorTargetHashes,
+  acceptedNfa073Css,
+  acceptedResumeBeforeSemanticRepair,
   acceptedU06Targets,
+  predecessorU06Targets,
   acceptedU06BrowserBlock,
 }));

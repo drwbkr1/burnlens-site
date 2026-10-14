@@ -1,0 +1,83 @@
+{
+  "project": "West Hawaiʻi heat-exposure GIS study",
+  "generated_at_utc": "2026-10-07T22:31:38.157512+00:00",
+  "figures": [
+    {
+      "file": "heat-exposure-2015.svg",
+      "width": 480,
+      "height": 1160,
+      "sha256": "86edb2f1310060b4b146bff0f5ca8873f1253629b44334c2bca90c49de0477b0",
+      "year": 2015,
+      "bytes": 57665
+    },
+    {
+      "file": "heat-exposure-2019.svg",
+      "width": 480,
+      "height": 1160,
+      "sha256": "f43507bd828d0d83474a58229c643d2954bb1d850791ad4b812cb0efe2b9057d",
+      "year": 2019,
+      "bytes": 57658
+    }
+  ],
+  "data_sources": [
+    {
+      "name": "NOAA Coral Reef Watch daily global 5 km product, saved 2015/2019 summaries",
+      "url": "https://coralreefwatch.noaa.gov/product/5km/methodology.php",
+      "citation_guidance": "https://coralreefwatch.noaa.gov/satellite/docs/recommendations_crw_citation.php"
+    },
+    {
+      "name": "NOAA/NCCOS and Analytical Laboratories of Hawaii, Main Hawaiian Islands benthic habitat mapping, 2007",
+      "url": "https://products.coastalscience.noaa.gov/collections/benthic/e97hawaii/data2007.aspx",
+      "imagery_dates": "2004–2006",
+      "use_constraint": "Not for navigation"
+    }
+  ],
+  "mapping": {
+    "crs": "NAD83 / UTM zone 5N (EPSG:26905)",
+    "coordinate_units": "metres",
+    "extent_m": [
+      168034.19010000024,
+      2086240.2928,
+      228561.97440000033,
+      2253359.8309000004
+    ],
+    "source_geometry_transformed": false,
+    "source_fields": [
+      "Cell_ID",
+      "DHW_Class",
+      "SUM_Valid_DHW",
+      "MAX_DHW_CW",
+      "SUM_Piece_ha"
+    ],
+    "grid_cells_per_year": 330,
+    "reef_containing_cells_per_year": 51,
+    "scale_bar_map_metres": 20000,
+    "north_arrow": "Grid north, not true north",
+    "colors": {
+      "Below 4": "#C7CDBF",
+      "4 to below 8": "#CB7A5C",
+      "8 or above": "#85412C",
+      "No valid DHW": "#E9E2D8 with #666666 diagonal hatch"
+    },
+    "source_habitat_polygon_count_read": 437,
+    "displayed_reef_polygon_outlines": 0,
+    "displayed_layers": [
+      "330 neutral grid-cell context polygons",
+      "51 reef-containing grid cells classed by annual maximum DHW"
+    ],
+    "map_fill_meaning": "Class of the whole satellite grid cell; not the extent or area of reef polygons.",
+    "habitat_area_method": "Separate composition uses saved SUM_Piece_ha, not colored cell area.",
+    "geometry_simplification": null
+  },
+  "limitations": [
+    "Annual maximum accumulated satellite heat stress, not observed bleaching, mortality or recovery.",
+    "Historical mapped reef/hardbottom is not present-day coral cover.",
+    "No valid DHW is unavailable, not low exposure; 17.029179358495156% of all mapped reef area is unavailable.",
+    "Only reef-containing cells are class-filled; neutral cells are context, not low-exposure observations.",
+    "Grid is coarser than reef polygons; a class applies to a grid cell, not a finely resolved reef site.",
+    "No basemap, invented coastline, source imagery, external requests or NOAA endorsement.",
+    "Saved-output internal consistency does not establish raw-source reconstruction or independent scientific validation.",
+    "Neither a coastline nor actual reef polygon extent is drawn; colored cells indicate reef presence and the cell's heat class, not complete reef coverage."
+  ],
+  "display_revision": "Cell classes only; historical habitat outlines omitted as an unnecessary heavy display layer."
+}

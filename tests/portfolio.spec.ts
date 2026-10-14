@@ -22,8 +22,6 @@ const expectedIndexable =
 
 const frontDoorEnergyBoundary =
   "Energy is historical governance context and a direction of interest—not evidence of an implemented energy system. The current work does not yet establish electrical engineering, controls, embedded, power-systems, or hardware implementation experience.";
-const runbookFeaturedTurn =
-  "The tested local model produced 9 of 84 outputs that passed the required structure, so the candidate was excluded and fixed-rule control remained.";
 const burnlensBuildRecordHref =
   "https://github.com/drwbkr1/burnlens-deschutes/blob/a741111d82e69689022d2058118ed8f4b9bf3546/records/prompt-build-log/2026-07-27-p6o1-t02.md#L26-L69";
 const burnlensReleaseHref =
@@ -31,20 +29,18 @@ const burnlensReleaseHref =
 const burnlensPinnedTreeHref =
   "https://github.com/drwbkr1/burnlens-deschutes/tree/a741111d82e69689022d2058118ed8f4b9bf3546";
 const portfolioMaking = {
-  headline: "How this portfolio was made",
-  thesis:
-    "I orchestrate Codex through bounded goals, explicit authority, critique, verification, and human gates—not as an authorial stand-in.",
+  headline: "How I work",
   roles: [
-    ["D.01", "Drew / Direction and decision", "Set the audience and use boundaries, make product and presentation decisions, and approve the exact public representation when a human gate is required."],
-    ["C.01", "Codex / Bounded execution", "Decompose milestones, research approved public sources, implement within exact scope, critique the UX, preserve failed attempts, and verify the result."],
-    ["E.01", "One concrete turn / BurnLens release surface", "For BurnLens, I bounded the release to one repository and directed it to Codex Sites. Codex assembled a canonical reviewer path, rechecked source and claim boundaries, and verified the production result. A local preview and two social-card attempts failed their gates, so they stayed rejected."],
-    ["B.01", "Verified boundary", "The verified v0.56.0 release shipped without a bespoke social image and without rewriting the underlying evidence."],
+    ["D.01", /Drew.*Direction/i, /direction|decision|scope|product/i],
+    ["C.01", /Codex/i, /implement|develop|research|refine|build/i],
   ],
-  boundary:
-    "This demonstrates a bounded human–Codex workflow—not autonomous authorship, independent user testing, or universal design superiority.",
 } as const;
-const runbookModelComparisonHref =
-  "https://github.com/drwbkr1/runbook-sentinel/blob/f149ac2408f30b504b78844780b8533bed2ebfdc/artifacts/evaluations/baseline-0018-model-comparison.json";
+const currentProjectIds = [
+  "wildfire-response",
+  "after-the-tip",
+  "west-hawaii-heat-exposure",
+  "nepal-satellite-atlas",
+] as const;
 
 const openClawRuntimeCommitment =
   "The private runtime was not inspected or evaluated; this route establishes no runtime quality, capability, failure dividend, or intended user.";
@@ -242,6 +238,49 @@ const representativeRoutes = [
   "/resume",
 ] as const;
 
+async function expectQuestTraceGroupSemantics(page: Page) {
+  const traces = page.locator('[data-agency-score] [data-path-trace]');
+  await expect(traces).toHaveCount(3);
+  for (const path of ["A", "B", "C"]) {
+    const group = page.getByRole("group", {
+      name: `Path ${path}: four-beat structural trace`,
+      exact: true,
+    });
+    await expect(group).toHaveCount(1);
+    await expect(group).toHaveAttribute("data-path-trace", path);
+  }
+  expect(await traces.evaluateAll((elements) => elements.map((element) => ({
+    path: element.getAttribute("data-path-trace"),
+    role: element.getAttribute("role"),
+    name: element.getAttribute("aria-label"),
+    tabindex: element.getAttribute("tabindex"),
+    tabIndex: (element as HTMLElement).tabIndex,
+    focusableDescendants: element.querySelectorAll(
+      'a[href],button,input,select,textarea,summary,[tabindex],[contenteditable="true"]',
+    ).length,
+    childCount: element.children.length,
+    beats: [...element.querySelectorAll(":scope > [data-beat]")].map((beat) => ({
+      id: beat.getAttribute("data-beat"),
+      number: beat.querySelector("span")?.textContent?.trim(),
+      label: beat.querySelector("strong")?.textContent?.trim(),
+    })),
+  })))).toEqual(["A", "B", "C"].map((path) => ({
+    path,
+    role: "group",
+    name: `Path ${path}: four-beat structural trace`,
+    tabindex: null,
+    tabIndex: -1,
+    focusableDescendants: 0,
+    childCount: 4,
+    beats: [
+      { id: "honor", number: "01", label: "Honor" },
+      { id: "effect", number: "02", label: "Effect" },
+      { id: "return", number: "03", label: "Return" },
+      { id: "carry", number: "04", label: "Carry" },
+    ],
+  })));
+}
+
 const letterPdfOptions = {
   format: "Letter" as const,
   printBackground: true,
@@ -252,6 +291,15 @@ const letterPdfOptions = {
 };
 
 async function attachLetterPdf(page: Page, testInfo: TestInfo, name: string) {
+  // Verify image completeness without changing the application's loading policy,
+  // so a successful page-count check cannot conceal missing evidence imagery.
+  await page.locator("img").evaluateAll(async (images) => {
+    await Promise.all(images.map(async (image) => {
+      if (!(image instanceof HTMLImageElement)) throw new Error("Print image selector matched a non-image.");
+      await image.decode();
+      if (!image.complete || image.naturalWidth === 0) throw new Error("Print evidence image did not load.");
+    }));
+  });
   await page.evaluate((publicOrigin) => {
     const localOrigin = location.origin;
     for (const anchor of document.querySelectorAll<HTMLAnchorElement>("a[href]")) {
@@ -261,7 +309,7 @@ async function attachLetterPdf(page: Page, testInfo: TestInfo, name: string) {
       }
     }
   }, expectedSiteOrigin);
-  const pdf = await page.pdf(letterPdfOptions);
+  const pdf = await page.pdf({ ...letterPdfOptions, path: testInfo.outputPath(`${name}-letter.pdf`) });
   const source = pdf.toString("latin1");
   const pages = (source.match(/\/Type\s*\/Page\b/g) ?? []).length;
   await testInfo.attach(`${name}-letter.pdf`, { body: pdf, contentType: "application/pdf" });
@@ -272,7 +320,7 @@ async function attachLetterPdf(page: Page, testInfo: TestInfo, name: string) {
 }
 
 for (const route of representativeRoutes) {
-  test(`${route} is semantic, accessible, and contained at mobile width`, async ({ page }) => {
+  test(`${route} is semantic, accessible, and contained at mobile width`, async ({ page }, testInfo) => {
     const consoleErrors: string[] = [];
     page.on("console", (message) => {
       if (message.type() === "error") consoleErrors.push(message.text());
@@ -292,6 +340,57 @@ for (const route of representativeRoutes) {
     }));
     expect(widths.document).toBeLessThanOrEqual(widths.viewport);
 
+    if (route === "/work/burnlens") {
+      const register = page.locator('[data-first-screen="burnlens"] > div').filter({
+        has: page.getByText("Field case / 01", { exact: true }),
+      });
+      await expect(register).toHaveCount(1);
+      expect(await register.locator(":scope > p").allTextContents()).toEqual([
+        "Field case / 01",
+        "Release governance / evidence system",
+      ]);
+      expect(await register.evaluate((element) => ({
+        tag: element.tagName,
+        label: element.getAttribute("aria-label"),
+        role: element.getAttribute("role"),
+        tabindex: element.getAttribute("tabindex"),
+        tabIndex: (element as HTMLElement).tabIndex,
+      }))).toEqual({ tag: "DIV", label: null, role: null, tabindex: null, tabIndex: -1 });
+      const registerTree = await register.ariaSnapshot();
+      expect(registerTree).toContain("Field case / 01");
+      expect(registerTree).toContain("Release governance / evidence system");
+      expect(registerTree).not.toContain("Case-file register");
+    }
+    if (route === "/work/quest-craft") await expectQuestTraceGroupSemantics(page);
+    if (route === "/work/burnlens" || route === "/work/quest-craft") {
+      const requestedRule = { type: "rule" as const, values: ["aria-prohibited-attr"] };
+      const ariaSemantics = await new AxeBuilder({ page }).options({
+        runOnly: requestedRule,
+        resultTypes: ["violations", "incomplete", "passes", "inapplicable"],
+      }).analyze();
+      await testInfo.attach("semantic-register-aria-full-results", {
+        body: Buffer.from(JSON.stringify(ariaSemantics, null, 2)),
+        contentType: "application/json",
+      });
+      await testInfo.attach("semantic-register-main-ax", {
+        body: await page.locator("main").ariaSnapshot(),
+        contentType: "text/plain",
+      });
+      // Axe exposes the effective RunOptions as toolOptions. Fail if the requested
+      // restriction was dropped; unrelated default-scan results are not targeted proof.
+      expect(ariaSemantics.toolOptions.runOnly).toEqual(requestedRule);
+      expect(ariaSemantics.toolOptions.resultTypes).toEqual([
+        "violations", "incomplete", "passes", "inapplicable",
+      ]);
+      const executedRuleIds = [...new Set([
+        ...ariaSemantics.violations, ...ariaSemantics.incomplete,
+        ...ariaSemantics.passes, ...ariaSemantics.inapplicable,
+      ].map((result) => result.id))].sort();
+      expect(executedRuleIds).toEqual(["aria-prohibited-attr"]);
+      expect(ariaSemantics.violations, JSON.stringify(ariaSemantics.violations, null, 2)).toEqual([]);
+      expect(ariaSemantics.incomplete, JSON.stringify(ariaSemantics.incomplete, null, 2)).toEqual([]);
+    }
+
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
       .analyze();
@@ -300,19 +399,507 @@ for (const route of representativeRoutes) {
   });
 }
 
-test("mobile navigation is native, visible, and keyboard-reachable", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+test("mobile navigation is native, visible, and keyboard-reachable", async ({ browser }) => {
+  test.setTimeout(180_000);
 
-  await expect(page.locator(".desktop-nav")).toBeHidden();
+  const routeStates = [
+    { route: "/", status: 200, brand: "page", work: null, resume: null, destination: "/", token: "page" },
+    { route: "/work", status: 200, brand: null, work: "page", resume: null, destination: "/work", token: "page" },
+    { route: "/work/burnlens", status: 200, brand: null, work: "location", resume: null, destination: "/work", token: "location" },
+    { route: "/work/runbook-sentinel", status: 200, brand: null, work: "location", resume: null, destination: "/work", token: "location" },
+    { route: "/work/quest-craft", status: 200, brand: null, work: "location", resume: null, destination: "/work", token: "location" },
+    { route: "/work/openclaw-showcase", status: 200, brand: null, work: "location", resume: null, destination: "/work", token: "location" },
+    { route: "/resume", status: 200, brand: null, work: null, resume: "page", destination: "/resume", token: "page" },
+    { route: "/workshop", status: 404, brand: null, work: null, resume: null, destination: null, token: null },
+  ] as const;
+
+  const expectCurrent = async (link: Locator, current: "page" | "location" | null) => {
+    if (current) {
+      await expect(link).toHaveAttribute("aria-current", current);
+    } else {
+      await expect(link).not.toHaveAttribute("aria-current");
+    }
+  };
+
+  const expectHeaderState = async (
+    page: Page,
+    state: (typeof routeStates)[number],
+    activeNavigation: ".desktop-nav" | ".mobile-menu nav",
+  ) => {
+    const header = page.locator(".site-header");
+    const brand = header.locator(".brand-mark");
+    const desktopWork = header.locator('.desktop-nav a[href="/work"]');
+    const desktopResume = header.locator('.desktop-nav a[href="/resume"]');
+    const mobileWork = header.locator('.mobile-menu a[href="/work"]');
+    const mobileResume = header.locator('.mobile-menu a[href="/resume"]');
+
+    await expect(brand).toHaveAccessibleName("Drew Baker, home");
+    await expect(header.locator(activeNavigation).getByRole("link", { name: "Work", exact: true }))
+      .toHaveAccessibleName("Work");
+    await expect(header.locator(activeNavigation).getByRole("link", { name: "Résumé", exact: true }))
+      .toHaveAccessibleName("Résumé");
+    await expectCurrent(brand, state.brand);
+    await expectCurrent(desktopWork, state.work);
+    await expectCurrent(mobileWork, state.work);
+    await expectCurrent(desktopResume, state.resume);
+    await expectCurrent(mobileResume, state.resume);
+
+    const currentLinks = await header.locator("a[aria-current]").evaluateAll((links) => links.map((link) => ({
+      href: link.getAttribute("href"),
+      token: link.getAttribute("aria-current"),
+    })));
+    expect(
+      [...new Set(currentLinks.map(({ href }) => href))],
+      `${state.route}: exactly one current destination or none`,
+    ).toEqual(state.destination ? [state.destination] : []);
+    expect(
+      [...new Set(currentLinks.map(({ token }) => token))],
+      `${state.route}: exact current token`,
+    ).toEqual(state.token ? [state.token] : []);
+    await expect(header.locator('a[aria-current="false"], a[aria-current=""]')).toHaveCount(0);
+  };
+
+  for (const width of [390, 1280]) {
+    const context = await browser.newContext({
+      viewport: { width, height: width === 390 ? 844 : 1000 },
+      serviceWorkers: "block",
+    });
+    const page = await context.newPage();
+    const consoleErrors: string[] = [];
+    const pageErrors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") consoleErrors.push(message.text());
+    });
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+
+    for (const state of routeStates) {
+      const response = await page.goto(state.route, { waitUntil: "networkidle" });
+      expect(response?.status(), state.route).toBe(state.status);
+      if (width === 390) {
+        await expect(page.locator(".desktop-nav")).toBeHidden();
+        await page.locator(".mobile-menu summary").click();
+        await expect(page.locator(".mobile-menu")).toHaveAttribute("open", "");
+        await expectHeaderState(page, state, ".mobile-menu nav");
+      } else {
+        await expect(page.locator(".desktop-nav")).toBeVisible();
+        await expect(page.locator(".mobile-menu")).toBeHidden();
+        await expectHeaderState(page, state, ".desktop-nav");
+      }
+    }
+
+    const expectedNotFoundErrors: string[] = consoleErrors.filter((message) =>
+      message === "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    );
+    expect(expectedNotFoundErrors, `${width}px intentional 404 console result`).toHaveLength(1);
+    expect(
+      consoleErrors.filter((message) => !expectedNotFoundErrors.includes(message)),
+      `${width}px unexpected direct-load console errors`,
+    ).toEqual([]);
+    expect(pageErrors, `${width}px direct-load page errors`).toEqual([]);
+    await context.close();
+  }
+
+  const spaContext = await browser.newContext({
+    viewport: { width: 1280, height: 1000 },
+    serviceWorkers: "block",
+  });
+  const spaPage = await spaContext.newPage();
+  const spaConsoleErrors: string[] = [];
+  const spaPageErrors: string[] = [];
+  spaPage.on("console", (message) => {
+    if (message.type() === "error") spaConsoleErrors.push(message.text());
+  });
+  spaPage.on("pageerror", (error) => spaPageErrors.push(error.message));
+  await spaPage.goto("/", { waitUntil: "networkidle" });
+  await spaPage.evaluate(() => {
+    (window as typeof window & { __nfa038NavigationSentinel?: string }).__nfa038NavigationSentinel = "preserved";
+  });
+  const expectSpaState = async (state: (typeof routeStates)[number]) => {
+    expect(await spaPage.evaluate(() => (
+      window as typeof window & { __nfa038NavigationSentinel?: string }
+    ).__nfa038NavigationSentinel), `${state.route}: no full reload`).toBe("preserved");
+    await expectHeaderState(spaPage, state, ".desktop-nav");
+  };
+
+  await spaPage.locator(".desktop-nav").getByRole("link", { name: "Work", exact: true }).click();
+  await expect(spaPage).toHaveURL(/\/work$/);
+  await expectSpaState(routeStates[1]);
+  await spaPage.locator('main a[href="/work/burnlens"]').first().click();
+  await expect(spaPage).toHaveURL(/\/work\/burnlens$/);
+  await expectSpaState(routeStates[2]);
+  await spaPage.locator(".desktop-nav").getByRole("link", { name: "Résumé", exact: true }).click();
+  await expect(spaPage).toHaveURL(/\/resume$/);
+  await expectSpaState(routeStates[6]);
+  await spaPage.locator(".brand-mark").click();
+  await expect(spaPage).toHaveURL(/\/$/);
+  await expectSpaState(routeStates[0]);
+  expect(spaConsoleErrors).toEqual([]);
+  expect(spaPageErrors).toEqual([]);
+  await spaContext.close();
+
+  const keyboardContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    serviceWorkers: "block",
+  });
+  const keyboardPage = await keyboardContext.newPage();
+  await keyboardPage.goto("/");
+
+  await expect(keyboardPage.locator(".desktop-nav")).toBeHidden();
+  const keyboardMenu = keyboardPage.locator(".mobile-menu");
+  const keyboardSummary = keyboardMenu.locator("summary");
+  await expect(keyboardMenu).toBeVisible();
+  await expect(keyboardSummary).toHaveAccessibleName("Menu");
+  await expect(keyboardSummary).not.toHaveAttribute("aria-label");
+  await expect(keyboardMenu).not.toHaveAttribute("open", "");
+  await keyboardSummary.focus();
+  await expect(keyboardSummary).toBeFocused();
+  await keyboardPage.keyboard.press("Enter");
+  await expect(keyboardMenu).toHaveAttribute("open", "");
+  await expect(keyboardMenu.locator("nav")).toBeVisible();
+  await expect(keyboardMenu.getByRole("link", { name: "Work" })).toBeVisible();
+  await expect(keyboardMenu.getByRole("link", { name: "Résumé" })).toBeVisible();
+  await keyboardPage.keyboard.press("Enter");
+  await expect(keyboardMenu).not.toHaveAttribute("open", "");
+  await keyboardContext.close();
+
+  const touchContext = await browser.newContext({
+    viewport: { width: 320, height: 844 },
+    hasTouch: true,
+    serviceWorkers: "block",
+  });
+  const touchPage = await touchContext.newPage();
+  await touchPage.addInitScript(() => {
+    const timings: Array<{ name: string; duration: number; interactionId: number }> = [];
+    Object.defineProperty(window, "__menuEventTimings", { value: timings, writable: false });
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        const event = entry as PerformanceEntry & { interactionId?: number };
+        timings.push({
+          name: event.name,
+          duration: event.duration,
+          interactionId: event.interactionId ?? 0,
+        });
+      }
+    }).observe({
+      type: "event",
+      buffered: true,
+      durationThreshold: 16,
+    } as PerformanceObserverInit & { durationThreshold: number });
+  });
+  await touchPage.goto("/");
+  const touchMenu = touchPage.locator(".mobile-menu");
+  const touchSummary = touchMenu.locator("summary");
+  await expect(touchSummary).toHaveAccessibleName("Menu");
+  await expect(touchSummary).not.toHaveAttribute("aria-label");
+  await touchSummary.tap();
+  await expect(touchMenu).toHaveAttribute("open", "");
+  await expect(touchMenu.getByRole("link", { name: "Work" })).toBeVisible();
+  await touchSummary.tap();
+  await expect(touchMenu).not.toHaveAttribute("open", "");
+  await touchPage.waitForTimeout(100);
+  const eventTimings = await touchPage.evaluate(() => (
+    window as typeof window & {
+      __menuEventTimings: Array<{ name: string; duration: number; interactionId: number }>;
+    }
+  ).__menuEventTimings);
+  const decisiveTimings = eventTimings.filter(
+    (entry) => entry.interactionId > 0 && ["click", "pointerup", "touchend"].includes(entry.name),
+  );
+  expect(decisiveTimings.length, JSON.stringify(eventTimings, null, 2)).toBeGreaterThan(0);
+  expect(Math.max(...decisiveTimings.map((entry) => entry.duration))).toBeLessThanOrEqual(200);
+  console.log(`MOBILE_MENU_EVENT_TIMINGS ${JSON.stringify(decisiveTimings)}`);
+  await touchContext.close();
+
+  for (const width of [320, 390]) {
+    const noScriptContext = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width, height: 844 },
+      hasTouch: true,
+    });
+    const noScriptPage = await noScriptContext.newPage();
+
+    for (const state of routeStates) {
+      const response = await noScriptPage.goto(state.route, { waitUntil: "domcontentloaded" });
+      expect(response?.status(), `${state.route} without JavaScript at ${width}px`).toBe(state.status);
+      const noScriptMenu = noScriptPage.locator(".mobile-menu");
+      const noScriptSummary = noScriptMenu.locator("summary");
+      await expect(noScriptSummary).toHaveAccessibleName("Menu");
+      await expect(noScriptSummary).not.toHaveAttribute("aria-label");
+      await noScriptSummary.tap();
+      await expect(noScriptMenu).toHaveAttribute("open", "");
+      await expectHeaderState(noScriptPage, state, ".mobile-menu nav");
+    }
+
+    await noScriptPage.goto("/", { waitUntil: "domcontentloaded" });
+    await noScriptPage.locator(".mobile-menu summary").tap();
+    await noScriptPage.locator('.mobile-menu a[href="/work"]').click();
+    await expect(noScriptPage).toHaveURL(/\/work$/);
+    await noScriptPage.locator(".mobile-menu summary").tap();
+    await expectHeaderState(noScriptPage, routeStates[1], ".mobile-menu nav");
+    await noScriptPage.locator('.mobile-menu a[href="/resume"]').click();
+    await expect(noScriptPage).toHaveURL(/\/resume$/);
+    await noScriptPage.locator(".mobile-menu summary").tap();
+    await expectHeaderState(noScriptPage, routeStates[6], ".mobile-menu nav");
+    await noScriptContext.close();
+  }
+});
+
+type Nfa047Window = Window & {
+  __nfa047Sentinel?: string;
+  __nfa047CommitFrame?: { open: boolean; pathname: string } | null;
+};
+
+async function waitForNfa047HeaderHydration(page: Page) {
+  await page.waitForFunction(() => {
+    const link = document.querySelector(".brand-mark");
+    return link && Object.keys(link).some((key) => {
+      if (!key.startsWith("__reactProps$")) return false;
+      const props = (link as unknown as Record<string, { onClick?: unknown }>)[key];
+      return typeof props?.onClick === "function";
+    });
+  });
+}
+
+async function expectNfa047RouteState(page: Page, pathname: "/" | "/work" | "/resume") {
+  await expect(page).toHaveURL(new RegExp(`${pathname === "/" ? "/" : pathname}$`));
+  const currentLinks = await page.locator(".site-header a[aria-current]").evaluateAll((links) =>
+    links.map((link) => ({ href: link.getAttribute("href"), token: link.getAttribute("aria-current") })),
+  );
+  expect(currentLinks).toEqual(Array.from({ length: pathname === "/" ? 1 : 2 }, () => ({
+    href: pathname,
+    token: "page",
+  })));
+  expect(await page.evaluate(() => (window as Nfa047Window).__nfa047Sentinel)).toBe("preserved");
+}
+
+async function observeNfa047FirstRouteFrame(page: Page) {
+  await page.evaluate(() => {
+    (window as Nfa047Window).__nfa047CommitFrame = null;
+    const header = document.querySelector(".site-header")!;
+    const observer = new MutationObserver(() => {
+      observer.disconnect();
+      requestAnimationFrame(() => {
+        (window as Nfa047Window).__nfa047CommitFrame = {
+          open: document.querySelector<HTMLDetailsElement>(".mobile-menu")!.open,
+          pathname: location.pathname,
+        };
+      });
+    });
+    observer.observe(header, { subtree: true, attributes: true, attributeFilter: ["aria-current"] });
+  });
+}
+
+test("NFA-047 mobile navigation closes with owned focus across widths and inputs", async ({ browser }) => {
+  test.setTimeout(90_000);
+  for (const width of [320, 390]) {
+    for (const modality of ["touch", "keyboard"] as const) {
+      await test.step(`${width}px using ${modality}`, async () => {
+        const context = await browser.newContext({
+          viewport: { width, height: 844 },
+          hasTouch: modality === "touch",
+          serviceWorkers: "block",
+        });
+        try {
+          const page = await context.newPage();
+          const errors: string[] = [];
+          page.on("pageerror", (error) => errors.push(error.message));
+          page.on("console", (message) => {
+            if (message.type() === "error") errors.push(message.text());
+          });
+          await page.goto("/", { waitUntil: "networkidle" });
+          await waitForNfa047HeaderHydration(page);
+          const timeOrigin = await page.evaluate(() => {
+            (window as Nfa047Window).__nfa047Sentinel = "preserved";
+            return performance.timeOrigin;
+          });
+          const menu = page.locator(".mobile-menu");
+          const summary = menu.locator("summary");
+          const brand = page.locator(".brand-mark");
+          const openMenu = async () => {
+            if (modality === "touch") {
+              await summary.tap();
+            } else {
+              await summary.focus();
+              await page.keyboard.press("Enter");
+            }
+            await expect(menu).toHaveAttribute("open", "");
+          };
+          const activate = async (label: "Work" | "Résumé") => {
+            await openMenu();
+            const link = menu.getByRole("link", { name: label, exact: true });
+            if (modality === "touch") {
+              await link.tap();
+            } else {
+              await page.keyboard.press("Tab");
+              if (label === "Résumé") await page.keyboard.press("Tab");
+              await expect(link).toBeFocused();
+              await page.keyboard.press("Enter");
+            }
+          };
+          const expectClosed = async (pathname: "/" | "/work" | "/resume", focus: Locator) => {
+            await expect(menu).not.toHaveAttribute("open", "");
+            await expect(menu.locator("nav")).toBeHidden();
+            await expect(focus).toBeFocused();
+            await expectNfa047RouteState(page, pathname);
+            expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin);
+          };
+
+          await activate("Work");
+          await expectClosed("/work", summary);
+          // A same-route activation has no pathname change and still closes.
+          await activate("Work");
+          await expectClosed("/work", summary);
+          await activate("Résumé");
+          await expectClosed("/resume", summary);
+
+          // Actual route commits, not a simulated effect: the first frame after
+          // ARIA changes must already have the menu closed for both history paths.
+          for (const direction of ["back", "forward"] as const) {
+            await openMenu();
+            await menu.getByRole("link", { name: "Work", exact: true }).focus();
+            await observeNfa047FirstRouteFrame(page);
+            if (direction === "back") await page.goBack();
+            else await page.goForward();
+            const pathname = direction === "back" ? "/work" : "/resume";
+            await expectClosed(pathname, summary);
+            await expect.poll(() => page.evaluate(() => (window as Nfa047Window).__nfa047CommitFrame))
+              .toEqual({ open: false, pathname });
+          }
+
+          if (modality === "keyboard") {
+            expect(await summary.evaluate((element) => {
+              const style = getComputedStyle(element);
+              return { visible: element.matches(":focus-visible"), width: style.outlineWidth, style: style.outlineStyle };
+            })).toEqual({ visible: true, width: "3px", style: "solid" });
+          }
+
+          // Closing an open menu must not steal focus from a persistent element
+          // outside it, whether navigation originates in history or the brand.
+          await openMenu();
+          await brand.focus();
+          await page.goBack();
+          await expectClosed("/work", brand);
+          await openMenu();
+          await brand.focus();
+          await page.keyboard.press("Enter");
+          await expectClosed("/", brand);
+          await openMenu();
+          await brand.focus();
+          await page.keyboard.press("Enter");
+          await expectClosed("/", brand);
+          expect(errors).toEqual([]);
+        } finally {
+          await context.close();
+        }
+      });
+    }
+  }
+});
+
+test("NFA-047 delayed hydration preserves a native open menu at mobile widths", async ({ browser }) => {
+  for (const width of [320, 390]) {
+    await test.step(`${width}px native interaction before hydration`, async () => {
+      const context = await browser.newContext({ viewport: { width, height: 844 }, serviceWorkers: "block" });
+      let releaseScripts = () => {};
+      const scriptGate = new Promise<void>((resolve) => { releaseScripts = resolve; });
+      let heldScriptRequests = 0;
+      await context.route("**/_next/static/**/*.js", async (route) => {
+        heldScriptRequests += 1;
+        await scriptGate;
+        await route.continue();
+      });
+      try {
+        const page = await context.newPage();
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
+        page.on("console", (message) => {
+          if (message.type() === "error") errors.push(message.text());
+        });
+        await page.goto("/", { waitUntil: "commit" });
+        const menu = page.locator(".mobile-menu");
+        const summary = menu.locator("summary");
+        const work = menu.getByRole("link", { name: "Work", exact: true });
+        await expect(summary).toBeVisible();
+        await expect.poll(() => heldScriptRequests).toBeGreaterThan(0);
+        expect(await page.locator(".brand-mark").evaluate((link) =>
+          Object.keys(link).some((key) => key.startsWith("__reactProps$")),
+        )).toBe(false);
+        await summary.focus();
+        await page.keyboard.press("Enter");
+        await expect(menu).toHaveAttribute("open", "");
+        await page.keyboard.press("Tab");
+        await expect(work).toBeFocused();
+
+        releaseScripts();
+        await page.waitForLoadState("networkidle");
+        await waitForNfa047HeaderHydration(page);
+        await expect(menu).toHaveAttribute("open", "");
+        await expect(work).toBeFocused();
+        await page.evaluate(() => { (window as Nfa047Window).__nfa047Sentinel = "preserved"; });
+        await page.keyboard.press("Enter");
+        await expect(menu).not.toHaveAttribute("open", "");
+        await expect(summary).toBeFocused();
+        await expectNfa047RouteState(page, "/work");
+        expect(errors).toEqual([]);
+      } finally {
+        releaseScripts();
+        await context.close();
+      }
+    });
+  }
+});
+
+test("NFA-047 modified and external links retain the current mobile disclosure", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" });
+  // The external destination is a local response fixture; this check sends no
+  // request to GitHub and exercises only native new-tab behavior.
+  await context.route("https://github.com/**", (route) => route.fulfill({
+    status: 200, contentType: "text/html", body: "<!doctype html><title>External destination fixture</title>",
+  }));
+  try {
+    const page = await context.newPage();
+    await page.goto("/", { waitUntil: "networkidle" });
+    await waitForNfa047HeaderHydration(page);
+    await page.evaluate(() => { (window as Nfa047Window).__nfa047Sentinel = "preserved"; });
+    const menu = page.locator(".mobile-menu");
+    await menu.locator("summary").click();
+    const work = menu.getByRole("link", { name: "Work", exact: true });
+    for (const activation of ["control", "shift", "middle", "external"] as const) {
+      const popupPromise = context.waitForEvent("page");
+      if (activation === "external") await menu.locator('a[target="_blank"]').click();
+      else if (activation === "middle") await work.click({ button: "middle" });
+      else await work.click({ modifiers: [activation === "control" ? "Control" : "Shift"] });
+      const popup = await popupPromise;
+      await popup.waitForLoadState("domcontentloaded");
+      await popup.close();
+      await expect(menu).toHaveAttribute("open", "");
+      await expect(menu.locator("nav")).toBeVisible();
+      await expectNfa047RouteState(page, "/");
+    }
+  } finally {
+    await context.close();
+  }
+});
+
+test("NFA-047 breakpoint navigation closes a hidden menu without stealing desktop focus", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  await waitForNfa047HeaderHydration(page);
+  await page.evaluate(() => { (window as Nfa047Window).__nfa047Sentinel = "preserved"; });
   const menu = page.locator(".mobile-menu");
-  await expect(menu).toBeVisible();
-  await menu.locator("summary").focus();
-  await expect(menu.locator("summary")).toBeFocused();
+  await menu.locator("summary").click();
+  await expect(menu).toHaveAttribute("open", "");
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await expect(menu).toBeHidden();
+  const desktopWork = page.locator('.desktop-nav a[href="/work"]');
+  await desktopWork.focus();
   await page.keyboard.press("Enter");
-  await expect(menu.locator("nav")).toBeVisible();
-  await expect(menu.getByRole("link", { name: "Work" })).toBeVisible();
-  await expect(menu.getByRole("link", { name: "Résumé" })).toBeVisible();
+  await expectNfa047RouteState(page, "/work");
+  await expect(menu).not.toHaveAttribute("open", "");
+  await expect(desktopWork).toBeFocused();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(menu).toBeVisible();
+  await expect(menu.locator("nav")).toBeHidden();
 });
 
 test("case-study chapter indexes remain keyboard-native at mobile and desktop widths", async ({ page }) => {
@@ -322,9 +909,9 @@ test("case-study chapter indexes remain keyboard-native at mobile and desktop wi
   await expect(burnlensIndex).toBeVisible();
   await expect(burnlensIndex.getByRole("link")).toHaveCount(4);
   await expect(burnlensIndex.getByRole("link").allTextContents()).resolves.toEqual([
-    "01Frame", "02Authority", "03Assembly", "04Boundary",
+    "01Frame", "02Constraints", "03Release", "04Boundary",
   ]);
-  const assembly = burnlensIndex.getByRole("link", { name: /Assembly/ });
+  const assembly = burnlensIndex.getByRole("link", { name: /Release/ });
   await assembly.focus();
   await expect(assembly).toBeFocused();
   await page.keyboard.press("Enter");
@@ -357,6 +944,7 @@ test("case-study chapter indexes remain keyboard-native at mobile and desktop wi
 });
 
 test("representative routes hold at every required review width", async ({ page }) => {
+  test.setTimeout(60_000);
   for (const width of [320, 390, 768, 1280, 1440]) {
     await page.setViewportSize({ width, height: width < 700 ? 844 : 1000 });
     for (const route of [
@@ -385,18 +973,18 @@ test("representative routes hold at every required review width", async ({ page 
   }
 });
 
-test("mobile homepage prioritizes the first flagship and keeps evidence labels legible", async ({ page }) => {
+test("mobile homepage prioritizes current work and keeps contribution labels legible", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/", { waitUntil: "networkidle" });
 
   const priority = await page.evaluate(() => {
     const selectedWork = document.querySelector("#selected-work")?.getBoundingClientRect();
-    const burnlensWorld = document.querySelector(
-      '[data-flagship-teaser="burnlens"] [data-atlas-grid]',
+    const firstProjectVisual = document.querySelector(
+      '[data-current-project="wildfire-response"] figure',
     )?.getBoundingClientRect();
     const labels = [
       ...document.querySelectorAll(
-        "[data-front-door-flagships] dt, [data-front-door-flagships] figcaption, [data-supporting-notes] dt, [data-capability-boundary] p",
+        "[data-current-work] figcaption, [data-current-work] [data-contribution], [data-front-door-flagships] figcaption, [data-supporting-notes] dt",
       ),
     ].filter((label) => {
       const style = getComputedStyle(label);
@@ -406,19 +994,19 @@ test("mobile homepage prioritizes the first flagship and keeps evidence labels l
 
     return {
       selectedWorkTop: selectedWork?.top ?? Number.POSITIVE_INFINITY,
-      burnlensWorldTop: burnlensWorld?.top ?? Number.POSITIVE_INFINITY,
-      burnlensWorldVisible: Boolean(burnlensWorld && burnlensWorld.width > 0 && burnlensWorld.height > 0),
+      firstVisualTop: firstProjectVisual?.top ?? Number.POSITIVE_INFINITY,
+      firstVisualVisible: Boolean(firstProjectVisual && firstProjectVisual.width > 0 && firstProjectVisual.height > 0),
       labelCount: labels.length,
       minimumLabelSize: Math.min(...labels.map((label) => Number.parseFloat(getComputedStyle(label).fontSize))),
     };
   });
 
   expect(priority.selectedWorkTop).toBeLessThanOrEqual(844 * 1.5);
-  expect(priority.burnlensWorldTop).toBeLessThanOrEqual(844 * 4);
-  expect(priority.burnlensWorldVisible).toBe(true);
+  expect(priority.firstVisualTop).toBeLessThanOrEqual(844 * 4);
+  expect(priority.firstVisualVisible).toBe(true);
   expect(priority.labelCount).toBeGreaterThan(0);
   expect(priority.minimumLabelSize).toBeGreaterThanOrEqual(12);
-  await expect(page.getByText("01 / Proven", { exact: true })).toBeVisible();
+  await expect(page.locator('[data-current-project="wildfire-response"] [data-contribution]')).toBeVisible();
   await expect(page.locator("[data-historical-coursework]")).toHaveCount(0);
 });
 
@@ -429,7 +1017,7 @@ test("reduced-motion preference disables smooth scrolling", async ({ page }) => 
   expect(scrollBehavior).toBe("auto");
 });
 
-test("homepage projects exactly two source-bound flagships without JavaScript", async ({ browser }) => {
+test("homepage preserves four contribution-led current cases and two source-bound flagships without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
     viewport: { width: 390, height: 844 },
@@ -441,16 +1029,42 @@ test("homepage projects exactly two source-bound flagships without JavaScript", 
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "I build evidence-bound systems for uncertain terrain.",
+      name: "I turn data and complex ideas into usable software.",
     }),
   ).toBeVisible();
   await expect(
-    page.getByText("Software engineering · geospatial evidence · climate-relevant systems", {
+    page.getByText("Software · maps · interactive experiences", {
       exact: true,
     }),
   ).toBeVisible();
+  await expect(page.locator("main")).toContainText(
+    "My work brings together software, maps and interactive experiences.",
+  );
+  await expect(page.locator("main")).toContainText(/I set the direction[\s\S]*product decisions[\s\S]*Codex/);
+  const currentWork = page.locator("[data-current-work]");
+  const currentCases = currentWork.locator("[data-current-project]");
+  await expect(currentCases).toHaveCount(4);
+  expect(await currentCases.evaluateAll((nodes) => nodes.map((node) =>
+    node.getAttribute("data-current-project"),
+  ))).toEqual([...currentProjectIds]);
+  for (const projectId of currentProjectIds) {
+    const entry = currentWork.locator(`[data-current-project="${projectId}"]`);
+    await expect(entry.locator("[data-contribution]")).toBeVisible();
+    await expect(entry.locator("[data-contribution]")).not.toHaveText("");
+    await expect(entry.locator(`a[href="/work/${projectId}"]`)).toBeVisible();
+    expect(await entry.locator("figure").count()).toBeGreaterThan(0);
+    for (const figure of await entry.locator("figure").all()) await expect(figure).toBeVisible();
+  }
+  await expect(currentWork).toHaveAttribute("aria-roledescription", "carousel");
+  await expect(currentWork.locator("[data-carousel-slide]")).toHaveCount(6);
+  await expect(currentWork.locator("#project-track")).toHaveAttribute("tabindex", "0");
+  await expect(currentWork.getByRole("button", { name: "Next project", includeHidden: true })).toBeHidden();
+  for (const projectId of currentProjectIds) {
+    await expect(currentWork
+      .locator(`a[href="/work/${projectId}"]`)).toHaveCount(1);
+  }
 
-  const flagships = page.locator("[data-front-door-flagships] > [data-flagship-teaser]");
+  const flagships = page.locator("[data-front-door-flagships] [data-flagship-teaser]");
   await expect(flagships).toHaveCount(2);
   expect(await flagships.evaluateAll((nodes) => nodes.map((node) => ({
     id: node.getAttribute("data-flagship-teaser"),
@@ -463,17 +1077,16 @@ test("homepage projects exactly two source-bound flagships without JavaScript", 
 
   const making = page.locator("[data-portfolio-making]");
   await expect(making).toHaveCount(1);
-  await expect(making.getByRole("heading", { level: 3, name: portfolioMaking.headline })).toBeVisible();
-  await expect(making).toContainText(portfolioMaking.thesis);
+  await expect(making.getByRole("heading", { level: 2, name: portfolioMaking.headline })).toBeVisible();
   expect(await making.locator("[data-orchestration-marker]").evaluateAll((nodes) =>
     nodes.map((node) => node.getAttribute("data-orchestration-marker")),
   )).toEqual(portfolioMaking.roles.map(([marker]) => marker));
-  for (const [marker, label, copy] of portfolioMaking.roles) {
+  for (const [marker, label, contribution] of portfolioMaking.roles) {
     const row = making.locator(`[data-orchestration-marker="${marker}"]`);
     await expect(row.locator("dt")).toContainText(label);
-    await expect(row.locator("dd")).toHaveText(copy);
+    await expect(row.locator("dd")).toContainText(contribution);
+    await expect(row.locator("dd")).not.toHaveText("");
   }
-  await expect(making).toContainText(portfolioMaking.boundary);
   await expect(making.locator('[data-source-id="burnlens-pinned-tree"]')).toHaveAttribute(
     "href",
     burnlensBuildRecordHref,
@@ -482,10 +1095,15 @@ test("homepage projects exactly two source-bound flagships without JavaScript", 
     "href",
     burnlensReleaseHref,
   );
-  expect(await making.evaluate((ledger) => Boolean(
-    ledger.compareDocumentPosition(document.querySelector("[data-front-door-flagships]")!) &
+  expect(await currentCases.last().evaluate((current) => Boolean(
+    current.compareDocumentPosition(document.querySelector("[data-flagship-teaser]")!) &
       Node.DOCUMENT_POSITION_FOLLOWING,
   ))).toBe(true);
+  expect(await making.evaluate((method) => Boolean(
+    document.querySelector('section[aria-labelledby="dashboard-title"]')!.compareDocumentPosition(method) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ))).toBe(true);
+  await expect(page.locator("[data-featured-turn], [data-turn-boundary]")).toHaveCount(0);
 
   const burnlens = flagships.nth(0);
   await expect(burnlens.locator("[data-atlas-grid]")).toHaveCount(1);
@@ -498,6 +1116,17 @@ test("homepage projects exactly two source-bound flagships without JavaScript", 
     "/work/burnlens",
   );
   await expect(burnlens).toContainText(renderedEvidence("burnlens", "maturity"));
+  await expect(burnlens.locator("[data-home-project-details]")).not.toHaveAttribute("open", "");
+  const burnlensSummary = burnlens.locator("[data-home-project-details] > summary");
+  await expect(burnlensSummary).toHaveJSProperty("tagName", "SUMMARY");
+  await expect(burnlensSummary).toHaveText("Release details");
+  await burnlensSummary.focus();
+  await expect(burnlensSummary).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(burnlens.locator("[data-home-project-details]")).toHaveAttribute("open", "");
+  await expect(burnlens.locator("[data-home-project-details] dl > div").filter({
+    has: page.locator("dt").filter({ hasText: /^My role$/ }),
+  }).locator("dd")).toContainText(renderedEvidence("burnlens", "personalRole"));
   await expect(burnlens.locator("dt").filter({ hasText: /^Result$/ })).toHaveCount(1);
   await expect(burnlens.locator("dt").filter({ hasText: /^Limit$/ })).toHaveCount(1);
 
@@ -505,35 +1134,37 @@ test("homepage projects exactly two source-bound flagships without JavaScript", 
   await expect(runbook.locator("[data-control-rail]")).toHaveCount(2);
   await expect(runbook.locator("[data-authority-break]")).toHaveCount(1);
   await expect(runbook.locator("[data-atlas-grid], [data-atlas-transect], [data-atlas-legend]")).toHaveCount(0);
-  const runbookTurn = runbook.locator('[data-featured-turn][data-evidence-id="RS.F03"]');
-  await expect(runbookTurn).toHaveCount(1);
-  await expect(runbookTurn.locator("[data-turn-copy]")).toContainText(runbookFeaturedTurn);
-  await expect(runbookTurn.locator("[data-turn-boundary]")).not.toHaveText("");
-  await expect(
-    runbookTurn.locator('[data-source-id="rs.model_comparison.0018"]'),
-  ).toHaveAttribute("href", runbookModelComparisonHref);
+  await expect(runbook.locator("[data-featured-turn], [data-source-id]")).toHaveCount(0);
   await expect(
     runbook.getByRole("link", { name: "Read Runbook Sentinel case study" }),
   ).toHaveAttribute("href", "/work/runbook-sentinel");
-  await expect(
-    runbook.getByText(
-      "Verified synthetic testbed with a public v0.0.20 release and zero real systems connected.",
-      { exact: true },
-    ),
-  ).toBeVisible();
+  await expect(runbook).toContainText(renderedEvidence("runbook-sentinel", "maturity"));
+  await expect(runbook.locator("[data-home-project-details]")).not.toHaveAttribute("open", "");
+  const runbookSummary = runbook.locator("[data-home-project-details] > summary");
+  await expect(runbookSummary).toHaveJSProperty("tagName", "SUMMARY");
+  await expect(runbookSummary).toHaveText("Release details");
+  await runbookSummary.focus();
+  await expect(runbookSummary).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(runbook.locator("[data-home-project-details]")).toHaveAttribute("open", "");
+  await expect(runbook.locator("[data-home-project-details] dl > div").filter({
+    has: page.locator("dt").filter({ hasText: /^My role$/ }),
+  }).locator("dd")).toContainText(renderedEvidence("runbook-sentinel", "personalRole"));
   await expect(runbook.locator("dt").filter({ hasText: /^Result$/ })).toHaveCount(1);
   await expect(runbook.locator("dt").filter({ hasText: /^Limit$/ })).toHaveCount(1);
 
-  const supporting = page.locator("[data-supporting-notes]");
+  await expect(page.locator("[data-historical-coursework]")).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 2, name: "Follow the work." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open project dashboard", exact: true })).toHaveAttribute("href", "/dashboard");
+  // The simple six-card landing delegates supporting and historical reading to
+  // its native work-index journey; retain their full source-bound checks there.
+  await expect(page.getByRole("link", { name: "Browse all work", exact: true })).toHaveAttribute("href", "/work");
+  await page.getByRole("link", { name: "Browse all work", exact: true }).click();
+  const supporting = page.locator('[data-work-lane="supporting-notes"]');
   expect(await supporting.locator(":scope article[data-project-model-id]").evaluateAll((nodes) =>
     nodes.map((node) => node.getAttribute("data-project-model-id")),
   )).toEqual(["quest-craft", "openclaw-showcase"]);
-  await expect(
-    supporting.getByText(
-      "These shorter field notes show bounded interaction and documentation work. Each is designed only from what its public evidence supports.",
-      { exact: true },
-    ),
-  ).toBeVisible();
+  await expect(supporting.getByRole("heading", { level: 2 })).toBeVisible();
   await expect(supporting.getByRole("link", { name: "Read Quest Craft field note" })).toHaveAttribute(
     "href",
     "/work/quest-craft",
@@ -550,13 +1181,9 @@ test("homepage projects exactly two source-bound flagships without JavaScript", 
     /public documentation artifact.*private runtime.*not inspected or evaluated.*no runtime capability.*intended user.*failure dividend/i,
   );
 
-  await expect(page.locator("[data-historical-coursework]")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /historical reading shelf/i })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Historical reading", exact: true })).toHaveAttribute(
     "href",
-    "/work#historical-reading",
-  );
-  await expect(page.locator('[data-capability-boundary="energy-ee"]')).toContainText(
-    frontDoorEnergyBoundary,
+    "#historical-reading",
   );
   await context.close();
 });
@@ -573,7 +1200,7 @@ test("work index preserves its three-lane hierarchy without JavaScript", async (
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Two flagships, two focused field notes, and a bounded historical shelf.",
+      name: "Software systems, focused field notes, and work in progress.",
     }),
   ).toBeVisible();
   expect(await page.locator("main > [data-work-lane]").evaluateAll((nodes) =>
@@ -596,7 +1223,7 @@ test("work index preserves its three-lane hierarchy without JavaScript", async (
     const labelledFields = [
       ["problem", "Problem"],
       ["intendedUser", "Intended reviewer"],
-      ["personalRole", "My role"],
+      ["personalRole", projectId === "burnlens" ? "Role split" : "My role"],
       ["decisionSupported", "Decision"],
       ...(projectId === "runbook-sentinel" ? [["stack", "Methods"]] as const : []),
       ["outcome", "Result"],
@@ -793,18 +1420,18 @@ test("front-door visual worlds remain distinct without relying on titles or rast
         ? '[data-flagship-teaser="runbook-sentinel"] [data-control-rail]'
         : '[data-project-model-id="runbook-sentinel"] [data-control-rail]',
     ] as const);
-    expect(tones.burnlens, `${route}: BurnLens daylight field`).toBeGreaterThan(150);
+    expect(tones.burnlens, `${route}: reviewed polar-night atlas field`).toBeCloseTo((18 + 35 + 47) / 3);
     expect(tones.runbook, `${route}: Runbook control field`).toBeLessThan(100);
   }
 
   for (const route of ["/", "/work"] as const) {
     await page.goto(route, { waitUntil: "networkidle" });
-    const flagships = page.locator(
-      route === "/" ? "[data-front-door-flagships]" : '[data-work-lane="flagships"]',
-    );
-    const supporting = page.locator(
-      route === "/" ? "[data-supporting-notes]" : '[data-work-lane="supporting-notes"]',
-    );
+    if (route === "/") {
+      await expect(page.locator("[data-carousel-slide]")).toHaveCount(6);
+      await page.getByRole("link", { name: "Browse all work", exact: true }).click();
+    }
+    const flagships = page.locator('[data-work-lane="flagships"]');
+    const supporting = page.locator('[data-work-lane="supporting-notes"]');
     const typeScale = await page.evaluate(([flagshipSelector, supportingSelector]) => {
       const flagshipTitles = [...document.querySelectorAll(`${flagshipSelector} h3`)]
         .filter((node) => getComputedStyle(node).visibility !== "hidden");
@@ -817,8 +1444,8 @@ test("front-door visual worlds remain distinct without relying on titles or rast
         supporting: Math.max(...supportingTitles.map((node) => Number.parseFloat(getComputedStyle(node).fontSize))),
       };
     }, [
-      route === "/" ? "[data-front-door-flagships]" : '[data-work-lane="flagships"]',
-      route === "/" ? "[data-supporting-notes]" : '[data-work-lane="supporting-notes"]',
+      '[data-work-lane="flagships"]',
+      '[data-work-lane="supporting-notes"]',
     ] as const);
     expect(typeScale.flagshipCount).toBe(2);
     expect(typeScale.supportingCount).toBe(2);
@@ -863,9 +1490,106 @@ test("front-door accessibility holds at mobile and desktop review widths", async
         expect(item.text, `${route}: empty aria-labelledby target ${item.id}`).not.toBe("");
       }
 
-      for (const [name, href] of expectedLinks) {
+      const routeLinks = route === "/"
+        ? [...currentProjectIds.map((id) => [null, `/work/${id}`] as const), ...expectedLinks.slice(0, 2)]
+        : expectedLinks;
+      for (const [name, href] of routeLinks) {
+        if (name === null) {
+          await expect(page.locator(`main a[href="${href}"]`)).toHaveCount(1);
+          continue;
+        }
         await expect(page.getByRole("link", { name, exact: true })).toHaveCount(1);
         await expect(page.getByRole("link", { name, exact: true })).toHaveAttribute("href", href);
+      }
+      if (route === "/") {
+        const primaryActions = page.getByRole("navigation", { name: "Primary actions", exact: true });
+        const currentProjectIndex = page.locator("[data-project-carousel]");
+        await expect(primaryActions).toHaveCount(1);
+        await expect(primaryActions).toHaveJSProperty("tagName", "NAV");
+        await expect(currentProjectIndex).toHaveCount(1);
+        await expect(currentProjectIndex).toHaveJSProperty("tagName", "SECTION");
+        await expect(currentProjectIndex).toHaveAttribute("aria-roledescription", "carousel");
+        await expect(currentProjectIndex.locator("#project-track")).toHaveAttribute("tabindex", "0");
+        await expect(currentProjectIndex.locator('article[data-carousel-slide][aria-roledescription="slide"]')).toHaveCount(6);
+        await expect(currentProjectIndex.locator('[data-carousel-slide][role]')).toHaveCount(0);
+
+        const ariaSemantics = await new AxeBuilder({ page })
+          .include("main")
+          .withRules(["aria-prohibited-attr"])
+          .analyze();
+        expect(
+          ariaSemantics.violations,
+          `homepage aria-prohibited-attr at ${width}px\n${JSON.stringify(ariaSemantics.violations, null, 2)}`,
+        ).toEqual([]);
+        expect(
+          ariaSemantics.incomplete,
+          `homepage unresolved aria-prohibited-attr at ${width}px\n${JSON.stringify(ariaSemantics.incomplete, null, 2)}`,
+        ).toEqual([]);
+
+        const markerSelector =
+          '[data-flagship-teaser="runbook-sentinel"] [data-control-rail] li > span';
+        await page.getByRole("link", { name: "Read Runbook Sentinel case study", exact: true }).focus();
+        await expect.poll(() => page.locator('[data-flagship-teaser="runbook-sentinel"]').evaluate((card) =>
+          Math.abs(card.getBoundingClientRect().left - document.querySelector("#project-track")!.getBoundingClientRect().left),
+        )).toBeLessThan(65);
+        const markerAxe = await new AxeBuilder({ page })
+          .include(markerSelector)
+          .withRules(["color-contrast"])
+          .analyze();
+        expect(
+          markerAxe.violations,
+          `homepage rail-marker contrast at ${width}px\n${JSON.stringify(markerAxe.violations, null, 2)}`,
+        ).toEqual([]);
+        expect(
+          markerAxe.incomplete,
+          `homepage unresolved rail-marker contrast at ${width}px\n${JSON.stringify(markerAxe.incomplete, null, 2)}`,
+        ).toEqual([]);
+        expect(
+          markerAxe.passes.find((result) => result.id === "color-contrast")?.nodes.length ?? 0,
+          `homepage audited rail markers at ${width}px`,
+        ).toBe(6);
+
+        const markerContrast = await page.locator(markerSelector).evaluateAll((markers) => {
+          function rgba(value: string) {
+            const channels = value.match(/[\d.]+/g)?.map(Number) ?? [];
+            if (channels.length < 3) throw new Error(`Unparseable marker color: ${value}`);
+            return {
+              r: channels[0],
+              g: channels[1],
+              b: channels[2],
+              a: channels[3] ?? 1,
+            };
+          }
+          function luminance(color: { r: number; g: number; b: number }) {
+            const channels = [color.r, color.g, color.b].map((value) => {
+              const normalized = value / 255;
+              return normalized <= 0.04045
+                ? normalized / 12.92
+                : ((normalized + 0.055) / 1.055) ** 2.4;
+            });
+            return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+          }
+          return markers.map((marker) => {
+            const style = getComputedStyle(marker);
+            const foreground = rgba(style.color);
+            const background = rgba(style.backgroundColor);
+            const light = Math.max(luminance(foreground), luminance(background));
+            const dark = Math.min(luminance(foreground), luminance(background));
+            return {
+              text: marker.textContent?.trim() ?? "",
+              foreground: style.color,
+              background: style.backgroundColor,
+              backgroundAlpha: background.a,
+              ratio: (light + 0.05) / (dark + 0.05),
+            };
+          });
+        });
+        expect(markerContrast.map(({ text }) => text)).toEqual(["01", "02", "03", "A", "B", "C"]);
+        for (const marker of markerContrast) {
+          expect(marker.background, `${marker.text} background at ${width}px`).toBe("rgb(18, 35, 47)");
+          expect(marker.backgroundAlpha, `${marker.text} opaque background at ${width}px`).toBe(1);
+          expect(marker.ratio, `${marker.text} contrast at ${width}px`).toBeGreaterThanOrEqual(4.5);
+        }
       }
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
@@ -879,12 +1603,31 @@ test("front-door links expose unobscured high-contrast keyboard focus", async ({
   for (const route of ["/", "/work"] as const) {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(route, { waitUntil: "networkidle" });
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("auto");
+    // Native disclosures retain every source link while keeping the landing concise.
+    for (const disclosure of await page.locator("main details").all()) {
+      if (!(await disclosure.getAttribute("open"))) await disclosure.locator(":scope > summary").click();
+    }
     const links = page.locator("main a[href]");
     expect(await links.count(), `${route}: focusable links`).toBeGreaterThan(0);
     for (const link of await links.all()) {
       await link.scrollIntoViewIfNeeded();
       await link.focus();
+      // Pointer-opened disclosures intentionally leave :focus-visible off.
+      // Establish a real native keyboard entry into each exact link, not a
+      // programmatic focus or forced CSS ring presented as keyboard evidence.
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
       await expect(link).toBeFocused();
+      expect(await link.evaluate(element => element.matches(":focus-visible"))).toBe(true);
+      await expect.poll(() => link.evaluate(element => {
+        const bounds = element.getBoundingClientRect();
+        const headerBottom = document.querySelector(".site-header")?.getBoundingClientRect().bottom ?? 0;
+        const card = element.closest("[data-carousel-slide]");
+        const track = card?.parentElement?.getBoundingClientRect();
+        return bounds.top >= headerBottom - 1 && bounds.bottom <= innerHeight + 1 &&
+          (!track || (bounds.left >= track.left - 1.5 && bounds.right <= track.right + 1.5));
+      })).toBe(true);
       const focus = await link.evaluate((element) => {
         function rgba(value: string) {
           const channels = value.match(/[\d.]+/g)?.map(Number) ?? [];
@@ -936,14 +1679,16 @@ test("front-door links expose unobscured high-contrast keyboard focus", async ({
     for (const selector of route === "/"
       ? [
           '[data-flagship-teaser="runbook-sentinel"] a[href="/work/runbook-sentinel"]',
-          '[data-flagship-teaser="runbook-sentinel"] [data-source-id]',
         ]
       : ['[data-work-lane="flagships"] a[href="/work/runbook-sentinel"]']) {
       const darkLink = page.locator(selector);
       await darkLink.focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
       await expect(darkLink).toBeFocused();
+      expect(await darkLink.evaluate(element => element.matches(":focus-visible"))).toBe(true);
       expect(await darkLink.evaluate((element) => getComputedStyle(element).outlineColor)).toBe(
-        "rgb(199, 205, 191)",
+        "rgb(167, 224, 241)",
       );
     }
   }
@@ -963,7 +1708,13 @@ test("front-door descendants remain contained at every review width", async ({ p
         });
         const escaping = visible.filter((element) => {
           if (element.getAttribute("aria-hidden") === "true" && getComputedStyle(element).position === "absolute") return false;
+          if (element.closest('svg[aria-hidden="true"]')) return false;
           const bounds = element.getBoundingClientRect();
+          const card = element.closest("[data-carousel-slide]");
+          if (card) {
+            const cardBounds = card.getBoundingClientRect();
+            return bounds.left < cardBounds.left - tolerance || bounds.right > cardBounds.right + tolerance;
+          }
           return bounds.left < -tolerance || bounds.right > window.innerWidth + tolerance;
         }).map((element) => ({
           tag: element.tagName,
@@ -974,7 +1725,7 @@ test("front-door descendants remain contained at every review width", async ({ p
         const scrollers = visible.filter((element) => {
           const style = getComputedStyle(element);
           return element.scrollWidth > element.clientWidth + 1 && /auto|scroll/.test(style.overflowX);
-        }).map((element) => element.getAttribute("data-work-lane") ?? element.className ?? element.tagName);
+        }).map((element) => element.id || element.getAttribute("data-work-lane") || element.className || element.tagName);
         const essential = visible.filter((element) =>
           element.matches("a, button, dt, figcaption, [data-turn-boundary], [data-support-boundary], [data-capability-boundary] p") &&
           element.innerText.trim() !== "" && !element.classList.contains("sr-only"),
@@ -992,13 +1743,70 @@ test("front-door descendants remain contained at every review width", async ({ p
       });
       expect(layout.document, `${route} at ${width}px document width`).toBeLessThanOrEqual(layout.viewport);
       expect(layout.escaping, `${route} at ${width}px escaping descendants`).toEqual([]);
-      expect(layout.scrollers, `${route} at ${width}px internal horizontal scrollers`).toEqual([]);
+      expect(layout.scrollers, `${route} at ${width}px internal horizontal scrollers`).toEqual(route === "/" ? ["project-track"] : []);
       expect(layout.essential.length).toBeGreaterThan(0);
       for (const item of layout.essential) {
         expect(item.size, `${route} at ${width}px: ${item.text}`).toBeGreaterThanOrEqual(13);
       }
     }
   }
+
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await page.goto("/work", { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  const textZoomLayout = await page.locator("main").evaluate((main) => {
+    const tolerance = 1.5;
+    const visible = [...main.querySelectorAll<HTMLElement>("*")].filter((element) => {
+      const style = getComputedStyle(element);
+      const bounds = element.getBoundingClientRect();
+      return style.display !== "none"
+        && style.visibility !== "hidden"
+        && !element.closest(".sr-only")
+        && bounds.width > 0
+        && bounds.height > 0;
+    });
+    const describe = (element: HTMLElement) => {
+      const bounds = element.getBoundingClientRect();
+      return {
+        tag: element.tagName,
+        hook: element.getAttribute("data-project-model-id")
+          ?? element.getAttribute("data-work-lane")
+          ?? (typeof element.className === "string" ? element.className : ""),
+        text: element.textContent?.replace(/\s+/g, " ").trim().slice(0, 100) ?? "",
+        left: bounds.left,
+        right: bounds.right,
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        overflowX: getComputedStyle(element).overflowX,
+      };
+    };
+    return {
+      viewport: window.innerWidth,
+      document: document.documentElement.scrollWidth,
+      auditedDescendants: visible.length,
+      historicalEntries: main.querySelectorAll(
+        '[data-work-lane="historical-reading-shelf"] [data-work-entry]',
+      ).length,
+      factLists: main.querySelectorAll("[data-work-facts] [data-method-list]").length,
+      escaping: visible.filter((element) => {
+        const bounds = element.getBoundingClientRect();
+        return bounds.left < -tolerance || bounds.right > window.innerWidth + tolerance;
+      }).map(describe),
+      internalOverflow: visible.filter((element) => (
+        element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1
+      )).map(describe),
+    };
+  });
+  expect(textZoomLayout.document, "/work at 1280px/200% document width").toBeLessThanOrEqual(
+    textZoomLayout.viewport,
+  );
+  expect(textZoomLayout.auditedDescendants).toBeGreaterThan(0);
+  expect(textZoomLayout.historicalEntries).toBe(3);
+  expect(textZoomLayout.factLists).toBe(1);
+  expect(textZoomLayout.escaping, "/work at 1280px/200% escaping descendants").toEqual([]);
+  expect(textZoomLayout.internalOverflow, "/work at 1280px/200% descendant internal overflow").toEqual([]);
 });
 
 test("front-door routes respect reduced motion and preserve decisive print evidence", async ({ page }, testInfo) => {
@@ -1028,16 +1836,71 @@ test("front-door routes respect reduced motion and preserve decisive print evide
     expect(motion.mainScroll).toBe("auto");
     expect(motion.maximumDurationMs).toBeLessThanOrEqual(0.01);
 
+    if (route === "/") {
+      // Visit the manual cards through their existing focus behavior before
+      // printing. Offscreen media is intentionally deferred, not incomplete;
+      // do not force eager loading or mutate src to satisfy the PDF helper.
+      for (const card of await page.locator("[data-carousel-slide]").all()) {
+        await card.locator('a[href^="/work/"]').focus();
+        await expect.poll(() => card.locator("img").evaluateAll(images => images.every(image =>
+          (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0,
+        ))).toBe(true);
+        await card.locator("img").evaluateAll(images => Promise.all(images.map(image =>
+          (image as HTMLImageElement).decode(),
+        )));
+      }
+    }
+
     await page.emulateMedia({ media: "print", reducedMotion: "no-preference" });
     await expect(page.locator(".site-header")).toBeHidden();
     await expect(page.locator(".site-footer")).toBeHidden();
     if (route === "/") {
-      await expect(page.locator("[data-featured-turn]")).toHaveCount(1);
-      for (const turn of await page.locator("[data-featured-turn]").all()) await expect(turn).toBeVisible();
-      await expect(page.locator("[data-turn-boundary]")).toHaveCount(1);
+      await expect(page.locator("[data-featured-turn], [data-turn-boundary]")).toHaveCount(0);
+      await expect(page.locator("[data-current-work] [data-current-project]")).toHaveCount(4);
+      for (const projectId of currentProjectIds) {
+        const entry = page.locator(`[data-current-project="${projectId}"]`);
+        await expect(entry.locator("[data-contribution]")).toBeVisible();
+        await expect(entry.locator(`a[href="/work/${projectId}"]`)).toBeVisible();
+        const linkedContribution = entry.locator(`a[href="/work/${projectId}"]`).locator("..").locator("p[data-contribution]");
+        await expect(linkedContribution).toHaveCount(1);
+        await expect(linkedContribution).toBeVisible();
+        await expect(linkedContribution).not.toHaveText("");
+        if (projectId === "after-the-tip") {
+          await expect(entry.locator("figure")).toHaveCount(2);
+          for (const figure of await entry.locator("figure").all()) await expect(figure).toBeHidden();
+          const interpretation = entry.getByText(/^Mean positive lead contribution/);
+          await expect(interpretation).toBeVisible();
+          await expect(interpretation).toContainText("points per game · regulation only");
+          await expect(interpretation).toContainText("not confidence intervals");
+          await expect(interpretation).toContainText("not a team-strength comparison");
+          expect(await interpretation.evaluate(element => getComputedStyle(element, "::before").content))
+            .toContain("Preview omitted in print.");
+        } else {
+          await expect(entry.locator("figcaption")).toHaveCount(1);
+          const caption = entry.locator("figcaption");
+          await expect(caption).toBeVisible();
+          expect(await caption.evaluate(element => getComputedStyle(element, "::before").content))
+            .toContain("Preview omitted in print.");
+          if (projectId === "wildfire-response") {
+            await expect(caption).toContainText("synthetic development fixture");
+            await expect(caption).toContainText("gameplay disabled");
+            await expect(caption).toContainText("AI-assisted terrain art");
+          } else if (projectId === "west-hawaii-heat-exposure") {
+            await expect(caption).toContainText("historical habitat—not observed reef condition");
+            await expect(caption).toContainText("NOAA source credits");
+          } else {
+            await expect(caption).toContainText("not a mapped landslide result");
+            await expect(caption).toContainText("ASF DAAC HyP3 2026");
+            await expect(caption).toContainText("Contains modified Copernicus Sentinel data 2026, processed by ESA");
+          }
+        }
+      }
+      const omittedPreviewImages = page.locator("[data-current-work] img, [data-current-work] svg");
+      expect(await omittedPreviewImages.count()).toBeGreaterThan(0);
+      for (const image of await omittedPreviewImages.all()) await expect(image).toBeHidden();
       await expect(page.locator("[data-portfolio-making]")).toBeVisible();
       await expect(page.locator("[data-portfolio-making] [data-source-id]")).toHaveCount(2);
-      await expect(page.locator("[data-source-id]")).toHaveCount(3);
+      await expect(page.locator("[data-source-id]")).toHaveCount(2);
     } else {
       await expect(page.locator("[data-work-facts]")).toHaveCount(2);
       for (const facts of await page.locator("[data-work-facts]").all()) await expect(facts).toBeVisible();
@@ -1046,9 +1909,61 @@ test("front-door routes respect reduced motion and preserve decisive print evide
       for (const entry of await historyEntries.all()) {
         await expect(entry).toBeVisible();
         await expect(entry.locator("a[href]")).toBeVisible();
+        await expect(entry.locator("article")).toHaveCSS("break-inside", "avoid");
       }
+      const historyHeading = page.locator("#historical-reading > header");
+      await expect(historyHeading).toHaveCSS("break-inside", "avoid");
+      await expect(historyHeading).toHaveCSS("break-after", "avoid");
+      await expect(historyHeading.locator("h2")).toBeVisible();
+      await expect(historyHeading.locator(":scope > p")).toBeVisible();
+      for (const ordinal of await page.locator("[data-work-ordinal]").all()) {
+        const identity = ordinal.locator("..");
+        await expect(identity).toHaveCSS("break-inside", "avoid");
+        await expect(identity).toHaveCSS("break-after", "avoid");
+        await expect(identity.locator("h3")).toBeVisible();
+        await expect(identity.locator("a[href]")).toBeVisible();
+      }
+      await expect(page.locator("#current-projects > article")).toHaveCount(4);
+      for (const projectId of currentProjectIds) {
+        const entry = page.locator("#current-projects > article").filter({
+          has: page.locator(`a[href="/work/${projectId}"]`),
+        });
+        await expect(entry).toBeVisible();
+        await expect(entry).toHaveCSS("break-inside", "avoid");
+        await expect(entry.getByText(/^My contribution:/)).toBeVisible();
+        await expect(entry.locator(`a[href="/work/${projectId}"]`)).toBeVisible();
+        const previewNote = projectId === "after-the-tip"
+          ? entry.getByText(/^Actual mean positive lead contributions/)
+          : entry.locator("figcaption");
+        await expect(previewNote).toBeVisible();
+        await expect(previewNote).toHaveCSS("break-inside", "avoid");
+        expect(await previewNote.evaluate(element => getComputedStyle(element, "::before").content))
+          .toContain("Preview omitted in print.");
+        if (projectId === "wildfire-response") {
+          await expect(previewNote).toContainText("historical synthetic development fixture");
+          await expect(previewNote).toContainText("gameplay disabled");
+          await expect(previewNote).toContainText("AI-assisted terrain art");
+        } else if (projectId === "after-the-tip") {
+          await expect(entry.locator("figure")).toBeHidden();
+          await expect(previewNote).toContainText("30 Purdue games · both sides · regulation only");
+          await expect(previewNote).toContainText("Not an uncertainty band or team-strength comparison");
+          await expect(entry.getByText(/Local exploratory prototype; not submitted/)).toBeVisible();
+        } else if (projectId === "west-hawaii-heat-exposure") {
+          await expect(previewNote).toContainText("historical reef/hardbottom cells filled");
+          await expect(previewNote).toContainText("not coral-damage observations");
+        } else {
+          await expect(previewNote).toContainText("unregistered visual experiment, not a mapped landslide result");
+          await expect(previewNote).toContainText("ASF DAAC HyP3 2026");
+          await expect(previewNote).toContainText("Contains modified Copernicus Sentinel data 2026, processed by ESA");
+        }
+      }
+      const omittedWorkPreviews = page.locator("#current-projects img, #current-projects svg");
+      expect(await omittedWorkPreviews.count()).toBeGreaterThan(0);
+      for (const preview of await omittedWorkPreviews.all()) await expect(preview).toBeHidden();
     }
-    await expect(page.locator('[data-capability-boundary="energy-ee"]')).toBeVisible();
+    if (route === "/work") {
+      await expect(page.locator('[data-capability-boundary="energy-ee"]')).toBeVisible();
+    }
 
     const printLayout = await page.locator("main").evaluate((main, currentRoute) => {
       const visible = [main, ...main.querySelectorAll<HTMLElement>("*")].filter((element) => {
@@ -1083,11 +1998,11 @@ test("front-door routes respect reduced motion and preserve decisive print evide
           : [];
       });
       const closing = currentRoute === "/"
-        ? main.querySelector<HTMLElement>('section[aria-labelledby="closing-title"]')
+        ? main.querySelector<HTMLElement>('section[aria-labelledby="dashboard-title"]')
         : null;
       const closingActions = closing?.querySelector<HTMLElement>("div");
       const primaryAction = currentRoute === "/"
-        ? closing?.querySelector<HTMLElement>('a[href="/resume"]') ?? null
+        ? closing?.querySelector<HTMLElement>('a[href="/dashboard"]') ?? null
         : null;
       const opaqueSurface = (item: HTMLElement) => {
         let current: HTMLElement | null = item;
@@ -1164,7 +2079,7 @@ test("front-door routes respect reduced motion and preserve decisive print evide
         return { r: 255, g: 255, b: 255, a: 1 };
       }
       const decisive = [...main.querySelectorAll<HTMLElement>(
-        "[data-featured-turn] p, [data-featured-turn] dt, [data-featured-turn] dd, [data-featured-turn] a, [data-work-facts] dt, [data-work-facts] dd, [data-work-lane='historical-reading-shelf'] p, [data-work-lane='historical-reading-shelf'] a, [data-capability-boundary] h2, [data-capability-boundary] p",
+        "[data-current-work] [data-contribution], [data-current-work] figcaption, #current-projects p, #current-projects figcaption, #current-projects a, [data-support-boundary], [data-portfolio-making] dt, [data-portfolio-making] dd, [data-work-facts] dt, [data-work-facts] dd, [data-work-lane='historical-reading-shelf'] p, [data-work-lane='historical-reading-shelf'] a, [data-capability-boundary] h2, [data-capability-boundary] p",
       )].filter((element) => {
         const style = getComputedStyle(element);
         return style.display !== "none" && style.visibility !== "hidden" && element.innerText.trim() !== "";
@@ -1294,7 +2209,8 @@ test("BurnLens release-governance story remains readable without JavaScript", as
   expect(response?.status()).toBe(200);
   const article = page.locator('article[data-project-model-id="burnlens"][data-field-atlas="burnlens"]');
   await expect(article).toHaveCount(1);
-  await expect(article.locator('[data-first-screen="burnlens"]#frame')).toBeVisible();
+  await expect(article.locator('[data-first-screen="burnlens"]')).toBeVisible();
+  await expect(article.locator('section#frame [data-claim-atom="problem"]')).toBeVisible();
   await expect(article.getByRole("heading", { level: 1, name: "BurnLens" })).toBeVisible();
 
   const chapters = article.locator('[data-case-chapter-index="burnlens"] a');
@@ -1303,8 +2219,8 @@ test("BurnLens release-governance story remains readable without JavaScript", as
     href: node.getAttribute("href"),
   })))).toEqual([
     { text: "01Frame", href: "#frame" },
-    { text: "02Authority", href: "#authority" },
-    { text: "03Assembly", href: "#assembly" },
+    { text: "02Constraints", href: "#authority" },
+    { text: "03Release", href: "#assembly" },
     { text: "04Boundary", href: "#boundary" },
   ]);
 
@@ -1326,8 +2242,26 @@ test("BurnLens release-governance story remains readable without JavaScript", as
   expect(await article.locator("[data-release-governance]").evaluateAll((nodes) =>
     nodes.map((node) => node.getAttribute("data-release-governance")),
   )).toEqual(["authority", "assembly", "boundary"]);
-  await expect(article.getByRole("heading", { level: 2, name: "Authority map" })).toBeVisible();
-  await expect(article.getByRole("heading", { level: 2, name: "Reviewer path" })).toBeVisible();
+  await expect(article.getByRole("heading", { level: 2, name: "My contribution" })).toBeVisible();
+  await expect(article.getByRole("heading", { level: 2, name: "The public boundary" })).toBeVisible();
+  await expect(article.locator('[data-first-screen] [data-claim-atom="role"]')).toHaveText(
+    renderedEvidence("burnlens", "personalRole"),
+  );
+  const ownerExample = article.locator("[data-burnlens-decision-example]");
+  await expect(ownerExample).toHaveAccessibleName("One decision I owned");
+  await expect(ownerExample.getByRole("heading", { level: 2, name: "One decision I owned" })).toBeVisible();
+  await expect(ownerExample.locator("details, summary")).toHaveCount(0);
+  await expect(ownerExample).toContainText("For BurnLens, I bounded the release to one repository and directed it to Codex Sites.");
+  await expect(ownerExample).toContainText("Codex assembled a canonical reviewer path");
+  await expect(ownerExample).toContainText("not autonomous authorship");
+  expect(await article.locator('[data-claim-atom], [data-burnlens-decision-example]').evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute("data-claim-atom") || "owner-example"),
+  )).toEqual(["audience", "role", "owner-example", "problem", "decision", "constraint", "outcome", "limitation", "lesson"]);
+  expect(await ownerExample.locator("p").evaluateAll((nodes) =>
+    nodes.every((node) => node.checkVisibility({ visibilityProperty: true })),
+  ), "The owner decision and qualifier are permanently readable without opening a control").toBe(true);
+  await expect(article.getByRole("heading", { level: 2, name: "One canonical reviewer entry point" })).toBeVisible();
+  await expect(article.getByRole("heading", { level: 2, name: "Release record" })).toBeVisible();
   await expect(article.getByRole("heading", { level: 2, name: "Use boundary" })).toBeVisible();
 
   const sources = article.locator('[aria-label="BurnLens public evidence"] [data-source-id]');
@@ -1345,6 +2279,9 @@ test("BurnLens release-governance story remains readable without JavaScript", as
   await page.emulateMedia({ media: "print", reducedMotion: "no-preference" });
   await expect(page.locator(".site-header")).toBeHidden();
   await expect(page.locator(".site-footer")).toBeHidden();
+  expect(await ownerExample.locator("p").evaluateAll((nodes) =>
+    nodes.every((node) => node.checkVisibility({ visibilityProperty: true })),
+  ), "The permanent owner decision and its boundary remain visible in print").toBe(true);
   const printEvidence = await article.locator("[data-claim-atom], [data-source-id]").evaluateAll((nodes) =>
     nodes.map((node) => ({
       text: node.textContent?.replace(/\s+/g, " ").trim().slice(0, 80),
@@ -1722,7 +2659,7 @@ test("Runbook dark surfaces expose a strong keyboard focus indicator", async ({ 
     });
     expect(focus.style, viewport.selector).not.toBe("none");
     expect(focus.width, viewport.selector).toBeGreaterThanOrEqual(3);
-    expect(focus.color, viewport.selector).toBe("rgb(199, 205, 191)");
+    expect(focus.color, viewport.selector).toBe("rgb(167, 224, 241)");
     expect(focus.withinViewport, viewport.selector).toBe(true);
   }
 });
@@ -2190,6 +3127,7 @@ test("Quest Craft native agency score changes state without generating or mutati
   });
   await page.goto("/work/quest-craft", { waitUntil: "networkidle" });
   runtimeRequests.length = 0;
+  await expectQuestTraceGroupSemantics(page);
 
   const baseline = await page.evaluate(() => ({
     text: document.querySelector("main")?.textContent?.replace(/\s+/g, " ").trim(),
@@ -2283,6 +3221,7 @@ test("Quest Craft remains complete and operable without JavaScript", async ({ br
   const page = await context.newPage();
   const response = await page.goto("/work/quest-craft", { waitUntil: "domcontentloaded" });
   expect(response?.status()).toBe(200);
+  await expectQuestTraceGroupSemantics(page);
 
   const movements = page.locator('article[data-supporting-route="quest-craft"] > [data-supporting-movement]');
   await expect(movements).toHaveCount(3);
@@ -3526,6 +4465,22 @@ test("résumé projects canonical hierarchy, provenance, no-JavaScript, and tech
   await expect(selectedLane.locator('[data-project-model-id="openclaw-showcase"]')).toHaveCount(0);
   await expect(selectedLane.locator('[data-resume-history]')).toHaveCount(0);
   await expect(article.locator('[data-project-model-id="openclaw-showcase"]')).toHaveCount(0);
+  for (const [projectId, linkKind, projectTitle] of [
+    ["burnlens", "case study", "BurnLens"],
+    ["runbook-sentinel", "case study", "Runbook Sentinel"],
+    ["quest-craft", "field note", "Quest Craft"],
+  ] as const) {
+    const project = selectedLane.locator(`[data-resume-project="${projectId}"]`);
+    await expect(
+      project.getByRole("link", { name: `Read the ${linkKind} for ${projectTitle}`, exact: true }),
+    ).toHaveAttribute("href", getProject(projectId).route);
+    const evidenceLink = project.getByRole("link", {
+      name: `Inspect pinned evidence for ${projectTitle} (opens in a new tab)`,
+      exact: true,
+    });
+    await expect(evidenceLink).toHaveAttribute("target", "_blank");
+    await expect(evidenceLink).toHaveAttribute("rel", /noopener/);
+  }
 
   expect(surface.history.map(({ id, dateTime, sourceId }) => [id, dateTime, sourceId])).toEqual(resumeHistory);
   for (const historical of surface.history) {
@@ -3602,6 +4557,21 @@ test("résumé projects canonical hierarchy, provenance, no-JavaScript, and tech
     const link = noScriptProfiles.getByRole("link", { name: new RegExp(label) });
     await expect(link).toHaveAttribute("href", href);
     await expect(link).toContainText(visibleHref);
+    await expect(link).toHaveAccessibleName(new RegExp(`^${label}.*\\(opens in a new tab\\)$`, "i"));
+  }
+  for (const [projectId, linkKind, projectTitle] of [
+    ["burnlens", "case study", "BurnLens"],
+    ["runbook-sentinel", "case study", "Runbook Sentinel"],
+    ["quest-craft", "field note", "Quest Craft"],
+  ] as const) {
+    const project = noScriptArticle.locator(`[data-resume-project="${projectId}"]`);
+    await expect(
+      project.getByRole("link", { name: `Read the ${linkKind} for ${projectTitle}`, exact: true }),
+    ).toHaveAttribute("href", getProject(projectId).route);
+    await expect(project.getByRole("link", {
+      name: `Inspect pinned evidence for ${projectTitle} (opens in a new tab)`,
+      exact: true,
+    })).toHaveAttribute("target", "_blank");
   }
   await noScript.close();
 });
@@ -3829,6 +4799,7 @@ test("résumé metadata, professional profile URLs, and isolated performance rem
     const link = profileNavigation.getByRole("link", { name: new RegExp(label) });
     await expect(link).toHaveAttribute("href", href);
     await expect(link).toContainText(visibleHref);
+    await expect(link).toHaveAccessibleName(new RegExp(`^${label}.*\\(opens in a new tab\\)$`, "i"));
   }
   const social = await request.get("/opengraph-image");
   expect(social.status()).toBe(200);
@@ -3883,20 +4854,15 @@ test("historical coursework and résumé lanes retain their exact source-bound s
     await page.locator("[data-project-model-id]").evaluateAll((nodes) =>
       nodes.map((node) => node.getAttribute("data-project-model-id")),
     ),
-  ).toEqual(["burnlens", "runbook-sentinel", "quest-craft", "openclaw-showcase"]);
-  await expect(page.getByRole("link", { name: "Read Quest Craft field note" })).toHaveAttribute(
-    "href",
-    "/work/quest-craft",
-  );
+  ).toEqual(["burnlens", "runbook-sentinel"]);
+  await expect(page.locator("[data-carousel-slide]")).toHaveCount(6);
   await expect(page.locator("[data-historical-coursework]")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /historical reading shelf/i })).toHaveAttribute(
-    "href",
-    "/work#historical-reading",
-  );
+  await expect(page.getByRole("link", { name: "Browse all work", exact: true })).toHaveAttribute("href", "/work");
   await expect(page.getByText("Hierarchical clustering exploration")).toHaveCount(0);
   await expect(page.getByText("DER Distributed Control Planner")).toHaveCount(0);
 
   await page.goto("/work", { waitUntil: "networkidle" });
+  await expect(page.getByRole("link", { name: "Historical reading", exact: true })).toHaveAttribute("href", "#historical-reading");
   expect(
     await page.locator("[data-project-model-id]").evaluateAll((nodes) =>
       nodes.map((node) => node.getAttribute("data-project-model-id")),
@@ -4026,6 +4992,9 @@ test("selected learning distinguishes linked credentials from unlinked study", a
   await expect(learning.locator("a[href]")).toHaveCount(4);
   await expect(learning.getByRole("link", { name: /Imperial College London.*Linear Algebra/ })).toBeVisible();
   await expect(learning.getByRole("link", { name: /Kaggle.*Intermediate Machine Learning/ })).toBeVisible();
+  for (const link of await learning.getByRole("link").all()) {
+    await expect(link).toHaveAccessibleName(/\(opens in a new tab\)$/i);
+  }
   await expect(learning.getByText(/Mimo|Python Development/i)).toHaveCount(0);
   await expect(learning.locator('a[href*="virtualbadge"]')).toHaveCount(0);
 });
@@ -4040,6 +5009,49 @@ test("metadata and discovery surfaces identify the personal site", async ({ page
     expectedIndexable ? /index, follow/i : /noindex, nofollow/i,
   );
   await expect(page.locator('link[rel="icon"]')).toHaveCount(1);
+
+  await page.goto("/work");
+  const workTitle = "Selected work | Drew Baker";
+  const workDescription =
+      "Software systems, product decisions, current projects and a historical reading shelf.";
+  await expect(page).toHaveTitle(workTitle);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `${expectedSiteOrigin}/work`,
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", workTitle);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
+    "content",
+    workDescription,
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    "content",
+    `${expectedSiteOrigin}/work`,
+  );
+  await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
+    "content",
+    "Drew Baker Portfolio",
+  );
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "website");
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    `${expectedSiteOrigin}/opengraph-image`,
+  );
+  await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
+  await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute("content", "630");
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute("content", workTitle);
+  await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute(
+    "content",
+    workDescription,
+  );
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+    "content",
+    `${expectedSiteOrigin}/opengraph-image`,
+  );
 
   await page.goto("/work/burnlens");
   await expect(page).toHaveTitle("BurnLens — Release governance and evidence system | Drew Baker");
@@ -4099,7 +5111,7 @@ test("shared chrome keeps one opaque, readable, high-contrast system across ever
       });
 
       expect(chrome.backdrop, `${route} at ${width}px backdrop`).toBe("none");
-      expect(chrome.background, `${route} at ${width}px header surface`).toBe("rgb(233, 226, 216)");
+      expect(chrome.background, `${route} at ${width}px header surface`).toBe("rgb(18, 35, 47)");
       expect(chrome.headerHeight, `${route} at ${width}px header height`).toBeGreaterThanOrEqual(80);
       expect(chrome.headerHeight, `${route} at ${width}px header height`).toBeLessThanOrEqual(81);
       expect(chrome.scrollPadding, `${route} at ${width}px scroll padding`).toBe(80);
@@ -4127,7 +5139,7 @@ test("shared chrome keeps one opaque, readable, high-contrast system across ever
           hit: hit === link || Boolean(hit && link.contains(hit)),
         };
       });
-      expect(focus.color).toBe("rgb(199, 205, 191)");
+      expect(focus.color).toBe("rgb(167, 224, 241)");
       expect(focus.width).toBeGreaterThanOrEqual(3);
       expect(focus.offset).toBeGreaterThanOrEqual(4);
       expect(focus.hit).toBe(true);
@@ -4162,6 +5174,18 @@ test("root Open Graph endpoint is an exact meaningful 1200 by 630 PNG", async ({
   expect(bytes.toString("ascii", 12, 16)).toBe("IHDR");
   expect(bytes.readUInt32BE(16)).toBe(1200);
   expect(bytes.readUInt32BE(20)).toBe(630);
+  const corner = await page.evaluate(async () => {
+    const image = new Image();
+    image.src = "/opengraph-image";
+    await image.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext("2d")!;
+    context.drawImage(image, 0, 0);
+    return [...context.getImageData(0, 0, 1, 1).data];
+  });
+  expect(corner, "reviewed opaque polar-night root social-image surface").toEqual([18, 35, 47, 255]);
 });
 
 test("convenience and legacy routes are permanent and contact intake is disabled", async ({ request }) => {
@@ -4390,10 +5414,22 @@ test("Runbook Sentinel stays inside conservative local lab budgets", async ({ br
   });
 
   await page.goto("/work/runbook-sentinel", { waitUntil: "networkidle" });
-  await page.locator('[data-governed-figure="runbook-dashboard"] img').scrollIntoViewIfNeeded();
+  const dashboard = page.locator('[data-governed-figure="runbook-dashboard"] img');
+  await expect(dashboard).toHaveAttribute("loading", "eager");
+  await dashboard.evaluate(async (element) => {
+    if (!(element instanceof HTMLImageElement)) throw new Error("Dashboard image is missing.");
+    await element.decode();
+    if (!element.complete || element.naturalWidth === 0) throw new Error("Dashboard image did not load.");
+  });
+  await dashboard.scrollIntoViewIfNeeded();
   await page.waitForTimeout(500);
   const measured = await page.evaluate(() => {
     const resources = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
+    // Eager SSR images can be fetched by a preload link. Bind measurement to
+    // actual image URLs as well as img initiators so those bytes cannot vanish.
+    const imageSources = new Set(Array.from(document.images, (image) => image.currentSrc));
+    const isImage = (resource: PerformanceResourceTiming) =>
+      resource.initiatorType === "img" || imageSources.has(resource.name);
     const bytes = (predicate: (resource: PerformanceResourceTiming) => boolean) =>
       resources.filter(predicate).reduce(
         (total, resource) => total + (resource.transferSize || resource.encodedBodySize),
@@ -4404,7 +5440,8 @@ test("Runbook Sentinel stays inside conservative local lab budgets", async ({ br
         __portfolioMetrics: { cls: number; lcp: number; tbt: number };
       }).__portfolioMetrics,
       staticBytes: bytes((resource) => new URL(resource.name).pathname.includes("/_next/static/")),
-      imageBytes: bytes((resource) => resource.initiatorType === "img"),
+      imageBytes: bytes(isImage),
+      imageInitiators: resources.filter(isImage).map((resource) => resource.initiatorType),
       measuredResources: resources.filter(
         (resource) => (resource.transferSize || resource.encodedBodySize) > 0,
       ).length,
@@ -4484,4 +5521,86 @@ test("Quest Craft stays inside its isolated local supporting-route budget", asyn
   expect(measured.hosts.every((host) => host === `127.0.0.1:${testPort}`)).toBe(true);
   console.log(`QUEST_LOCAL_LAB_METRICS ${JSON.stringify(measured)}`);
   await context.close();
+});
+
+test("NFA-047 existing evidence receives truthful work and resume labels", async ({ browser }, testInfo) => {
+  test.setTimeout(60_000);
+  for (const javaScriptEnabled of [true, false]) {
+    for (const width of [390, 1440]) {
+      const context = await browser.newContext({ viewport: { width, height: 1000 }, javaScriptEnabled });
+      try {
+        const page = await context.newPage();
+        await page.goto("/work", { waitUntil: "networkidle" });
+        const work = page.locator('[data-work-entry][data-project-model-id="burnlens"]');
+        await expect(work.locator('[data-field-key="personalRole"] dt')).toHaveText("Role split");
+        await expect(work.locator('[data-field-key="personalRole"] dd')).toHaveText(
+          toReaderFirst(getProject("burnlens").evidence.personalRole.summary),
+        );
+        await expect(work.locator("[data-method-list]")).toHaveCount(0);
+        await expect(page.getByText(
+          "Each row states the problem, role, supported decision or result, and limits before it asks you to open the full evidence narrative.",
+        )).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        if (javaScriptEnabled) await work.screenshot({ path: testInfo.outputPath(`work-labels-${width}.png`) });
+
+        await page.goto("/resume", { waitUntil: "networkidle" });
+        const resume = page.locator('[data-resume-project="burnlens"]');
+        for (const [field, label] of [
+          ["personalRole", "Role split"],
+          ["implementation", "Release constraint"],
+          ["testStrategy", "Reliability lesson"],
+        ] as const) {
+          const row = resume.locator("dl > div").filter({ has: page.locator(`[data-field-key="${field}"]`) });
+          await expect(row.locator("dt")).toHaveText(label);
+          await expect(row.locator("dd")).toHaveText(toReaderFirst(getProject("burnlens").evidence[field].summary));
+        }
+        await expect(resume.getByText("What I built", { exact: true })).toHaveCount(0);
+        await expect(resume.getByText("How I tested it", { exact: true })).toHaveCount(0);
+        await expect(page.locator('[data-resume-project="runbook-sentinel"]').getByText("How I tested it", { exact: true })).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        if (javaScriptEnabled) await resume.screenshot({ path: testInfo.outputPath(`resume-labels-${width}.png`) });
+        await page.emulateMedia({ media: "print" });
+        await expect(resume.getByText("Release constraint", { exact: true })).toBeVisible();
+        await expect(resume.getByText("Reliability lesson", { exact: true })).toBeVisible();
+      } finally {
+        await context.close();
+      }
+    }
+  }
+});
+
+test("NFA-047 Runbook next threshold stays historical, sourced, and readable", async ({ browser }, testInfo) => {
+  test.setTimeout(60_000);
+  const nextStep = getProject("runbook-sentinel").evidence.nextStep;
+  for (const javaScriptEnabled of [true, false]) {
+    for (const width of [320, 390, 1440]) {
+      const context = await browser.newContext({ viewport: { width, height: 1000 }, javaScriptEnabled });
+      try {
+        const page = await context.newPage();
+        await page.goto("/work/runbook-sentinel", { waitUntil: "networkidle" });
+        const threshold = page.locator('[data-next-threshold="runbook-sentinel"]');
+        await expect(threshold).toHaveCount(1);
+        await expect(threshold.getByRole("heading", { name: "Next threshold at this release", level: 3 })).toBeVisible();
+        await expect(threshold.getByText(nextStep.summary, { exact: true })).toBeVisible();
+        await expect(threshold).toContainText("This is the v0.0.20 record, not a current roadmap or a production-readiness claim.");
+        await expect(threshold.locator("a")).toHaveCount(2);
+        expect(await threshold.locator("a").evaluateAll((links) => links.map((link) => link.getAttribute("href"))))
+          .toEqual(nextStep.sourceIds.map((sourceId) => getPublicSourceHref(sourceId)));
+        expect(await threshold.evaluate((element) => {
+          const box = element.getBoundingClientRect();
+          return box.left >= 0 && box.right <= innerWidth && element.scrollWidth <= element.clientWidth + 1;
+        })).toBe(true);
+        if (javaScriptEnabled) {
+          const audit = await new AxeBuilder({ page }).include('[data-next-threshold="runbook-sentinel"]').analyze();
+          expect(audit.violations).toEqual([]);
+          await threshold.screenshot({ path: testInfo.outputPath(`runbook-threshold-${width}.png`) });
+        }
+        await page.emulateMedia({ media: "print" });
+        await expect(threshold.getByText(nextStep.summary, { exact: true })).toBeVisible();
+        for (const link of await threshold.locator("a").all()) await expect(link).toBeVisible();
+      } finally {
+        await context.close();
+      }
+    }
+  }
 });

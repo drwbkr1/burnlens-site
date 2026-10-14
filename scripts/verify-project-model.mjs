@@ -23,7 +23,7 @@ import {
 } from "../content/project-model.ts";
 
 const projectRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const expectedModelSha256 = "8e2821882dc7b7801d716935baeeedbf014c38d75fedb2bfa577d0ac77e9f918";
+const expectedModelSha256 = "ba250b9487ade28253f7b8cc7b1d9498e9c41c2a854fb4a4b59d2abac9eaca8c";
 
 const evidenceFields = [
   "problem",
@@ -192,7 +192,7 @@ const expectedFailureTargets = {
     projectRoute: [],
   },
   "runbook-sentinel": {
-    homepage: ["RS.F03"],
+    homepage: [],
     workIndex: [],
     resume: [],
     projectRoute: ["RS.F03", "RS.F02", "RS.F01"],

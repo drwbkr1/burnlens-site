@@ -1,0 +1,62 @@
+.portfolio-workbench { max-width: calc(76rem + 64px); margin-inline: auto; padding: 24px 32px 96px; color: var(--text); }
+@media (max-width: 650px) { .portfolio-workbench { padding: 18px 16px 56px; } }
+.portfolio-workbench .workbench-heading { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.portfolio-workbench .workbench-return { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem 2rem; margin-bottom: 2rem; font-size: .875rem; }
+.portfolio-workbench .workbench-return a { display: inline-flex; min-height: 44px; align-items: center; font-weight: 650; color: var(--accent); text-decoration: underline; text-underline-offset: .3em; }
+.portfolio-workbench .workbench-return span { color: var(--secondary); }
+.portfolio-workbench .workbench-definition { max-width: 56rem; margin-block: 0 1.4rem; color: var(--secondary); line-height: 1.75; }
+.portfolio-workbench .workbench-records { margin-top: 2rem; }
+.portfolio-workbench .workbench-record { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem 2rem; padding-block: 1.5rem; border-top: 1px solid var(--border-strong); }
+.portfolio-workbench .workbench-record h2 { margin: 0; font-size: clamp(1.35rem, 2.4vw, 2rem); font-weight: 550; letter-spacing: -.025em; line-height: 1.3; }
+.portfolio-workbench .workbench-record h2 a { display: inline-block; min-height: 44px; color: var(--text); text-underline-offset: .25em; }
+.portfolio-workbench .workbench-record h2 a:hover { color: var(--accent); }
+.portfolio-workbench .workbench-record p { margin: .45rem 0 0; color: var(--secondary); font-size: .9375rem; line-height: 1.7; max-width: 60rem; }
+.portfolio-workbench .workbench-count { display: flex; flex-direction: column; align-items: flex-end; justify-content: start; }
+.portfolio-workbench .workbench-count strong { color: var(--accent); font-size: 1.75rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.portfolio-workbench .workbench-count strong span { color: var(--secondary); font-size: 1rem; font-weight: 400; }
+.portfolio-workbench .workbench-count > span { color: var(--secondary); font-size: .8125rem; }
+.portfolio-workbench .workbench-record details { grid-column: 1 / -1; }
+.portfolio-workbench .workbench-record summary { min-height: 44px; padding-block: .6rem; color: var(--accent); font-size: .875rem; cursor: pointer; }
+.portfolio-workbench .workbench-record summary:hover { text-decoration: underline; text-underline-offset: .25em; }
+.portfolio-workbench .workbench-freshness { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--secondary); font-size: .8125rem; line-height: 1.7; }
+.portfolio-workbench :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 600px) { .portfolio-workbench .workbench-return { display: grid; } .portfolio-workbench .workbench-record { grid-template-columns: minmax(0, 1fr); gap: .6rem; } .portfolio-workbench .workbench-count { align-items: flex-start; } }
+
+/* Authored menu only. Existing SDK filter/menu classes retain their visual tokens. */
+.portfolio-workbench .portfolio-workarea-host {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+}
+.portfolio-workbench .portfolio-workarea-host > .filter-trigger[data-state="open"] {
+  background: var(--interaction-active);
+}
+.portfolio-workbench .portfolio-workarea-menu {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  width: 188px;
+  min-width: 0;
+  max-width: calc(100vw - 24px);
+  max-height: 320px;
+  overscroll-behavior: contain;
+}
+/* SDK portal lived outside the authored :focus-visible rule. Match that menu rule here. */
+.portfolio-workbench .portfolio-workarea-menu:focus,
+.portfolio-workbench .portfolio-workarea-menu .menu-item:focus-visible {
+  outline: none;
+}
+/* Keep the same narrow-menu width, while coarse devices use the unchanged native shell. */
+@media (max-width: 650px) {
+  .portfolio-workbench .portfolio-workarea-menu {
+    width: min(320px, calc(100vw - 32px));
+  }
+}
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+  .portfolio-workbench .portfolio-workarea-host.has-native-picker { display: none; }
+}
+@media print {
+  .portfolio-workbench { max-width: 76rem; padding: 0; }
+  .portfolio-workbench .portfolio-workarea-menu { display: none !important; }
+}

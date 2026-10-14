@@ -48,6 +48,15 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        // The pinned independent dashboard runtime uses a bundled data: module.
+        // Keep this exception on its exact HTML destination, not portfolio pages.
+        source: "/dashboard/explore/index.html",
+        headers: [
+          { key: "Content-Security-Policy", value: "default-src 'none'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' data: 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
     ];
   },
 };

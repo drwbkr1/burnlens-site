@@ -1,0 +1,36 @@
+{
+  "schema_version": "portfolio-media-provenance-v1",
+  "project": "Nepal Satellite Atlas",
+  "status": "local case-study candidate; publication not authorized",
+  "source_repository": "https://github.com/drwbkr1/nepal-2026-before-after-map",
+  "source_commit": "89aa2ca1eb11c47b2b4f9b435bf8c35868123e2d",
+  "credit": "ASF DAAC HyP3 2026. Contains modified Copernicus Sentinel data 2026, processed by ESA.",
+  "rights_scope": "Existing credited, explicitly unregistered VV imagery preview; official Copernicus source/modification notice and product-specific acknowledgement retained. No raw archives, DEM, basemap or optical pilot.",
+  "assets": [
+    {
+      "file": "dated-radar-atlas.png",
+      "source_path": "docs/assets/gis-demonstration-cartography-001.png",
+      "source_git_blob": "469016af2f1959c1cdf540a8d8be18ce3cc5ce3d",
+      "bytes": 820469,
+      "sha256": "5787827db942b773baf25e4d38a1de670e31880165eb4ad3583ab5d262e029e3",
+      "width": 1560,
+      "height": 1020,
+      "copy_unchanged": true,
+      "scope": "Actual public ArcGIS comparison of 16 and 28 August 2026 Sentinel-1D VV gamma0, same -30 to 0 dB range, EPSG:32645. Original dates, legend, true-north arrows, scale, exclusions, qualifications and credits remain intact."
+    }
+  ],
+  "processing_dois": ["https://doi.org/10.5281/zenodo.3962581", "https://doi.org/10.5281/zenodo.3962936"],
+  "source_guidance": ["https://hyp3-docs.asf.alaska.edu/usage_guidelines/", "https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice"],
+  "coverage": {
+    "basis": "Common-valid VV/VH fraction of full search/review AOI; displayed imagery is VV alone",
+    "source_area_percent": 54.6721,
+    "upper_corridor_percent": 75.7928
+  },
+  "limitations": [
+    "Unregistered visual GIS experiment; original full-area screening remains deferred.",
+    "Blank areas are exclusions, not proof of no change.",
+    "No hazard map, measured physical change, landslide damage, event attribution, field validation or agency endorsement.",
+    "Same-machine GIS package mechanics are not clean-machine or cross-version portability.",
+    "Newer integrated handoff and optical pilot remain local and are not included."
+  ]
+}

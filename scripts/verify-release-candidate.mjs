@@ -13,7 +13,7 @@ const manifest = JSON.parse(
 const snapshotRoot = await mkdtemp(join(tmpdir(), "nfa-release-candidate-"));
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 let primaryError;
-const EXPECTED_BROWSER_TESTS = 65;
+const EXPECTED_BROWSER_TESTS = 112;
 
 async function availablePort() {
   return new Promise((resolvePort, rejectPort) => {
