@@ -575,8 +575,10 @@ const primitiveDefinitionPaths = new Set([
   join(projectRoot, "components", "editorial", "EvidenceLink.tsx"),
   join(projectRoot, "components", "editorial", "ProjectFactLedger.tsx"),
 ]);
+// NFA109 keeps canonical model consumption on the work index, résumé and
+// designed cases. The biography-first homepage is a separate preview selection;
+// U04 binds its supported copy/assets without changing the registry hierarchy.
 const allowedModelConsumerPaths = new Set([
-  "app/page.tsx",
   "app/resume/page.tsx",
   "app/work/burnlens/page.tsx",
   "app/work/openclaw-showcase/page.tsx",
@@ -664,5 +666,5 @@ console.log(JSON.stringify({
   glossaryCount: plainLanguageGlossary.length,
   legacyExceptionCount: legacySurfaceExceptions.length,
   modelSha256,
-  runtimeBoundary: "canonical-model-consumed-by-front-door-and-designed-routes; editorial-primitives-mounted-on-burnlens-runbook-and-resume",
+  runtimeBoundary: "canonical-model-consumed-by-work-index-resume-and-designed-routes; separate-homepage-preview-validated-by-u04; editorial-primitives-mounted-on-burnlens-runbook-and-resume",
 }));

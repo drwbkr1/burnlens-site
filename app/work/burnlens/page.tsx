@@ -70,13 +70,16 @@ export default function BurnLensCaseStudy() {
             <div className={styles.heroTitle}>
               <p className={styles.eyebrow}>BurnLens</p>
               <h1>BurnLens</h1>
+              <p className={styles.lede} data-burnlens-purpose>
+                Making a research release readable.
+              </p>
               <p className={styles.audience} data-claim-atom="audience">
                 {claimAtoms.audience}
               </p>
             </div>
 
             <div className={styles.heroContribution} data-burnlens-contribution>
-              <h2>My contribution</h2>
+              <h2>I set the public release direction.</h2>
               <p data-claim-atom="role">{claimAtoms.role}</p>
             </div>
 

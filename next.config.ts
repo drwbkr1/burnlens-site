@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { fileURLToPath } from "node:url";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -33,6 +34,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Keep ancestor lockfiles and private candidate folders outside the build root.
+  turbopack: {
+    root: fileURLToPath(new URL(".", import.meta.url)),
+  },
   async redirects() {
     return [
       { source: "/burnlens", destination: "/work/burnlens", permanent: true },

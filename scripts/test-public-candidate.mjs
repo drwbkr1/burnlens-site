@@ -25,6 +25,23 @@ const generatedAudioBytes = new Map(await Promise.all(generatedAudioPaths.map(as
 ])));
 const datedRadarAtlasPath = "public/media/projects/nepal-satellite-atlas/dated-radar-atlas.png";
 const datedRadarAtlasBytes = await readFile(resolve(sourceRoot, datedRadarAtlasPath));
+const homepageWebpPaths = [
+  "public/media/projects/homepage-reveal/after-the-tip-expanded-mobile.webp",
+  "public/media/projects/homepage-reveal/after-the-tip-expanded.webp",
+  "public/media/projects/homepage-reveal/after-the-tip-thumbnail.webp",
+  "public/media/projects/homepage-reveal/nepal-expanded-mobile.webp",
+  "public/media/projects/homepage-reveal/nepal-expanded.webp",
+  "public/media/projects/homepage-reveal/nepal-thumbnail.webp",
+  "public/media/projects/homepage-reveal/runbook-interface-expanded-mobile-v2.webp",
+  "public/media/projects/homepage-reveal/runbook-interface-expanded-v2.webp",
+  "public/media/projects/homepage-reveal/runbook-interface-thumbnail-v2.webp",
+  "public/media/projects/homepage-reveal/west-hawaii-expanded-mobile.webp",
+  "public/media/projects/homepage-reveal/west-hawaii-expanded.webp",
+  "public/media/projects/homepage-reveal/west-hawaii-thumbnail.webp",
+];
+const homepageWebpBytes = new Map(await Promise.all(homepageWebpPaths.map(async path => [
+  path, await readFile(resolve(sourceRoot, path)),
+])));
 const temporaryBase = await realpath(tmpdir());
 const fixturePrefix = "portfolio-scope-fixture-";
 function createFixtureEnvironment(inherited) {
@@ -757,5 +774,123 @@ test("ordinary privacy scanning rejects giant and allowed-email suffix addresses
     // allowlist. Preserve that refusal; do not expand it for this fixture.
     await write("public/media/example.txt", `${owner}${suffix}`);
     failed(verify(), /Unexpected email address[^\n]*206760088/);
+  });
+});
+
+async function withHomepageWebpFixture(run, {
+  path = homepageWebpPaths[0], bytes = homepageWebpBytes.get(homepageWebpPaths[0]),
+} = {}) {
+  await withFixture(async fixture => {
+    fixture.manifest.files.push(path);
+    await fixture.write(path, bytes);
+    await fixture.write(manifestPath, JSON.stringify(fixture.manifest) + "\n");
+    await run(fixture);
+  });
+}
+
+function fixtureWebpChunk(type, payload, padding = 0) {
+  const chunk = Buffer.alloc(8 + payload.length + payload.length % 2);
+  chunk.write(type, 0, "latin1");
+  chunk.writeUInt32LE(payload.length, 4);
+  payload.copy(chunk, 8);
+  if (payload.length % 2) chunk[chunk.length - 1] = padding;
+  return chunk;
+}
+
+function fixtureWebpRiff(...chunks) {
+  const bytes = Buffer.concat([Buffer.from("RIFF\0\0\0\0WEBP", "latin1"), ...chunks]);
+  bytes.writeUInt32LE(bytes.length - 8, 4);
+  return bytes;
+}
+
+function resizeWebpRiff(bytes) {
+  bytes.writeUInt32LE(bytes.length - 8, 4);
+  return bytes;
+}
+
+test("all twelve exact reviewed WebP screenshots pass together without metadata exemptions", async () => {
+  await withFixture(async ({ manifest, write, verify }) => {
+    for (const [path, bytes] of homepageWebpBytes) {
+      manifest.files.push(path);
+      await write(path, bytes);
+    }
+    await write(manifestPath, JSON.stringify(manifest) + "\n");
+    assert.equal(passed(verify()).files, 16);
+  });
+});
+
+for (const path of homepageWebpPaths) {
+  test(`each reviewed WebP rejects a changed VP8 payload: ${path.split("/").at(-1)}`, async () => {
+    const bytes = Buffer.from(homepageWebpBytes.get(path));
+    bytes[30] ^= 1;
+    await withHomepageWebpFixture(async ({ verify }) => {
+      failed(verify(), /Reviewed WebP source identity mismatch/);
+    }, { path, bytes });
+  });
+}
+
+for (const path of [
+  "public/media/other.webp",
+  "public/media/projects/homepage-reveal/renamed-screenshot.webp",
+  "public/media/projects/homepage-reveal/after-the-tip-expanded-mobile.WEBP",
+]) {
+  test(`an otherwise allowlisted WebP cannot borrow screenshot approval: ${path}`, async () => {
+    await withHomepageWebpFixture(async ({ verify }) => {
+      failed(verify(), /Unreviewed WebP path/);
+    }, { path });
+  });
+}
+
+const malformedWebpCases = [
+  ["truncated container", bytes => bytes.subarray(0, 11), /signature or truncated header/],
+  ["RIFF signature", bytes => { bytes.write("RIFX", 0); return bytes; }, /signature or truncated header/],
+  ["high-bit RIFF alias", bytes => { bytes[0] |= 0x80; return bytes; }, /signature or truncated header/],
+  ["WEBP signature", bytes => { bytes.write("WAVE", 8); return bytes; }, /signature or truncated header/],
+  ["RIFF length", bytes => { bytes.writeUInt32LE(bytes.length - 7, 4); return bytes; }, /RIFF length mismatch/],
+  ["missing image chunk", () => fixtureWebpRiff(), /exactly one complete VP8 chunk/],
+  ["truncated chunk header", bytes => resizeWebpRiff(Buffer.concat([bytes, Buffer.from("tail")])), /Truncated WebP chunk header/],
+  ["truncated chunk payload", bytes => { bytes.writeUInt32LE(0xffffffff, 16); return bytes; }, /Truncated WebP chunk payload/],
+  ["short VP8 header", () => fixtureWebpRiff(fixtureWebpChunk("VP8 ", Buffer.alloc(9))), /exactly one complete VP8 chunk/],
+  ["duplicate VP8 chunks", bytes => fixtureWebpRiff(bytes.subarray(12), bytes.subarray(12)), /exactly one complete VP8 chunk/],
+  ["inter-frame profile", bytes => { bytes[20] |= 1; return bytes; }, /VP8 key-frame profile/],
+  ["unsupported VP8 version", bytes => { bytes[20] = (bytes[20] & ~14) | 14; return bytes; }, /VP8 key-frame profile/],
+  ["hidden frame", bytes => { bytes[20] &= ~16; return bytes; }, /VP8 key-frame profile/],
+  ["key-frame start code", bytes => { bytes[23] ^= 1; return bytes; }, /VP8 key-frame profile/],
+  ["empty first partition", bytes => { bytes.writeUIntLE(16, 20, 3); return bytes; }, /VP8 key-frame profile/],
+  ["overflowing first partition", bytes => { bytes.writeUIntLE(0xfffff0, 20, 3); return bytes; }, /VP8 key-frame profile/],
+  ["width", bytes => { bytes.writeUInt16LE(639, 26); return bytes; }, /dimensions or scaling mismatch/],
+  ["height", bytes => { bytes.writeUInt16LE(639, 28); return bytes; }, /dimensions or scaling mismatch/],
+  ["scaled dimension", bytes => { bytes.writeUInt16LE(640 | 0x4000, 26); return bytes; }, /dimensions or scaling mismatch/],
+  ["nonzero chunk padding", bytes => {
+    const payload = Buffer.concat([bytes.subarray(20), Buffer.from([0])]);
+    return fixtureWebpRiff(fixtureWebpChunk("VP8 ", payload, 1));
+  }, /Invalid WebP chunk padding/],
+  ["truncated bytes with corrected RIFF length", bytes => resizeWebpRiff(bytes.subarray(0, bytes.length - 1)), /Truncated WebP chunk payload/],
+];
+for (const [name, mutate, message] of malformedWebpCases) {
+  test(`reviewed WebP grammar validation precedes immutable identity: ${name}`, async () => {
+    await withHomepageWebpFixture(async ({ verify }) => {
+      failed(verify(), message);
+    }, { bytes: mutate(Buffer.from(homepageWebpBytes.get(homepageWebpPaths[0]))) });
+  });
+}
+
+for (const type of ["EXIF", "XMP ", "ICCP", "VP8X", "VP8L", "ALPH", "ANIM", "ANMF", "JUNK"]) {
+  test(`reviewed WebP still rejects appended ${type.trim()} metadata or alternate layout`, async () => {
+    const bytes = homepageWebpBytes.get(homepageWebpPaths[0]);
+    await withHomepageWebpFixture(async ({ verify }) => {
+      failed(verify(), /WebP metadata or unsupported chunk/);
+    }, { bytes: fixtureWebpRiff(bytes.subarray(12), fixtureWebpChunk(type, Buffer.from("unapproved"))) });
+  });
+}
+
+test("reviewed WebP identity cannot be authorized by adding a new manifest hash declaration", async () => {
+  await withHomepageWebpFixture(async ({ manifest, write, verify }) => {
+    const bytes = Buffer.from(homepageWebpBytes.get(homepageWebpPaths[0]));
+    bytes[30] ^= 1;
+    manifest.screenshot_sha256 = createHash("sha256").update(bytes).digest("hex");
+    await write(homepageWebpPaths[0], bytes);
+    await write(manifestPath, JSON.stringify(manifest) + "\n");
+    failed(verify(), /Reviewed WebP source identity mismatch/);
   });
 });

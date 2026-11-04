@@ -131,7 +131,10 @@ export default function QuestCraftCaseStudy() {
                 </h1>
               </div>
               <div className={styles.heroIntroduction}>
-                <p>{problem.summary}</p>
+                <p>
+                  I designed a three-path interaction for an adult Game Master handling an
+                  unexpected player choice.
+                </p>
                 <p
                   className={styles.authorityStatement}
                   data-project-field="decisionSupported"

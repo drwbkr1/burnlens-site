@@ -22,30 +22,40 @@ export function ProjectCarousel({ children, projectNames }: { children: ReactNod
     if (cards.length !== projectNames.length || cards.length === 0) return;
 
     let frame = 0;
+    let requestedIndex: number | null = null;
     const origin = () => cards[0].offsetLeft;
     const nearest = () => cards.reduce((best, card, index) => Math.abs(card.offsetLeft - origin() - track.scrollLeft) < Math.abs(cards[best].offsetLeft - origin() - track.scrollLeft) ? index : best, 0);
+    const navigationIndex = () => requestedIndex ?? nearest();
+    const updateControls = (index: number) => {
+      previous.disabled = index === 0;
+      next.disabled = index === cards.length - 1;
+    };
     const fit = (index: number) => {
       const padding = getComputedStyle(track);
       track.style.height = `${Math.ceil(cards[index].getBoundingClientRect().height + Number.parseFloat(padding.paddingTop) + Number.parseFloat(padding.paddingBottom))}px`;
     };
     const sync = () => {
       const index = nearest();
-      previous.disabled = index === 0;
-      next.disabled = index === cards.length - 1;
+      if (requestedIndex === index) requestedIndex = null;
+      updateControls(navigationIndex());
       const text = `${index + 1} of ${cards.length} · ${projectNames[index]}`;
       if (position.textContent !== text) position.textContent = text;
       fit(index);
     };
     const go = (index: number) => {
       const target = Math.max(0, Math.min(cards.length - 1, index));
+      // Keep consecutive requests independent of smooth-scroll progress. The
+      // live status still describes the nearest visible card, not a promise.
+      requestedIndex = target;
+      updateControls(target);
       fit(target);
       track.scrollTo({ top: 0, left: cards[target].offsetLeft - origin(), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
     };
-    const onPrevious = () => go(nearest() - 1);
-    const onNext = () => go(nearest() + 1);
+    const onPrevious = () => go(navigationIndex() - 1);
+    const onNext = () => go(navigationIndex() + 1);
     const onKey = (event: KeyboardEvent) => {
       if (event.target !== track) return;
-      const targets: Record<string, number> = { ArrowLeft: nearest() - 1, ArrowRight: nearest() + 1, Home: 0, End: cards.length - 1 };
+      const targets: Record<string, number> = { ArrowLeft: navigationIndex() - 1, ArrowRight: navigationIndex() + 1, Home: 0, End: cards.length - 1 };
       if (!(event.key in targets)) return;
       event.preventDefault();
       go(targets[event.key]);
@@ -59,6 +69,10 @@ export function ProjectCarousel({ children, projectNames }: { children: ReactNod
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(sync);
     };
+    const resetNavigation = () => {
+      requestedIndex = null;
+      sync();
+    };
 
     controls.hidden = false;
     position.hidden = false;
@@ -67,8 +81,11 @@ export function ProjectCarousel({ children, projectNames }: { children: ReactNod
     track.addEventListener("keydown", onKey);
     track.addEventListener("focusin", onFocus);
     track.addEventListener("scroll", onScroll, { passive: true });
-    track.addEventListener("scrollend", sync);
-    window.addEventListener("resize", sync);
+    track.addEventListener("scrollend", resetNavigation);
+    track.addEventListener("pointerdown", resetNavigation);
+    track.addEventListener("wheel", resetNavigation, { passive: true });
+    track.addEventListener("touchstart", resetNavigation, { passive: true });
+    window.addEventListener("resize", resetNavigation);
     const observer = new ResizeObserver(sync);
     cards.forEach(card => observer.observe(card));
     sync();
@@ -80,8 +97,11 @@ export function ProjectCarousel({ children, projectNames }: { children: ReactNod
       track.removeEventListener("keydown", onKey);
       track.removeEventListener("focusin", onFocus);
       track.removeEventListener("scroll", onScroll);
-      track.removeEventListener("scrollend", sync);
-      window.removeEventListener("resize", sync);
+      track.removeEventListener("scrollend", resetNavigation);
+      track.removeEventListener("pointerdown", resetNavigation);
+      track.removeEventListener("wheel", resetNavigation);
+      track.removeEventListener("touchstart", resetNavigation);
+      window.removeEventListener("resize", resetNavigation);
       controls.hidden = true;
       position.hidden = true;
       track.style.removeProperty("height");

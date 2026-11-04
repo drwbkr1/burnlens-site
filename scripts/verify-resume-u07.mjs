@@ -41,9 +41,14 @@ const acceptedNfa073Css = {
   bytes: 17_754,
   sha256: "72a733e20cf3b8de1403c0371d142031757203f0957c314df86bf92c0bb6f171",
 };
+const acceptedNfa086Targets = {
+  page: { bytes: 24_415, sha256: "72c3dff2c8b43cd33bb895d36190aa28920965bed98b8c17e428956b688a8df6" },
+  css: { bytes: 19_396, sha256: "97f8642618c129d622b78ea6da582e61b5a0d8ece2a73db58051e55155032d64" },
+};
 const expectedTargetHashes = {
   ...predecessorTargetHashes,
-  [cssPath]: acceptedNfa073Css.sha256,
+  [pagePath]: acceptedNfa086Targets.page.sha256,
+  [cssPath]: acceptedNfa086Targets.css.sha256,
 };
 const acceptedResumeBeforeSemanticRepair = {
   bytes: 21_425,
@@ -65,9 +70,23 @@ const acceptedU06BrowserBlock = {
   sha256: "d167bfbf12b9f0ba3e353a826414cde59a6b5b2ed5dda5d14fb6ffe5713ac2d0",
 };
 
-const exactRoleLine = "Software engineering · Geospatial evidence · Climate-relevant systems";
+const exactRoleLine = "Software development · geospatial analysis · product direction";
 const exactSummary =
-  "Software engineer building inspectable systems, deterministic software authorization boundaries, and geospatial evidence workflows for high-consequence settings. Public projects show bounded model evaluation and release testing; historical coursework adds energy-policy context.";
+  "I develop software and explore geospatial questions, from a synthetic Python incident-response testbed to satellite heat-exposure maps. I frame the problem, make product decisions and work with Codex on implementation and testing.";
+const exactContributionCopy = {
+  burnlens: {
+    status: "Public v0.56.0 research portfolio release",
+    summary: "I defined the audience, public story and use limits for an experimental computer-vision and geospatial project, and owned its publication decisions. Codex led technical, product and reliability work within that direction. The result was a public v0.56.0 research portfolio release—not an operational wildfire tool.",
+  },
+  "runbook-sentinel": {
+    status: "Released synthetic testbed · v0.0.20",
+    summary: "I designed and implemented a Python/SQLite synthetic incident-response testbed that separates diagnosis and proposals from approval and execution. I owned its release and evaluation, including the rejection of a local-model candidate that failed the output contract. At v0.0.20, it used synthetic state only; no real systems were connected.",
+  },
+  "quest-craft": {
+    status: "Reviewed prototype · public reviewer snapshot",
+    summary: "I designed a three-path interaction for an adult Game Master handling an unexpected player choice. I directed AI-assisted development, evaluation and corrections; the adult can accept, revise or ignore the suggestions. The public reviewer snapshot documents this work; it is not the private implementation or a general child-safety result.",
+  },
+};
 const exactEnergyBoundary =
   "Energy is historical governance context and a direction of interest—not evidence of an implemented energy system. The current work does not yet establish electrical engineering, controls, embedded, power-systems, or hardware implementation experience.";
 const exactMetadata = {
@@ -373,6 +392,95 @@ function countOccurrences(source, value) {
   return source.split(value).length - 1;
 }
 
+function replaceExactlyOnce(source, current, predecessor, location) {
+  assert.equal(countOccurrences(source, current), 1, `${location}: expected one exact reviewed replacement.`);
+  return source.replace(current, predecessor);
+}
+
+// The current identities do not replace preservation evidence. Reverse only
+// the declared editorial/progressive-disclosure delta, then prove every byte
+// of the complete accepted NFA-084 page and NFA-073 stylesheet unchanged.
+const readerProjectionStart = "// NFA-086 reader-first projection start. Canonical records remain below each summary.\n";
+const readerProjectionEnd = "// NFA-086 reader-first projection end.\n\n";
+const readerProjection = between(pageSource, readerProjectionStart, readerProjectionEnd, pagePath)
+  + readerProjectionEnd;
+for (const { status, summary } of Object.values(exactContributionCopy)) {
+  requireText(readerProjection, `status: ${JSON.stringify(status)}`, pagePath);
+  requireText(readerProjection, `summary: ${JSON.stringify(summary)}`, pagePath);
+}
+let resumeBeforeContributionIntegration = replaceExactlyOnce(pageSource, readerProjection, "", pagePath);
+for (const [current, predecessor] of [
+  ['    readerCopy: resumeReaderCopy[projectId],\n', ""],
+  ['  const { project, sourceId, tier, readerCopy } = entry;', '  const { project, sourceId, tier } = entry;'],
+  ['  const readerSourceIds = [...new Set(fields.flatMap((field) => supported(project.id, field).sourceIds))];\n', ""],
+  [`        <small data-resume-project-status={project.id} data-source-ids={maturity.sourceIds.join(" ")}>
+          {readerCopy.status}
+        </small>`, `        <small
+          data-evidence-field="maturity"
+          data-evidence-owner={\`\${project.id}.maturity\`}
+          data-field-key="maturity"
+          data-field-owner="maturity"
+          data-source-ids={maturity.sourceIds.join(" ")}
+        >
+          {resumeReaderFirst(maturity.summary)}
+        </small>`],
+  [`        <p className={styles.projectIntro} data-resume-contribution={project.id} data-source-ids={readerSourceIds.join(" ")}>
+          {readerCopy.summary}
+        </p>
+        <details className={styles.projectDetails} data-resume-project-details={project.id}>
+          <summary>Methods and release details <span className="sr-only">for {project.title}</span></summary>
+          <p
+            className={styles.fullMaturity}
+            data-evidence-field="maturity"
+            data-evidence-owner={\`\${project.id}.maturity\`}
+            data-field-key="maturity"
+            data-field-owner="maturity"
+            data-source-ids={maturity.sourceIds.join(" ")}
+          >
+            {resumeReaderFirst(maturity.summary)}
+          </p>
+          <ProjectFactLedger
+            className={styles.projectFacts}
+            data-resume-project-facts={project.id}
+            facts={projectFacts}
+          />
+        </details>`, `        <ProjectFactLedger
+          className={styles.projectFacts}
+          data-resume-project-facts={project.id}
+          facts={projectFacts}
+        />`],
+  ['<p className={styles.eyebrow}>Résumé / selected work</p>', '<p className={styles.eyebrow}>Public résumé / evidence edition</p>'],
+  [exactRoleLine, "Software engineering · Geospatial evidence · Climate-relevant systems"],
+  [`                I develop software and explore geospatial questions, from a synthetic Python
+                incident-response testbed to satellite heat-exposure maps. I frame the problem,
+                make product decisions and work with Codex on implementation and testing.`, `                Software engineer building inspectable systems, deterministic software authorization
+                boundaries, and geospatial evidence workflows for high-consequence settings. Public
+                projects show bounded model evaluation and release testing; historical coursework
+                adds energy-policy context.`],
+  [`          <p className={styles.printEvidenceHint} data-resume-details-print-fallback>
+            Before printing the full record, expand each project’s methods and release details.
+          </p>
+
+`, ""],
+  ['<p>What I built and directed</p>', '<p>Hiring order / implemented and evaluated work</p>'],
+  ['<h2 id="projects-heading">Selected projects</h2>', '<h2 id="projects-heading">Selected project evidence</h2>'],
+  ['Copy review: 15 October 2026', 'Last editorial review: August 2026'],
+]) {
+  resumeBeforeContributionIntegration = replaceExactlyOnce(resumeBeforeContributionIntegration, current, predecessor, pagePath);
+}
+assert.equal(Buffer.byteLength(resumeBeforeContributionIntegration), 22_012,
+  "NFA-086 must reconstruct the complete accepted NFA-084 résumé page byte length.");
+assert.equal(sha256(resumeBeforeContributionIntegration), predecessorTargetHashes[pagePath],
+  "NFA-086 must preserve every predecessor résumé source byte outside its declared delta.");
+const disclosureStylesStart = "/* NFA-086 reader-first disclosure styles start. */\n";
+const disclosureStylesEnd = "/* NFA-086 reader-first disclosure styles end. */\n\n";
+const disclosureStyles = between(cssSource, disclosureStylesStart, disclosureStylesEnd, cssPath)
+  + disclosureStylesEnd;
+const cssBeforeContributionIntegration = replaceExactlyOnce(cssSource, disclosureStyles, "", cssPath);
+assert.equal(Buffer.byteLength(cssBeforeContributionIntegration), acceptedNfa073Css.bytes);
+assert.equal(sha256(cssBeforeContributionIntegration), acceptedNfa073Css.sha256,
+  "NFA-086 must preserve every predecessor stylesheet byte outside its explicit added block.");
+
 function ruleBody(selectorPattern, location) {
   const match = cssSource.match(new RegExp(`${selectorPattern}\\s*\\{([^}]*)\\}`, "s"));
   assert.ok(match, `${location}: required CSS rule is missing.`);
@@ -385,11 +493,72 @@ function cssNumber(body, property, location) {
   return Number.parseFloat(match[1]);
 }
 
+// NFA091-BEGIN
+// Accepted local NFA091 candidate identities only; not owner/release approval.
+// Preserve both historical registries and the entire predecessor U06 guard,
+// including all its old checks, before adapting only its page and guard targets.
+const acceptedLocalNfa091U06Targets = {
+  page: {
+    path: "app/work/openclaw-showcase/page.tsx",
+    bytes: 19_402,
+    sha256: "ef7f2b39a57e4fd227e7621e0c89a13b6c579afad91a32b1ad17a783392d9f5c",
+  },
+  guard: {
+    path: "scripts/verify-openclaw-u06.mjs",
+    bytes: 35_866,
+    sha256: "bc697c1f2ecd9f9bd621a2dab707b98863cc7fbd531af0a4788346748543481d",
+    predecessorBytes: 32_606,
+    predecessorSha256: "02c1f086a084a5069cebececfd62cfd0494542aeaaa265df0904da129192197c",
+  },
+};
+const nfa091U06GuardSource = read(acceptedLocalNfa091U06Targets.guard.path);
+const nfa091U06BlockStart = "// NFA091-BEGIN\n";
+const nfa091U06BlockEnd = "// NFA091-END\n\n";
+assert.equal(countOccurrences(nfa091U06GuardSource, nfa091U06BlockStart), 1,
+  "The NFA091 U06 migration must have exactly one explicit insertion start.");
+assert.equal(countOccurrences(nfa091U06GuardSource, nfa091U06BlockEnd), 1,
+  "The NFA091 U06 migration must have exactly one explicit insertion end.");
+const nfa091U06Insertion = between(nfa091U06GuardSource, nfa091U06BlockStart,
+  nfa091U06BlockEnd, acceptedLocalNfa091U06Targets.guard.path) + nfa091U06BlockEnd;
+const nfa091PredecessorU06Guard = replaceExactlyOnce(nfa091U06GuardSource,
+  nfa091U06Insertion, "", acceptedLocalNfa091U06Targets.guard.path);
+assert.equal(Buffer.byteLength(nfa091PredecessorU06Guard),
+  acceptedLocalNfa091U06Targets.guard.predecessorBytes,
+  "Removing only the NFA091 insertion must reconstruct the full predecessor U06 guard byte length.");
+assert.equal(sha256(nfa091PredecessorU06Guard),
+  acceptedLocalNfa091U06Targets.guard.predecessorSha256,
+  "Every predecessor U06 guard byte and check must remain unchanged outside the exact NFA091 insertion.");
+assert.equal(acceptedU06Targets[acceptedLocalNfa091U06Targets.guard.path],
+  acceptedLocalNfa091U06Targets.guard.predecessorSha256,
+  "The inherited U06 guard identity must remain recorded in the historical registry.");
+assert.equal(acceptedU06Targets[acceptedLocalNfa091U06Targets.page.path],
+  "0d84b95d21edf86ae99f1c4f8bff237744e74726d8a3a5d5ff705b6a50a8ee80",
+  "The inherited OpenClaw page identity must remain recorded in the historical registry.");
+const nfa091InheritedU06Targets = { ...acceptedU06Targets };
+for (const target of Object.values(acceptedLocalNfa091U06Targets)) {
+  const currentTarget = read(target.path);
+  assert.equal(Buffer.byteLength(currentTarget), target.bytes,
+    `${target.path}: the exact accepted local NFA091 target byte length drifted.`);
+  assert.equal(sha256(currentTarget), target.sha256,
+    `${target.path}: the exact accepted local NFA091 target identity drifted.`);
+  acceptedU06Targets[target.path] = target.sha256;
+}
+assert.deepEqual(Object.keys(acceptedU06Targets), Object.keys(nfa091InheritedU06Targets),
+  "NFA091 must not expand the inherited U06 target set.");
+for (const [targetPath, targetHash] of Object.entries(nfa091InheritedU06Targets)) {
+  if (!Object.values(acceptedLocalNfa091U06Targets).some((target) => target.path === targetPath)) {
+    assert.equal(acceptedU06Targets[targetPath], targetHash,
+      `${targetPath}: NFA091 must not adapt any unrelated U06 target.`);
+  }
+}
+// NFA091-END
+
 for (const [path, expectedHash] of Object.entries({ ...expectedTargetHashes, ...acceptedU06Targets })) {
   assert.equal(sha256(read(path)), expectedHash, `${path}: frozen target identity drifted.`);
 }
-assert.equal(readFileSync(resolve(root, cssPath)).byteLength, acceptedNfa073Css.bytes,
-  `${cssPath}: reviewed NFA-073 presentation byte length drifted.`);
+assert.equal(readFileSync(resolve(root, pagePath)).byteLength, acceptedNfa086Targets.page.bytes);
+assert.equal(readFileSync(resolve(root, cssPath)).byteLength, acceptedNfa086Targets.css.bytes,
+  `${cssPath}: reviewed NFA-086 disclosure presentation byte length drifted.`);
 const projectLinksBlock = between(
   pageSource,
   '<div className={styles.projectLinks}>',
@@ -453,7 +622,7 @@ const burnlensLabelOverride = `  const labels = project.id === "burnlens"
 requireText(pageSource, burnlensLabelOverride, `${pagePath} BurnLens evidence labels`);
 assert.equal(countOccurrences(pageSource, "term: labels[field]"), 2,
   "Both résumé fact branches must consume the project-specific labels.");
-const resumeBeforeLabelRepair = pageSource
+const resumeBeforeLabelRepair = resumeBeforeContributionIntegration
   .replace(burnlensLabelOverride, "")
   .replaceAll("term: labels[field]", "term: resumeFieldLabels[field]");
 assert.equal(Buffer.byteLength(resumeBeforeLabelRepair), 21_794);
@@ -574,6 +743,37 @@ for (const value of [
 ]) {
   requireText(pageSource, value, pagePath);
 }
+for (const value of [
+  'data-resume-project-status={project.id}',
+  'data-resume-contribution={project.id} data-source-ids={readerSourceIds.join(" ")}',
+  'const readerSourceIds = [...new Set(fields.flatMap((field) => supported(project.id, field).sourceIds))];',
+  '<details className={styles.projectDetails} data-resume-project-details={project.id}>',
+  '<summary>Methods and release details <span className="sr-only">for {project.title}</span></summary>',
+  'data-resume-details-print-fallback',
+  'Before printing the full record, expand each project’s methods and release details.',
+  'Résumé / selected work',
+  'Copy review: 15 October 2026',
+  'What I built and directed',
+  '<h2 id="projects-heading">Selected projects</h2>',
+]) requireText(pageSource, value, pagePath);
+const projectDetailsRender = between(pageSource,
+  '<details className={styles.projectDetails}', '</details>', `${pagePath} native canonical details`);
+requireText(projectDetailsRender, 'data-evidence-owner={`${project.id}.maturity`}', pagePath);
+requireText(projectDetailsRender, '<ProjectFactLedger', pagePath);
+assert.ok(projectDetailsRender.indexOf('data-evidence-owner') < projectDetailsRender.indexOf('<ProjectFactLedger'),
+  'The full canonical maturity owner must remain before the unchanged fact ledger.');
+reject(projectDetailsRender, /\bopen(?:\s|=|>)/, pagePath, 'selected project disclosures must start collapsed');
+reject(projectDetailsRender, /projectLinks|<EvidenceLink|href=/, pagePath,
+  'primary project and pinned-evidence links must remain outside collapsed disclosures');
+reject(pageSource, /["']use client["']|\bon(?:Click|Toggle|KeyDown|KeyUp)\s*=/, pagePath,
+  'the contribution and native disclosure layer must not add a client runtime');
+for (const value of [
+  '.page summary:focus-visible',
+  '@supports not selector(::details-content)',
+  '.projectDetails::details-content',
+  'display: block !important;',
+  'content-visibility: visible !important;',
+]) requireText(disclosureStyles, value, cssPath);
 for (const token of exactSummary.split(" ")) requireText(pageSource, token, pagePath);
 for (const token of exactEnergyBoundary.split(" ")) requireText(pageSource, token, pagePath);
 for (const value of Object.values(exactMetadata)) requireText(pageSource, value, pagePath);
@@ -631,6 +831,9 @@ for (const value of [
 const focusRule = ruleBody("\\.page a:focus-visible,[\\s\\n]*\\.page button:focus-visible", "résumé focus rule");
 assert.match(focusRule, /outline\s*:\s*3px\s+solid\s+var\(--color-focus\)\s*;/);
 assert.match(focusRule, /outline-offset\s*:\s*4px\s*;/);
+const summaryFocusRule = ruleBody("\\.page summary:focus-visible", "résumé native disclosure focus rule");
+assert.match(summaryFocusRule, /outline\s*:\s*3px\s+solid\s+var\(--color-focus\)\s*;/);
+assert.match(summaryFocusRule, /outline-offset\s*:\s*4px\s*;/);
 const pageRule = ruleBody("\\.page", "résumé page rule");
 assert.ok(cssNumber(pageRule, "font-size", "résumé page rule") >= 1);
 assert.ok(cssNumber(pageRule, "line-height", "résumé page rule") >= 1.6);
@@ -733,6 +936,8 @@ console.log(JSON.stringify({
   targetHashes: expectedTargetHashes,
   predecessorTargetHashes,
   acceptedNfa073Css,
+  acceptedNfa086Targets,
+  completePredecessorReconstruction: { pageBytes: Buffer.byteLength(resumeBeforeContributionIntegration), cssBytes: Buffer.byteLength(cssBeforeContributionIntegration) },
   acceptedResumeBeforeSemanticRepair,
   acceptedU06Targets,
   predecessorU06Targets,

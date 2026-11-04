@@ -85,6 +85,23 @@ const selectedSourceIds = {
   "quest-craft": "quest.snapshot",
 } as const satisfies Record<(typeof selectedProjectIds)[number], PublicLinkSourceId>;
 
+// NFA-086 reader-first projection start. Canonical records remain below each summary.
+const resumeReaderCopy = {
+  burnlens: {
+    status: "Public v0.56.0 research portfolio release",
+    summary: "I defined the audience, public story and use limits for an experimental computer-vision and geospatial project, and owned its publication decisions. Codex led technical, product and reliability work within that direction. The result was a public v0.56.0 research portfolio release—not an operational wildfire tool.",
+  },
+  "runbook-sentinel": {
+    status: "Released synthetic testbed · v0.0.20",
+    summary: "I designed and implemented a Python/SQLite synthetic incident-response testbed that separates diagnosis and proposals from approval and execution. I owned its release and evaluation, including the rejection of a local-model candidate that failed the output contract. At v0.0.20, it used synthetic state only; no real systems were connected.",
+  },
+  "quest-craft": {
+    status: "Reviewed prototype · public reviewer snapshot",
+    summary: "I designed a three-path interaction for an adult Game Master handling an unexpected player choice. I directed AI-assisted development, evaluation and corrections; the adult can accept, revise or ignore the suggestions. The public reviewer snapshot documents this work; it is not the private implementation or a general child-safety result.",
+  },
+} as const satisfies Record<(typeof selectedProjectIds)[number], { status: string; summary: string }>;
+// NFA-086 reader-first projection end.
+
 const selectedProjects = selectedProjectIds.map((projectId, index) => {
   const tier = selectedProjectHierarchy[index];
   if (!tier) throw new Error(`Missing resume hierarchy tier for ${projectId}.`);
@@ -93,6 +110,7 @@ const selectedProjects = selectedProjectIds.map((projectId, index) => {
     project: getProject(projectId),
     sourceId: selectedSourceIds[projectId],
     tier,
+    readerCopy: resumeReaderCopy[projectId],
   };
 });
 
@@ -238,7 +256,7 @@ function ResumeProject({
   entry: (typeof selectedProjects)[number];
   index: number;
 }) {
-  const { project, sourceId, tier } = entry;
+  const { project, sourceId, tier, readerCopy } = entry;
   const labels = project.id === "burnlens"
     ? {
         ...resumeFieldLabels,
@@ -249,6 +267,7 @@ function ResumeProject({
     : resumeFieldLabels;
   const fields = projectSurfacePlan[project.id].fields.resume as readonly ResumeField[];
   const maturity = supported(project.id, "maturity");
+  const readerSourceIds = [...new Set(fields.flatMap((field) => supported(project.id, field).sourceIds))];
   const factFields = fields.filter((field) => field !== "maturity") as readonly Exclude<
     ResumeField,
     "maturity"
@@ -287,24 +306,34 @@ function ResumeProject({
     >
       <div className={styles.projectIndex}>
         <span>{tierLabel}</span>
-        <small
-          data-evidence-field="maturity"
-          data-evidence-owner={`${project.id}.maturity`}
-          data-field-key="maturity"
-          data-field-owner="maturity"
-          data-source-ids={maturity.sourceIds.join(" ")}
-        >
-          {resumeReaderFirst(maturity.summary)}
+        <small data-resume-project-status={project.id} data-source-ids={maturity.sourceIds.join(" ")}>
+          {readerCopy.status}
         </small>
       </div>
 
       <div className={styles.projectCopy}>
         <h3>{project.title}</h3>
-        <ProjectFactLedger
-          className={styles.projectFacts}
-          data-resume-project-facts={project.id}
-          facts={projectFacts}
-        />
+        <p className={styles.projectIntro} data-resume-contribution={project.id} data-source-ids={readerSourceIds.join(" ")}>
+          {readerCopy.summary}
+        </p>
+        <details className={styles.projectDetails} data-resume-project-details={project.id}>
+          <summary>Methods and release details <span className="sr-only">for {project.title}</span></summary>
+          <p
+            className={styles.fullMaturity}
+            data-evidence-field="maturity"
+            data-evidence-owner={`${project.id}.maturity`}
+            data-field-key="maturity"
+            data-field-owner="maturity"
+            data-source-ids={maturity.sourceIds.join(" ")}
+          >
+            {resumeReaderFirst(maturity.summary)}
+          </p>
+          <ProjectFactLedger
+            className={styles.projectFacts}
+            data-resume-project-facts={project.id}
+            facts={projectFacts}
+          />
+        </details>
         <div className={styles.projectLinks}>
           <Link href={project.route}>
             Read the {tier === "flagship" ? "case study" : "field note"}{" "}
@@ -391,19 +420,18 @@ export default function ResumePage() {
         <article className={styles.resume} data-resume-surface="public-resume">
           <header className={styles.hero}>
             <div className={styles.heroIdentity}>
-              <p className={styles.eyebrow}>Public résumé / evidence edition</p>
+              <p className={styles.eyebrow}>Résumé / selected work</p>
               <h1>William “Drew” Baker</h1>
               <p className={styles.roleLine}>
-                Software engineering · Geospatial evidence · Climate-relevant systems
+                Software development · geospatial analysis · product direction
               </p>
             </div>
 
             <div className={styles.heroBrief}>
               <p className={styles.summary}>
-                Software engineer building inspectable systems, deterministic software authorization
-                boundaries, and geospatial evidence workflows for high-consequence settings. Public
-                projects show bounded model evaluation and release testing; historical coursework
-                adds energy-policy context.
+                I develop software and explore geospatial questions, from a synthetic Python
+                incident-response testbed to satellite heat-exposure maps. I frame the problem,
+                make product decisions and work with Codex on implementation and testing.
               </p>
               <nav className={styles.profileLinks} aria-label="Public professional profiles">
                 <a
@@ -436,6 +464,10 @@ export default function ResumePage() {
             </span>
           </p>
 
+          <p className={styles.printEvidenceHint} data-resume-details-print-fallback>
+            Before printing the full record, expand each project’s methods and release details.
+          </p>
+
           <div className={styles.resumeGrid}>
             <div className={styles.primaryColumn}>
               <section
@@ -446,8 +478,8 @@ export default function ResumePage() {
                 <div className={styles.sectionHeading}>
                   <span>01</span>
                   <div>
-                    <p>Hiring order / implemented and evaluated work</p>
-                    <h2 id="projects-heading">Selected project evidence</h2>
+                    <p>What I built and directed</p>
+                    <h2 id="projects-heading">Selected projects</h2>
                   </div>
                 </div>
                 <div className={styles.projectList}>
@@ -604,7 +636,7 @@ export default function ResumePage() {
 
           <footer className={styles.resumeFooter}>
             <span>William Drew Baker / public résumé</span>
-            <span>Last editorial review: August 2026</span>
+            <span>Copy review: 15 October 2026</span>
           </footer>
         </article>
       </main>

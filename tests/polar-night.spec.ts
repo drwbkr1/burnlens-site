@@ -1,10 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import approvedSnapshot from "../content/dashboard-artifact/data.json" with { type: "json" };
 
 const rows = approvedSnapshot.queries.portfolio_projects.rows;
-const ids = ["wildfire-response", "after-the-tip", "west-hawaii-heat-exposure", "nepal-satellite-atlas", "burnlens", "runbook-sentinel"] as const;
+const previews = [
+  { id: "runbook-sentinel", title: "Runbook Sentinel" },
+  { id: "west-hawaii-heat-exposure", title: "West Hawaiʻi heat" },
+  { id: "nepal-satellite-atlas", title: "Nepal Satellite Atlas" },
+] as const;
 const htmlHash = "ee2687c4b8acdcaeb0751291bcea55cc6d4f2b396295bae598ff99a11f5bb66a";
 const snapshotHash = "591dd3b8ea5ef905b3d90fb0bbc1b5610054629024ccb4837957aadd0a711ea3";
 const snapshotPath = `/dashboard/explore/snapshot.${snapshotHash}.json`;
@@ -13,17 +17,57 @@ const testOrigin = `http://127.0.0.1:${process.env.PORTFOLIO_TEST_PORT ?? "3101"
 const hash = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const rowKeys = ["id", "title", "sourceTitle", "category", "sourceReviewedAt", "coveredThrough", "session", "completedTasks", "plannedTasks", "completedModules", "plannedModules", "caseRoute", "state"].sort();
 
-async function selectCard(page: Page, id: typeof ids[number]) {
-  const card = page.locator(`[data-carousel-slide="${id}"]`);
-  const link = card.locator(`a[href="/work/${id}"]`);
-  await link.focus();
-  await expect(link).toBeFocused();
-  await expect.poll(() => card.evaluate(element => {
-    const track = element.parentElement!;
-    const first = track.querySelector<HTMLElement>("[data-carousel-slide]")!;
-    return Math.abs(track.scrollLeft - ((element as HTMLElement).offsetLeft - first.offsetLeft));
-  })).toBeLessThan(1.5);
-  return card;
+function nativeCard(page: Page, project: typeof previews[number]) {
+  return page.getByRole("region", { name: "Selected project previews", exact: true })
+    .getByRole("article", { name: project.title, exact: true });
+}
+
+type FrameSample = { at: number; left: number; top: number; width: number; height: number };
+type FrameTrace = { active: boolean; samples: FrameSample[] };
+
+async function frameBounds(frame: Locator) {
+  return frame.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    const card = element.closest("article")!.getBoundingClientRect();
+    return { left: box.left - card.left, top: box.top - card.top, width: box.width, height: box.height };
+  });
+}
+
+// Start before native activation, so a slow driver round trip cannot miss the
+// real intermediate frames. This observes CSS geometry; it does not drive it.
+async function beginFrameTrace(frame: Locator) {
+  await frame.evaluate(element => {
+    const target = element as HTMLElement & { __nfa109FrameTrace?: FrameTrace };
+    if (target.__nfa109FrameTrace) target.__nfa109FrameTrace.active = false;
+    const trace: FrameTrace = { active: true, samples: [] };
+    target.__nfa109FrameTrace = trace;
+    const start = performance.now();
+    const sample = () => {
+      const box = target.getBoundingClientRect();
+      const card = target.closest("article")!.getBoundingClientRect();
+      trace.samples.push({ at: performance.now() - start, left: box.left - card.left, top: box.top - card.top, width: box.width, height: box.height });
+      if (trace.active && target.isConnected && performance.now() - start < 2000) requestAnimationFrame(sample);
+    };
+    sample();
+  });
+}
+
+async function finishFrameTrace(frame: Locator) {
+  return frame.evaluate(element => {
+    const trace = (element as HTMLElement & { __nfa109FrameTrace?: FrameTrace }).__nfa109FrameTrace;
+    if (!trace) throw new Error("The persistent image frame was replaced during its transition.");
+    trace.active = false;
+    return trace.samples;
+  });
+}
+
+function expectIntermediateFrame(samples: FrameSample[], small: Awaited<ReturnType<typeof frameBounds>>, large: Awaited<ReturnType<typeof frameBounds>>) {
+  expect(samples.length, "real animation-frame samples were recorded").toBeGreaterThan(2);
+  expect(samples.some(sample => sample.width > small.width + 2 && sample.width < large.width - 2
+    && sample.height > small.height + 2 && sample.height < large.height - 2
+    && sample.left > large.left + .5 && sample.left < small.left - .5
+    && sample.top > large.top + .5 && sample.top < small.top - .5),
+  "the SAME thumbnail frame passes through a real intermediate size and position, not an immediate pop or entry-only wipe").toBe(true);
 }
 
 async function openExplorer(page: Page) {
@@ -69,66 +113,106 @@ function assertPublicProjection(value: unknown) {
   visit(value);
 }
 
-test("Polar-night carousel is manual, bounded and keyboard/focus navigable across all six cards", async ({ page }) => {
+test("Polar-night project previews stay manual and native disclosure exclusivity never hides project links", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/", { waitUntil: "networkidle" });
-  const carousel = page.locator("[data-project-carousel]");
-  const track = carousel.locator("#project-track");
-  const previous = carousel.getByRole("button", { name: "Previous project", exact: true });
-  const next = carousel.getByRole("button", { name: "Next project", exact: true });
-  const position = carousel.locator('[aria-live="polite"]');
-  expect(await carousel.locator("[data-carousel-slide]").evaluateAll(cards => cards.map(card => card.getAttribute("data-carousel-slide")))).toEqual([...ids]);
-  await expect(previous).toBeDisabled();
-  await expect(next).toBeEnabled();
-  await expect(position).toContainText("1 of 6");
-  const initial = await track.evaluate(element => element.scrollLeft);
+  const selection = page.getByRole("region", { name: "Selected project previews", exact: true });
+  expect(await selection.getByRole("heading", { level: 2 }).allTextContents()).toEqual(previews.map(project => project.title));
+  await expect(selection.locator("details[open]")).toHaveCount(0);
   await page.waitForTimeout(1200);
-  expect(await track.evaluate(element => element.scrollLeft), "no autoplay while idle").toBe(initial);
-  await next.click();
-  await expect(position).toContainText("2 of 6");
-  await expect(next, "advancing does not steal button focus").toBeFocused();
-  await track.focus();
-  await page.keyboard.press("End");
-  await expect(position).toContainText("6 of 6");
-  await expect(next).toBeDisabled();
-  await expect(previous).toBeEnabled();
-  await page.keyboard.press("ArrowRight");
-  await expect(position).toContainText("6 of 6");
-  await page.keyboard.press("Home");
-  await expect(position).toContainText("1 of 6");
-  await page.keyboard.press("ArrowLeft");
-  await expect(previous).toBeDisabled();
-  for (const [index, id] of ids.entries()) {
-    await selectCard(page, id);
-    await expect(position).toContainText(`${index + 1} of 6`);
+  await expect(selection.locator("details[open]"), "idle never auto-expands or advances project discovery").toHaveCount(0);
+  for (const project of previews) {
+    const card = nativeCard(page, project);
+    await card.locator("summary").click();
+    await expect(card.locator("details")).toHaveAttribute("open", "");
+    await expect(selection.locator("details[open]")).toHaveCount(1);
+    for (const item of previews) {
+      await expect(nativeCard(page, item).getByRole("heading", { level: 2 })).toBeVisible();
+      await expect(nativeCard(page, item).getByRole("link", { name: `Explore ${item.title} project`, exact: true })).toBeVisible();
+      if (item.id !== project.id) await expect(nativeCard(page, item).locator("details")).not.toHaveAttribute("open", "");
+    }
   }
-  await expect(page.locator("main audio, main video, main iframe")).toHaveCount(0);
+  await nativeCard(page, previews[2]).locator("summary").click();
+  await expect(selection.locator("details[open]")).toHaveCount(0);
+  await expect(page.locator("main audio, main video, main canvas, main iframe")).toHaveCount(0);
 });
 
-test("Kinetic typography has one finite arrival and reduced motion keeps readable instant controls", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/", { waitUntil: "networkidle" });
-  const h1 = page.locator("main h1");
-  const motion = await h1.evaluate(element => {
-    const style = getComputedStyle(element);
-    return { name: style.animationName, duration: style.animationDuration, iterations: style.animationIterationCount, opacity: style.opacity };
-  });
-  expect(motion.name).not.toBe("none");
-  expect(motion.duration).toBe("0.7s");
-  expect(motion.iterations).toBe("1");
-  expect(motion.opacity).toBe("1");
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(h1).toBeVisible();
-  expect(await h1.evaluate(element => getComputedStyle(element).animationName)).toBe("none");
-  expect(await page.locator("main *").evaluateAll(elements => elements.every(element => {
-    const style = getComputedStyle(element);
-    return [style.animationDuration, style.transitionDuration].every(value => value.split(",").every(duration => Number.parseFloat(duration) <= .01));
-  }))).toBe(true);
-  expect(await page.locator("#project-track").evaluate(element => getComputedStyle(element).scrollBehavior)).toBe("auto");
-  await page.locator("#project-track").focus();
-  await page.keyboard.press("End");
-  await expect(page.locator('[data-project-carousel] [aria-live="polite"]')).toContainText("6 of 6");
-  expect(await page.locator("main h1").evaluate(element => getComputedStyle(element).opacity)).toBe("1");
+test("Image reveal motion is finite, image inspection stays unfaded and only the separate Collapse control closes it", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/", { waitUntil: "networkidle" });
+    const card = nativeCard(page, previews[0]);
+    const summary = card.locator("summary");
+    const details = card.locator("details");
+    const frame = card.locator("[data-project-image-frame]");
+    const image = card.locator("[data-project-image-expanded]");
+    await frame.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).complete && (element as HTMLImageElement).naturalWidth > 0)).toBe(true);
+    await image.evaluate(async element => { await (element as HTMLImageElement).decode(); });
+    await expect(card).toHaveAttribute("data-image-readiness", "ready");
+    await expect(frame).toHaveAttribute("aria-hidden", "true");
+    await expect(card.getByRole("img")).toHaveCount(0);
+    const closed = await frameBounds(frame);
+    const transition = await frame.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { properties: style.transitionProperty.split(",").map(value => value.trim()), durations: style.transitionDuration.split(",").map(value => Number.parseFloat(value)), clip: style.clipPath, animation: style.animationName };
+    });
+    expect(transition.properties).toEqual(expect.arrayContaining(["top", "left", "width", "height", "border-radius"]));
+    expect(transition.durations.every(duration => duration > 0 && duration <= 1)).toBe(true);
+    expect(transition.clip).toBe("none");
+    expect(transition.animation).toBe("none");
+    const initialTitleSize = await card.getByRole("heading", { level: 2 }).evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize));
+    await beginFrameTrace(frame);
+    await summary.click();
+    await expect(details).toHaveAttribute("open", "");
+    await expect(card.getByRole("img")).toHaveCount(1);
+    await expect(card.locator("[data-project-image-semantic]")).toHaveAccessibleName(/frozen Runbook Sentinel dashboard.*not a live operations console/i);
+    await expect.poll(() => frame.evaluate(element => {
+      const box = element.getBoundingClientRect(); const card = element.closest("article")!.getBoundingClientRect();
+      return Math.max(Math.abs(box.width - card.width), Math.abs(box.height - card.height), Math.abs(box.top - card.top), Math.abs(box.left - card.left));
+    })).toBeLessThanOrEqual(2);
+    const opened = await frameBounds(frame);
+    const opening = await finishFrameTrace(frame);
+    expectIntermediateFrame(opening, closed, opened);
+    await expect(image.locator("..")).toHaveCSS("opacity", "1");
+    const collapseLabel = summary.locator(":scope > span").filter({ hasText: /^Collapse/ });
+    await expect(collapseLabel).toHaveCSS("opacity", "1");
+    await expect(summary).toHaveAccessibleName("Collapse Runbook Sentinel image");
+    expect(await card.getByRole("heading", { level: 2 }).evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize))).toBeLessThan(initialTitleSize);
+    const bounds = await image.boundingBox();
+    expect(bounds).not.toBeNull();
+    await page.mouse.move(bounds!.x + bounds!.width * .5, bounds!.y + bounds!.height * .65);
+    await expect(image.locator("..")).toHaveCSS("opacity", "1");
+    await expect(image).toHaveCSS("filter", "none");
+    await page.mouse.click(bounds!.x + bounds!.width * .5, bounds!.y + bounds!.height * .65);
+    await expect(details).toHaveAttribute("open", "");
+    await expect(collapseLabel).toHaveCSS("opacity", "1");
+    await expect(summary.locator(":scope > span").filter({ hasText: /^Expand image/ })).toBeHidden();
+    await beginFrameTrace(frame);
+    await summary.click();
+    await expect(details).not.toHaveAttribute("open", "");
+    await expect(card.getByRole("img"), "native collapse removes the qualified image from the accessibility tree").toHaveCount(0);
+    await expect.poll(async () => {
+      const box = await frameBounds(frame);
+      return Math.max(Math.abs(box.width - closed.width), Math.abs(box.height - closed.height), Math.abs(box.left - closed.left), Math.abs(box.top - closed.top));
+    }).toBeLessThanOrEqual(1.5);
+    const closing = await finishFrameTrace(frame);
+    expectIntermediateFrame(closing, closed, opened);
+    await testInfo.attach(`${width}px-real-frame-expansion-contraction`, { body: JSON.stringify({ closed, opened, transition, opening, closing }, null, 2), contentType: "application/json" });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await summary.click();
+    await expect(details).toHaveAttribute("open", "");
+    await expect(page.getByRole("heading", { level: 1, name: "Drew Baker.", exact: true })).toBeVisible();
+    expect(await page.locator("main *").evaluateAll(elements => elements.every(element => {
+      const style = getComputedStyle(element);
+      return [style.animationDuration, style.transitionDuration].every(value => value.split(",").every(duration => Number.parseFloat(duration) <= .01));
+    }))).toBe(true);
+    expect(await page.locator("html").evaluate(element => getComputedStyle(element).scrollBehavior)).toBe("auto");
+    await expect(collapseLabel).toHaveCSS("opacity", "1");
+    await expect(image.locator("..")).toHaveCSS("opacity", "1");
+  }
 });
 
 test("Dashboard SSR and no-JavaScript companion retain the exact five dated qualified records", async ({ browser }) => {
@@ -385,15 +469,9 @@ test("Actual independent dashboard is usable at three widths with no overflow or
   } finally { await mobile.close(); }
 });
 
-test("Print is light and motion-free while scientific source colors and qualifiers stay bounded", async ({ page }) => {
+test("Print keeps a light motion-free biography and project-link handoff while scientific qualifiers remain on All projects", async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
-  const paths = page.locator('[data-carousel-slide="after-the-tip"] [data-lead-figure] svg path');
-  const originalColors = [{ fill: "rgb(117, 127, 100)", stroke: "rgb(72, 81, 63)" }, { fill: "rgb(92, 117, 122)", stroke: "rgb(49, 78, 84)" }];
-  expect(await paths.evaluateAll(elements => elements.map(element => ({ fill: getComputedStyle(element).fill, stroke: getComputedStyle(element).stroke })))).toEqual([...originalColors, ...originalColors]);
-  expect(await page.locator('[data-current-project] img, [data-lead-figure] svg').evaluateAll(elements => elements.every(element => {
-    const style = getComputedStyle(element);
-    return style.filter === "none" && style.clipPath === "none";
-  }))).toBe(true);
+  await nativeCard(page, previews[2]).locator("summary").click();
   await page.emulateMedia({ media: "print", reducedMotion: "reduce" });
   expect(await page.locator("body").evaluate(element => getComputedStyle(element).backgroundColor)).toBe("rgb(255, 255, 255)");
   expect(await page.locator("html").evaluate(element => getComputedStyle(element).colorScheme)).toBe("light");
@@ -401,98 +479,144 @@ test("Print is light and motion-free while scientific source colors and qualifie
     const style = getComputedStyle(element);
     return [style.animationDuration, style.transitionDuration].every(value => value.split(",").every(duration => Number.parseFloat(duration) <= .01));
   }))).toBe(true);
-  await expect(page.getByRole("button", { name: "Next project", includeHidden: true })).toBeHidden();
-  for (const id of ids) await expect(page.locator(`[data-carousel-slide="${id}"] a[href="/work/${id}"]`)).toBeVisible();
-  for (const figure of await page.locator('[data-current-project]:not([data-current-project="after-the-tip"]) figure').all()) await expect(figure.locator("figcaption")).toBeVisible();
-  await expect(page.locator('[data-current-project="after-the-tip"]').getByText(/^Mean positive lead contribution/)).toBeVisible();
-  for (const figure of await page.locator('[data-current-project="after-the-tip"] figure').all()) await expect(figure).toBeHidden();
-  await expect(page.locator('[data-current-project="nepal-satellite-atlas"]')).toContainText(/unregistered.*not a mapped landslide/i);
-  await expect(page.locator('[data-current-project="west-hawaii-heat-exposure"]')).toContainText(/not observed reef condition/i);
-  for (const image of await page.locator('[data-current-project] img').all()) await expect(image).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1, name: "Drew Baker.", exact: true })).toBeVisible();
+  await expect(page.getByText("I set the direction, make product decisions and review the result. Development is collaborative and includes Codex assistance.", { exact: true })).toBeVisible();
+  for (const project of previews) {
+    const card = nativeCard(page, project);
+    await expect(card.getByRole("heading", { level: 2 })).toBeVisible();
+    await expect(card.getByRole("list", { name: "Relevant tools and skills", exact: true })).toBeVisible();
+    await expect(card.locator(":scope > div > p")).toBeVisible();
+    const explore = card.getByRole("link", { name: `Explore ${project.title} project`, exact: true });
+    await expect(explore).toBeVisible();
+    expect(await explore.evaluate(element => getComputedStyle(element, "::after").content)).toContain(`burnlensproject.org/work/${project.id}`);
+    await expect(card.locator("summary")).toBeHidden();
+    for (const image of await card.locator("img").all()) await expect(image).toBeHidden();
+  }
+  const credit = nativeCard(page, previews[2]).locator("..").locator("figcaption");
+  await expect(credit).toBeVisible();
+  await expect(credit).toContainText("ASF DAAC HyP3 2026. Contains modified Copernicus Sentinel data 2026, processed by ESA.");
+  for (const [label, href] of [
+    ["All projects", "/work"],
+    ["BurnLens case", "/work/burnlens"],
+    ["Workbench", "/dashboard"],
+    ["My résumé", "/resume"],
+    ["Get in touch", "https://www.linkedin.com/in/william-baker-843946162/"],
+  ] as const) {
+    // The print-only URL suffix contributes to local anchors' accessible names.
+    const name = href.startsWith("/") ? `${label} (burnlensproject.org${href})` : label;
+    const link = page.locator("main").getByRole("link", { name, exact: true });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", href);
+  }
+  await page.emulateMedia({ media: "screen", reducedMotion: "reduce" });
+  await page.goto("/work", { waitUntil: "networkidle" });
+  const paths = page.locator('#current-projects [data-lead-figure="purdue"] svg path');
+  const originalColors = [{ fill: "rgb(117, 127, 100)", stroke: "rgb(72, 81, 63)" }, { fill: "rgb(92, 117, 122)", stroke: "rgb(49, 78, 84)" }];
+  expect(await paths.evaluateAll(elements => elements.map(element => ({ fill: getComputedStyle(element).fill, stroke: getComputedStyle(element).stroke })))).toEqual(originalColors);
+  await page.emulateMedia({ media: "print", reducedMotion: "reduce" });
+  const current = page.locator("#current-projects");
+  for (const figure of await current.locator("article:not(:has([data-lead-figure])) figure").all()) await expect(figure.locator("figcaption")).toBeVisible();
+  const tip = current.getByRole("article").filter({ has: page.getByRole("heading", { name: "After the Tip", exact: true }) });
+  await expect(tip.getByText(/^Actual mean positive lead contributions/)).toBeVisible();
+  await expect(tip).toContainText("Not an uncertainty band or team-strength comparison.");
+  await expect(tip.locator("figure")).toBeHidden();
+  await expect(current).toContainText(/unregistered.*not a mapped landslide/i);
+  await expect(current).toContainText("heat-exposure maps, not coral-damage observations");
+  for (const image of await current.locator("img").all()) await expect(image).toBeHidden();
   await page.goto("/dashboard", { waitUntil: "networkidle" });
   await expect(page.locator("[data-dashboard-project]")).toHaveCount(5);
   for (const row of rows) await expect(page.locator(`[data-dashboard-project="${row.id}"]`)).toContainText(row.state);
   expect(await page.locator("body").evaluate(element => getComputedStyle(element).backgroundColor)).toBe("rgb(255, 255, 255)");
 });
 
-test("Every carousel card keeps complete source media and captions inside the active mobile and desktop frame", async ({ page }, testInfo) => {
+test("Native expanded screenshots keep controls, context and attribution inside responsive frames with a touch inspection path", async ({ page, browser }, testInfo) => {
+  test.setTimeout(90_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/", { waitUntil: "networkidle" });
-    for (const id of ids) {
-      const card = await selectCard(page, id);
-      await expect(card.getByRole("heading", { level: 3 })).toBeVisible();
-      await expect.poll(() => card.locator("img").evaluateAll(images => images.every(image =>
-        (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0,
-      ))).toBe(true);
-      await card.locator("img").evaluateAll(async images => {
-        await Promise.all(images.map(image => (image as HTMLImageElement).decode()));
-      });
-      await expect.poll(() => card.evaluate(element =>
-        element.getBoundingClientRect().height <= element.parentElement!.clientHeight + 1.5,
-      )).toBe(true);
+    for (const project of previews) {
+      const card = nativeCard(page, project);
+      const summary = card.locator("summary");
+      await summary.click();
+      await expect(card.locator("details")).toHaveAttribute("open", "");
+      const image = card.locator("[data-project-image-expanded]");
+      await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).complete && (element as HTMLImageElement).naturalWidth > 0)).toBe(true);
+      await image.evaluate(async element => { await (element as HTMLImageElement).decode(); });
+      await expect(image.locator("..")).toHaveCSS("opacity", "1");
+      await expect(card.getByRole("img")).toHaveCount(1);
       const framing = await card.evaluate(element => {
         const cardBounds = element.getBoundingClientRect();
-        const track = element.parentElement!;
-        const trackBounds = track.getBoundingClientRect();
-        return { fullCard: cardBounds.left >= -.5 && cardBounds.right <= innerWidth + .5,
-          fullHeight: cardBounds.height <= track.clientHeight + 1.5,
-          media: [...element.querySelectorAll<HTMLImageElement>("img")].map(image => {
-            const style = getComputedStyle(image); const bounds = image.getBoundingClientRect();
-            const contentWidth = bounds.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth) - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight);
-            const contentHeight = bounds.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth) - Number.parseFloat(style.paddingTop) - Number.parseFloat(style.paddingBottom);
-            return { loaded: image.complete && image.naturalWidth > 0, fit: style.objectFit, clip: style.clipPath, filter: style.filter,
-              ratioDelta: Math.abs(contentWidth / contentHeight - image.naturalWidth / image.naturalHeight),
-              contained: bounds.left >= cardBounds.left - 1.5 && bounds.right <= cardBounds.right + 1.5 && bounds.bottom <= trackBounds.bottom + 1.5 };
-          }),
-          captions: [...element.querySelectorAll("figcaption")].map(caption => { const bounds = caption.getBoundingClientRect(); return bounds.left >= cardBounds.left - 1.5 && bounds.right <= cardBounds.right + 1.5 && bounds.bottom <= trackBounds.bottom + 1.5; }),
+        const title = element.querySelector("h2")!;
+        const summary = element.querySelector("summary")!;
+        const label = [...summary.children].find(child => getComputedStyle(child).display !== "none")!;
+        const context = element.querySelector("details > div > p")!;
+        const explore = element.querySelector("a")!;
+        const image = element.querySelector<HTMLImageElement>("[data-project-image-expanded]")!;
+        const bounds = (node: Element) => {
+          const box = node.getBoundingClientRect();
+          return { left: box.left, right: box.right, top: box.top, bottom: box.bottom, width: box.width, height: box.height };
+        };
+        const contained = (node: Element) => {
+          const box = node.getBoundingClientRect();
+          return box.left >= cardBounds.left - 1 && box.right <= cardBounds.right + 1
+            && box.top >= cardBounds.top - 1 && box.bottom <= cardBounds.bottom + 1;
+        };
+        return {
+          fullCard: cardBounds.left >= -.5 && cardBounds.right <= innerWidth + .5,
+          contained: [title, summary, label, context, explore, image].map(contained),
+          title: bounds(title), label: bounds(label), context: bounds(context), explore: bounds(explore), summary: bounds(summary),
+          fonts: { control: Number.parseFloat(getComputedStyle(label).fontSize), context: Number.parseFloat(getComputedStyle(context).fontSize), link: Number.parseFloat(getComputedStyle(explore).fontSize) },
+          image: { fit: getComputedStyle(image).objectFit, clip: getComputedStyle(image).clipPath, filter: getComputedStyle(image).filter, opacity: getComputedStyle(image).opacity },
         };
       });
-      expect(framing.fullCard, `${id} at ${width}px`).toBe(true);
-      expect(framing.fullHeight, `${id} active track height`).toBe(true);
-      expect(framing.captions.length, `${id} complete caption`).toBeGreaterThan(0);
-      expect(framing.captions.every(Boolean)).toBe(true);
-      for (const media of framing.media) {
-        expect(media.loaded).toBe(true); expect(media.fit).toBe("contain"); expect(media.clip).toBe("none"); expect(media.filter).toBe("none");
-        expect(media.ratioDelta).toBeLessThan(.01); expect(media.contained).toBe(true);
+      expect(framing.fullCard, `${project.id} at ${width}px`).toBe(true);
+      expect(framing.contained.every(Boolean), "all reading and interactive overlays remain in the frame").toBe(true);
+      expect(framing.label.top, "Collapse sits below the compact title").toBeGreaterThanOrEqual(framing.title.bottom - 1);
+      expect(framing.title.right <= framing.context.left + 1 || framing.title.bottom <= framing.context.top + 1, "title and context do not overlap").toBe(true);
+      expect(framing.explore.top).toBeGreaterThan(framing.label.bottom);
+      expect(framing.summary.height).toBeGreaterThanOrEqual(44);
+      expect(framing.explore.height).toBeGreaterThanOrEqual(44);
+      expect(framing.fonts.control).toBeGreaterThanOrEqual(13);
+      expect(framing.fonts.context).toBeGreaterThanOrEqual(12);
+      expect(framing.fonts.link).toBeGreaterThanOrEqual(13);
+      expect(framing.image).toEqual({ fit: "contain", clip: "none", filter: "none", opacity: "1" });
+      await testInfo.attach(`${project.id}-${width}px-native-framing`, { body: JSON.stringify(framing, null, 2), contentType: "application/json" });
+      if (project.id === "nepal-satellite-atlas" || project.id === "west-hawaii-heat-exposure") {
+        const credit = card.locator("..").locator("figcaption");
+        await expect(credit).toBeVisible();
+        expect(await credit.evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(13);
+        const creditBounds = await credit.boundingBox();
+        expect(creditBounds).not.toBeNull();
+        expect(creditBounds!.x).toBeGreaterThanOrEqual(0);
+        expect(creditBounds!.x + creditBounds!.width).toBeLessThanOrEqual(width + 1);
       }
-      if (id === "after-the-tip") await expect(card.locator("[data-lead-figure]")).toHaveCount(2);
-      else if (id === "west-hawaii-heat-exposure") await expect(card.locator("img")).toHaveCount(2);
-      else if (id === "wildfire-response" || id === "nepal-satellite-atlas") await expect(card.locator("img")).toHaveCount(1);
-      else await expect(card.locator("img, picture, video, canvas")).toHaveCount(0);
-      if (width === 768 && id === ids[0]) {
-        const track = page.locator("#project-track");
-        const next = page.getByRole("button", { name: "Next project", exact: true });
-        await next.scrollIntoViewIfNeeded();
-        const trackBounds = await track.boundingBox();
-        expect(trackBounds).not.toBeNull();
-        const pointerY = Math.min(trackBounds!.y + 40, 980);
-        expect(pointerY).toBeGreaterThan(trackBounds!.y);
-        await page.mouse.move(trackBounds!.x + trackBounds!.width / 2, pointerY);
-        await page.mouse.wheel(0, 300);
-        await expect.poll(() => track.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
-        const before = await track.evaluate(element => ({ innerScrollTop: element.scrollTop, windowY: scrollY }));
-        await next.click();
-        await expect(next).toBeFocused();
-        await expect.poll(() => track.evaluate(element => element.scrollTop)).toBe(0);
-        await expect(page.locator('[aria-live="polite"]')).toContainText("2 of 6");
-        const activeTitle = page.locator(`[data-carousel-slide="${ids[1]}"]`).getByRole("heading", { level: 3 });
-        await expect(activeTitle).toBeVisible();
-        const after = await activeTitle.evaluate(element => {
-          const bounds = element.getBoundingClientRect();
-          const frame = element.closest("[data-carousel-slide]")!.parentElement!.getBoundingClientRect();
-          return { titleTop: bounds.top, titleBottom: bounds.bottom, frameTop: frame.top, frameBottom: frame.bottom, windowY: scrollY };
-        });
-        expect(after.titleTop).toBeGreaterThanOrEqual(after.frameTop);
-        expect(after.titleBottom).toBeLessThanOrEqual(after.frameBottom);
-        expect(after.windowY).toBe(before.windowY);
-        await testInfo.attach("native-768-inner-scroll-reset", {
-          body: JSON.stringify({ input: "native mouse wheel", width, before, after }),
-          contentType: "application/json",
-        });
-      }
+      await summary.click();
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
+  const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, reducedMotion: "reduce", baseURL: testOrigin });
+  try {
+    const touchPage = await touchContext.newPage();
+    await touchPage.goto("/");
+    for (const project of previews) {
+      const card = nativeCard(touchPage, project);
+      const summary = card.locator("summary");
+      await expect(summary.locator(":scope > span").filter({ hasText: /^Expand image/ })).toHaveCSS("opacity", "1");
+      await summary.tap();
+      await expect(card.locator("details")).toHaveAttribute("open", "");
+      await card.scrollIntoViewIfNeeded();
+      const image = card.locator("[data-project-image-expanded]");
+      await expect(image.locator("..")).toHaveCSS("opacity", "1");
+      const bounds = await image.boundingBox();
+      expect(bounds).not.toBeNull();
+      await touchPage.touchscreen.tap(bounds!.x + bounds!.width * .5, bounds!.y + bounds!.height * .65);
+      await expect(card.locator("details")).toHaveAttribute("open", "");
+      await expect(image).toHaveCSS("opacity", "1");
+      await expect(summary).toHaveAccessibleName(`Collapse ${project.title} image`);
+      await summary.tap();
+      await expect(card.locator("details")).not.toHaveAttribute("open", "");
+    }
+    await testInfo.attach("390px-touch-native-previews", { body: await touchPage.screenshot({ fullPage: true, animations: "disabled" }), contentType: "image/png" });
+  } finally { await touchContext.close(); }
 });

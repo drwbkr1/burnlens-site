@@ -39,6 +39,16 @@
 .basketballFigures figcaption { color: var(--charcoal); }
 .basketballFigures figcaption span:first-child { font-size: 1.3rem; }
 .basketballFigures [aria-hidden="true"] { font-size: .75rem; }
+/* NFA093-BEGIN: let wrapping labels size the paired preview rows together. */
+@supports (grid-template-rows: subgrid) {
+  @media (width > 420px) {
+    .basketballFigures { grid-template-rows: repeat(4, auto); row-gap: 0; }
+    .basketballFigures > figure { display: grid; grid-row: 1 / span 4; grid-template-rows: subgrid; }
+    .basketballFigures > figure:first-child { grid-column: 1; }
+    .basketballFigures > figure:last-child { grid-column: 2; }
+  }
+}
+/* NFA093-END */
 .reefMaps { display: flex; justify-content: center; gap: 1.25rem; padding: 1rem .5rem; border: 1px solid var(--color-rule); background: var(--white); color: var(--charcoal); color-scheme: light; }
 .reefMaps > div { min-width: 0; width: min(42%, 12rem); }
 .reefMaps span { display: block; margin-bottom: .5rem; font-family: var(--serif); font-size: 1.5rem; }

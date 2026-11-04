@@ -55,6 +55,7 @@ const homePage = await read("app/page.tsx");
 const burnlensPage = await read("app/work/burnlens/page.tsx");
 const burnlensCss = await read("app/work/burnlens/page.module.css");
 const tests = await read("tests/portfolio.spec.ts");
+// NFA106 counts and audits the actual migrated suite below, not historical byte prefixes.
 const releaseVerifier = await read("scripts/verify-release-candidate.mjs");
 
 // NFA-073 supersedes the warm presentation bytes, not the scientific display
@@ -101,8 +102,8 @@ assert.deepEqual(manifest.downstream_external_action_gates, [
 for (const path of exactDeletedPaths) {
   assert.ok(!manifest.files.includes(path), `${path} remains allowlisted`);
 }
-assert.equal(manifest.files.length, 112,
-  "NFA-073 must retain the 98-file predecessor and exactly 14 declared carousel/dashboard/regression additions.");
+assert.equal(manifest.files.length, 128,
+  "NFA109 retains112 predecessor paths and exactly16 declared native component/screenshot additions.");
 const predecessorPublicPaths = [
   ".env.example",
   ".gitattributes",
@@ -219,11 +220,30 @@ const nfa073PublicAdditions = [
   "scripts/build-portfolio-dashboard.mjs",
   "tests/polar-night.spec.ts"
 ];
+const nativeHomepageAdditions = [
+  "components/home/PersonalFieldAtlas.tsx",
+  "components/home/ProjectImageReveal.tsx",
+  "components/home/projects.ts",
+  "components/home/homepage.module.css",
+  "public/media/projects/homepage-reveal/after-the-tip-expanded-mobile.webp",
+  "public/media/projects/homepage-reveal/after-the-tip-expanded.webp",
+  "public/media/projects/homepage-reveal/after-the-tip-thumbnail.webp",
+  "public/media/projects/homepage-reveal/nepal-expanded-mobile.webp",
+  "public/media/projects/homepage-reveal/nepal-expanded.webp",
+  "public/media/projects/homepage-reveal/nepal-thumbnail.webp",
+  "public/media/projects/homepage-reveal/runbook-interface-expanded-mobile-v2.webp",
+  "public/media/projects/homepage-reveal/runbook-interface-expanded-v2.webp",
+  "public/media/projects/homepage-reveal/runbook-interface-thumbnail-v2.webp",
+  "public/media/projects/homepage-reveal/west-hawaii-expanded-mobile.webp",
+  "public/media/projects/homepage-reveal/west-hawaii-expanded.webp",
+  "public/media/projects/homepage-reveal/west-hawaii-thumbnail.webp"
+];
+assert.equal(nativeHomepageAdditions.length, 16);
 assert.equal(predecessorPublicPaths.length, 98);
 assert.equal(nfa073PublicAdditions.length, 14);
 assert.equal(new Set(manifest.files).size, manifest.files.length, "Duplicate candidate path");
-assert.deepEqual([...manifest.files].sort(), [...predecessorPublicPaths, ...nfa073PublicAdditions].sort(),
-  "The public roster must retain every exact predecessor path and only the 14 NFA-073 additions.");
+assert.deepEqual([...manifest.files].sort(), [...predecessorPublicPaths, ...nfa073PublicAdditions, ...nativeHomepageAdditions].sort(),
+  "The public roster must retain every predecessor path and only the exact16 native-homepage additions, including the three reviewed Hawaiʻi frames.");
 
 const componentFiles = await listFiles("components");
 assert.deepEqual(componentFiles, [
@@ -234,6 +254,10 @@ assert.deepEqual(componentFiles, [
   "components/chrome/SiteHeader.tsx",
   "components/editorial/EvidenceLink.tsx",
   "components/editorial/ProjectFactLedger.tsx",
+  "components/home/PersonalFieldAtlas.tsx",
+  "components/home/ProjectImageReveal.tsx",
+  "components/home/homepage.module.css",
+  "components/home/projects.ts",
 ]);
 const appFiles = await listFiles("app");
 const modulePaths = [...appFiles, ...componentFiles].filter((path) => /\.(?:tsx?|css)$/.test(path));
@@ -260,12 +284,32 @@ while (pendingModules.length) {
     if (imported && !reachableModules.has(imported)) pendingModules.push(imported);
   }
 }
+// Only the two exact retained predecessor modules may be unreachable.
+// They are preserved history in this test-only migration, not active homepage code.
+const retainedUnusedPredecessor = new Map([
+  ["components/ProjectCarousel.tsx","7cc7805020ea5895f4f035ba3b0e1501fe8ab652c2c75c4515ebc7a500b472a7"],
+  ["components/ProjectCarousel.module.css","7490ee2cf5f746b8f9c4361f1b5614fc0f3339e5a0edbcf2905e2e9176a3a0c4"],
+]);
 for (const componentPath of componentFiles) {
-  assert.ok(reachableModules.has(componentPath), `Unreachable public component/module: ${componentPath}`);
-  assert.ok(manifest.files.includes(componentPath), `Component/module missing from public roster: ${componentPath}`);
+  assert.ok(manifest.files.includes(componentPath), "Component/module missing from public roster: " + componentPath);
+  if (retainedUnusedPredecessor.has(componentPath)) {
+    assert.equal(sha256(moduleSources.get(componentPath)), retainedUnusedPredecessor.get(componentPath),
+      "Retained unused predecessor bytes changed: " + componentPath);
+    assert.ok(!reachableModules.has(componentPath), "Legacy carousel must not be active in the selected application.");
+  } else {
+    assert.ok(reachableModules.has(componentPath), "Unreachable public component/module: " + componentPath);
+  }
 }
-assert.ok(moduleSources.get("components/ProjectCarousel.tsx").includes('"./ProjectCarousel.module.css"'),
-  "The carousel must own its reachable scoped stylesheet.");
+for (const [path, source] of moduleSources) {
+  if (retainedUnusedPredecessor.has(path)) continue;
+  assert.doesNotMatch(source, /from\s*["'][^"']*ProjectCarousel(?:\.module\.css)?["']/,
+    "Active source may not import the retained predecessor carousel: " + path);
+}
+assert.ok(moduleSources.get("components/home/PersonalFieldAtlas.tsx").includes('"./homepage.module.css"'));
+assert.ok(moduleSources.get("components/home/ProjectImageReveal.tsx").includes('"./homepage.module.css"'));
+const nativeCssPath = "components/home/homepage.module.css";
+const nativeHome = moduleSources.get("components/home/PersonalFieldAtlas.tsx");
+const nativeReveal = moduleSources.get("components/home/ProjectImageReveal.tsx");
 
 const cssFiles = [...await listFiles("app", ".css"), ...await listFiles("components", ".css")].sort();
 const cssSources = new Map(await Promise.all(cssFiles.map(async (path) => [path, await read(path)])));
@@ -344,10 +388,22 @@ for (const [path, source] of cssSources) {
   const localNames = new Set();
   for (const [, name, value] of definitions) {
     if (path === "app/globals.css" && foundationNames.has(name)) continue;
-    assert.equal(path, "app/work/openclaw-showcase/page.module.css", `Route-local token in ${path}: --${name}`);
-    assert.ok([folioAliases.get(name), printFolioAliases.get(name)].some((alias) => value.trim() === `var(--${alias})`),
-      `OpenClaw alias drifted: --${name}`);
+    if (path === nativeCssPath) {
+      const nativeTokens = new Map([["pfr-night","#193342"],["pfr-ink","#163443"],["pfr-frost","#f0f6f5"],["pfr-muted","#bfd0d8"]]);
+      assert.ok(nativeTokens.has(name), "Unreviewed native token: --" + name);
+      assert.equal(value.trim(), nativeTokens.get(name), "Native presentation token drifted: --" + name);
+      localNames.add(name);
+      continue;
+    }
+    assert.equal(path, "app/work/openclaw-showcase/page.module.css", "Route-local token in " + path + ": --" + name);
+    assert.ok([folioAliases.get(name), printFolioAliases.get(name)].some((alias) => value.trim() === "var(--" + alias + ")"),
+      "OpenClaw alias drifted: --" + name);
     localNames.add(name);
+  }
+  if (path === nativeCssPath) {
+    assert.deepEqual([...localNames].sort(), ["pfr-frost","pfr-ink","pfr-muted","pfr-night"]);
+    assert.ok(nativeReveal.includes('"--pfr-image-surface": imageSurface'), "Native image surface must remain typed source data.");
+    localNames.add("pfr-image-surface");
   }
   localDefinedNames.set(path, localNames);
   if (path === "app/work/openclaw-showcase/page.module.css") {
@@ -367,13 +423,45 @@ for (const [path, source] of cssSources) {
       "Exactly the reviewed missing-data hatch is allowed.");
     withoutFoundation = source.replace(reviewedHatch, "");
   }
+  if (path === nativeCssPath) {
+    // Scoped, reviewed design/crop exceptions apply ONLY to the selected preview component.
+    // Full scientific/case media elsewhere keep the unchanged no-crop/no-literal policy.
+    const allowedNativeColors = new Set(["#193342","#163443","#f0f6f5","#bfd0d8","#9eb6c1","#294653","#ffffff"]);
+    const actualColors = [...new Set([...source.matchAll(/#[0-9a-f]{3,8}\b/gi)].map(([hex]) =>
+      hex.length === 4 ? "#" + [...hex.slice(1)].map(c => c + c).join("") : hex.toLowerCase()))].sort();
+    assert.deepEqual(actualColors, [...allowedNativeColors].sort(), "Only the reviewed native palette is permitted.");
+    withoutFoundation = source.replace(/#[0-9a-f]{3,8}\b/gi, "reviewed-native-color");
+    const clipValues = [...source.matchAll(/\bclip-path\s*:\s*([^;]+);/gi)].map(([,value]) => value.trim());
+    assert.deepEqual(clipValues, ["inset(50%)"],
+      "Only screen-reader hiding is permitted; physical frame expansion replaces the reveal wipe.");
+    assert.doesNotMatch(source, /\bmask(?:-image)?\s*:/i, "No masking exception is granted.");
+    assert.equal((source.match(/\bobject-fit\s*:\s*cover\b/gi) ?? []).length, 1,
+      "Only one reviewed thumbnail detail crop may use cover.");
+    assert.match(source, /\.pfrThumbnail\s*\{[^}]*object-fit:cover/);
+    assert.match(source, /\.pfrFullImage\s+img\s*\{[^}]*object-fit:contain;/,
+      "Expanded source evidence must remain proportional and fully contained.");
+    assert.match(source, /\.pfrMediaFrame\s*\{[^}]*transition:top 650ms[^}]*width 650ms[^}]*height 650ms/,
+      "One persistent frame must interpolate its real geometry in both directions.");
+    assert.ok(nativeReveal.includes('data-project-image-frame aria-hidden="true"') && nativeReveal.includes("data-project-image-semantic"),
+      "Decorative motion and the qualified native accessible image must remain separate.");
+    const cleanCss = source.replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const [, selector] of cleanCss.matchAll(/(?:^|})\s*([^{}]+)\{[^{}]*\}/g)) {
+      assert.ok(selector.trim().startsWith(".pfr") || /^(?:from|to)$/.test(selector.trim()) || selector.trim().startsWith("@"),
+        "Native styles may not escape their local component scope: " + selector);
+    }
+    for (const [foreground,background] of [["#163443","#9eb6c1"],["#294653","#9eb6c1"],["#f0f6f5","#193342"],["#bfd0d8","#193342"],["#f0f6f5","#163443"]]) {
+      assert.ok(contrast(foreground,background) >= 4.5, "Native role contrast fails: " + foreground + " / " + background);
+    }
+  }
   assert.ok(!/(?:#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i.test(withoutFoundation), `Raw color outside foundation: ${path}`);
   assert.ok(!/\b(?:backdrop-)?filter\s*:/i.test(source), `Filter effect is forbidden: ${path}`);
   assert.ok(!/\burl\s*\(/i.test(source), `CSS imagery is forbidden: ${path}`);
-  for (const [, value] of source.matchAll(/\b(?:clip-path|mask(?:-image)?)\s*:\s*([^;]+);/gi)) {
-    assert.equal(value.trim(), "none", `Unreviewed cropping/masking is forbidden: ${path}`);
+  if (path !== nativeCssPath) {
+    for (const [, value] of source.matchAll(/\b(?:clip-path|mask(?:-image)?)\s*:\s*([^;]+);/gi)) {
+      assert.equal(value.trim(), "none", "Unreviewed cropping/masking is forbidden: " + path);
+    }
+    assert.ok(!/\bobject-fit\s*:\s*cover\b/i.test(source), "Scientific/source media cropping is forbidden: " + path);
   }
-  assert.ok(!/\bobject-fit\s*:\s*cover\b/i.test(source), `Scientific/source media cropping is forbidden: ${path}`);
   for (const match of source.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const selector = match[1].trim();
     const body = match[2];
@@ -436,52 +524,252 @@ for (const foreground of ["#F0F9FC", "#BDD3DF", "#A7E0F1"]) {
   assert.ok(contrast(foreground, "#12232F") >= 4.5, `Root social-image contrast failed: ${foreground}`);
 }
 
-assert.match(homePage, /How I work/);
-assert.match(homePage, /data-portfolio-making/);
-assert.match(homePage, /<ProjectCarousel\s+projectNames=\{projectNames\}/);
-assert.match(moduleSources.get("components/ProjectCarousel.tsx"), /data-current-work\s+data-front-door-flagships\s+data-project-carousel/);
-assert.doesNotMatch(homePage, /data-featured-turn|9 of 84/);
-assert.doesNotMatch(homePage, /BL\.F0[1-3]|burnlens-report|burnlens-media-manifest/);
+assert.match(homePage, /import\s*\{\s*PersonalFieldAtlas\s*\}\s*from\s*["']@\/components\/home\/PersonalFieldAtlas["']/);
+assert.match(nativeHome, /aria-label="About Drew"/);
+assert.match(nativeHome, /I set the direction, make product decisions and review the result\./);
+assert.match(nativeHome, /Development is collaborative and includes Codex assistance\./);
+assert.match(nativeHome, /aria-label="Selected project previews"/);
+assert.match(nativeHome, /href="\/work\/burnlens"/);
+assert.doesNotMatch(homePage + nativeHome, /ProjectCarousel|data-carousel-slide/);
+assert.doesNotMatch(homePage + nativeHome, /data-featured-turn|9 of 84/);
+assert.doesNotMatch(homePage + nativeHome, /BL\.F0[1-3]|burnlens-report|burnlens-media-manifest/);
 assert.doesNotMatch(
   burnlensPage,
   /(?:BL\.F0[1-3]|data-governed-figure|data-media-warning|burnlens-(?:report|failure-record|media-manifest)|baseline-evaluation\.png|model-decision\.png|ward-creek-overlay\.png)/,
 );
 assert.doesNotMatch(burnlensPage, /from\s+["']next\/image["']|<\s*(?:Image|img)\b/);
 assert.doesNotMatch(burnlensCss, /url\s*\(/i);
-const generatedRouteBlock = tests.match(/const representativeRoutes = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
-const generatedRouteTests = (generatedRouteBlock.match(/^\s*"\//gm) ?? []).length;
-const topLevelTests = (tests.match(/^test\(/gm) ?? []).length;
-assert.equal(topLevelTests + generatedRouteTests, 71,
-  "The browser regression suite must retain 65 predecessor tests and six NFA-047 regressions.");
-const exactBrowserSpecs = new Map([
-  ["tests/portfolio.spec.ts", 71],
-  ["tests/wildfire-response.spec.ts", 4],
-  ["tests/after-the-tip.spec.ts", 9],
-  ["tests/west-hawaii-heat-exposure.spec.ts", 7],
-  ["tests/nepal-satellite-atlas.spec.ts", 7],
-  ["tests/homepage-contributions.spec.ts", 6],
-  ["tests/polar-night.spec.ts", 8],
+// NFA106: explicit reviewed current titles and route expansion; not historical byte slices.
+const reviewedSpecCoverage = new Map([
+  [
+    "tests/portfolio.spec.ts",
+    {
+      "titles": [
+        "NFA-084 résumé printing has a native no-JavaScript fallback",
+        "NFA-084 hydrated résumé print action invokes browser print",
+        "NFA-086 contribution-first résumé preserves exact copy and collapsed canonical evidence with and without JavaScript",
+        "NFA-086 résumé details expose complete facts through independent native keyboard controls",
+        "NFA-086 closed résumé details print every canonical fact without changing open state",
+        "mobile navigation is native, visible, and keyboard-reachable",
+        "NFA-047 mobile navigation closes with owned focus across widths and inputs",
+        "NFA-047 delayed hydration preserves a native open menu at mobile widths",
+        "NFA-047 modified and external links retain the current mobile disclosure",
+        "NFA-047 breakpoint navigation closes a hidden menu without stealing desktop focus",
+        "case-study chapter indexes remain keyboard-native at mobile and desktop widths",
+        "representative routes hold at every required review width",
+        "mobile homepage keeps biography first and selected contributions legible",
+        "reduced-motion preference disables smooth scrolling",
+        "homepage preserves biography, supported contributions and portfolio journeys without JavaScript",
+        "work index preserves its three-lane hierarchy without JavaScript",
+        "front-door copy explains technical identifiers before using them",
+        "work-index visual worlds and lane hierarchy remain distinct without titles or raster images",
+        "front-door accessibility holds at mobile and desktop review widths",
+        "front-door links expose unobscured high-contrast keyboard focus",
+        "front-door descendants remain contained at every review width",
+        "front-door routes respect reduced motion and preserve decisive print evidence",
+        "BurnLens release-governance story remains readable without JavaScript",
+        "Runbook authority evidence remains readable without JavaScript",
+        "Runbook headings and accessibility hold at mobile and desktop review widths",
+        "Runbook descendants remain contained and the output matrix keeps its intended columns",
+        "Runbook dark surfaces expose a strong keyboard focus indicator",
+        "Runbook respects reduced motion and prints its evidence in readable contrast",
+        "Runbook Open Graph endpoint is an exact 1200 by 630 PNG",
+        "flagship failure evidence remains only where the selected public story supports it",
+        "Quest Craft is exactly three supporting movements with the canonical route projection",
+        "Quest Craft native agency score changes state without generating or mutating content",
+        "Quest Craft remains complete and operable without JavaScript",
+        "Quest Craft corrections own exact claims and immutable evidence links",
+        "Quest Craft passes targeted accessibility and semantic hierarchy at mobile and desktop",
+        "Quest Craft contains every review width and only its labeled table scrolls",
+        "Quest Craft focus, reduced motion, and print retain every decisive boundary",
+        "Quest Craft keeps a coherent reading order and branching identity without titles",
+        "Quest Craft preserves native control meaning in forced-colors mode",
+        "Quest Craft metadata and governed social media remain exact",
+        "OpenClaw is exactly three documentary movements with canonical ownership",
+        "OpenClaw native disclosure layers remain independent without runtime requests",
+        "OpenClaw documentary evidence and independent disclosures survive without JavaScript",
+        "OpenClaw passes targeted Axe, focus, and target-size gates",
+        "OpenClaw contains every required width, 200 percent text, and 400 percent reflow",
+        "OpenClaw preserves disclosure meaning in forced colors, reduced motion, and print",
+        "OpenClaw metadata, social image, and title-hidden folio identity remain exact",
+        "OpenClaw stays inside its isolated local supporting-route budget",
+        "historical coursework forms a bounded reading shelf outside the case-study lane",
+        "résumé projects canonical hierarchy, provenance, no-JavaScript, and technology bindings",
+        "résumé survives every review width, text zoom, forced colors, reduced motion, and print",
+        "résumé metadata, professional profile URLs, and isolated performance remain bounded",
+        "historical coursework and résumé lanes retain their exact source-bound separation",
+        "historical coursework remains complete without JavaScript",
+        "flagship case studies preserve a clear next portfolio destination",
+        "BurnLens release and evidence identities remain visibly distinct",
+        "selected learning distinguishes linked credentials from unlinked study",
+        "metadata and discovery surfaces identify the personal site",
+        "shared chrome keeps one opaque, readable, high-contrast system across every route",
+        "root Open Graph endpoint is an exact meaningful 1200 by 630 PNG",
+        "convenience and legacy routes are permanent and contact intake is disabled",
+        "security and privacy defaults are present",
+        "homepage and work index independently stay inside conservative local lab budgets",
+        "homepage stays inside conservative local lab budgets",
+        "BurnLens stays inside conservative local lab budgets",
+        "Runbook Sentinel stays inside conservative local lab budgets",
+        "Quest Craft stays inside its isolated local supporting-route budget",
+        "NFA-047 existing evidence receives truthful work and resume labels",
+        "NFA-047 Runbook next threshold stays historical, sourced, and readable",
+        "NFA-099 OpenClaw natural keyboard traversal preserves independent disclosures and return"
+      ],
+      "templates": [
+        "`${route} is semantic, accessible, and contained at mobile width`"
+      ],
+      "routes": [
+        "/",
+        "/work",
+        "/work/burnlens",
+        "/work/runbook-sentinel",
+        "/work/quest-craft",
+        "/work/openclaw-showcase",
+        "/resume"
+      ],
+      "declared": 77
+    }
+  ],
+  [
+    "tests/wildfire-response.spec.ts",
+    {
+      "titles": [
+        "Wildfire case study renders its contribution and actual media across sizes",
+        "Tradeoffs work by keyboard and the case is discoverable from selected work",
+        "Case study has no automated WCAG A or AA violations",
+        "Core case-study journey works without JavaScript and with reduced motion"
+      ],
+      "templates": [],
+      "routes": [],
+      "declared": 4
+    }
+  ],
+  [
+    "tests/after-the-tip.spec.ts",
+    {
+      "titles": [
+        "After the Tip shows the contribution and two legible figures across viewport sizes",
+        "Selected work links to the case and ribbon explanation operates by keyboard",
+        "Shared-clock listening is optional, native, and does not autoplay",
+        "A paused cohort switch preserves the elapsed position on the common clock",
+        "Playback and rapid cohort switches keep the selected excerpt on the shared clock",
+        "A persistent selected-track failure retains paused position and the selected cohort for retry",
+        "A persistent selected-track failure retains the active playback intent for retry",
+        "After the Tip has no automated WCAG A or AA violations",
+        "The core comparison and native audio fallback remain usable without JavaScript"
+      ],
+      "templates": [],
+      "routes": [],
+      "declared": 9
+    }
+  ],
+  [
+    "tests/west-hawaii-heat-exposure.spec.ts",
+    {
+      "titles": [
+        "Year-specific reef maps decode and the case stays contained at four viewport sizes",
+        "Habitat shares preserve the common denominator and visible missing-data category",
+        "The native explanation opens by keyboard and distinguishes all from assessed habitat",
+        "Selected work shows both real maps and leads to the reef study",
+        "Closed and open explanations have no automated WCAG A or AA violations with reduced motion",
+        "The comparison, work-index navigation and values remain usable without JavaScript",
+        "Core routes fetch local resources while official source links remain unvisited"
+      ],
+      "templates": [],
+      "routes": [],
+      "declared": 7
+    }
+  ],
+  [
+    "tests/nepal-satellite-atlas.spec.ts",
+    {
+      "titles": [
+        "The complete dated radar map decodes and stays contained at four viewport sizes",
+        "The full-size map opens the same local PNG without contacting source sites",
+        "Native keyboard details preserve exact coverage and distinguish display from change",
+        "Selected work foregrounds the Nepal project and leads to the actual map",
+        "Closed and open methods have no automated WCAG A or AA violations with reduced motion",
+        "The map, contribution story, coverage and navigation remain usable without JavaScript",
+        "Core routes use local resources while credited source links remain unvisited"
+      ],
+      "templates": [],
+      "routes": [],
+      "declared": 7
+    }
+  ],
+  [
+    "tests/homepage-contributions.spec.ts",
+    {
+      "titles": [
+        "Biography-first discovery preserves contributions, skills and screenshot source boundaries",
+        "All-project discovery retains current-project qualifications and distinct flagship records",
+        "Actual screenshot previews decode in their purpose-made mobile and desktop frames at four widths",
+        "Real keyboard journeys expand native previews, restore focus with Escape and reach each selected case",
+        "Direct homepage journeys reach all projects, the other flagship, résumé, workbench and contact",
+        "Native previews, project journeys and the mobile menu remain usable without JavaScript",
+        "Reduced-motion reading keeps local resources, accurate metadata and no autoplay media",
+        "Closed previews, each expanded screenshot and the native mobile menu have no automated WCAG violations"
+      ],
+      "templates": [],
+      "routes": [],
+      "declared": 8
+    }
+  ],
+  [
+    "tests/polar-night.spec.ts",
+    {
+      "titles": [
+        "Polar-night project previews stay manual and native disclosure exclusivity never hides project links",
+        "Image reveal motion is finite, image inspection stays unfaded and only the separate Collapse control closes it",
+        "Dashboard SSR and no-JavaScript companion retain the exact five dated qualified records",
+        "Independent dashboard HTTP artifacts match reviewed bytes and its CSP exception stays route-local",
+        "Interactive dashboard filters real records and exposes only the selected source preview",
+        "Actual independent dashboard is usable at three widths with no overflow or automated WCAG violations",
+        "Print keeps a light motion-free biography and project-link handoff while scientific qualifiers remain on All projects",
+        "Native expanded screenshots keep controls, context and attribution inside responsive frames with a touch inspection path"
+      ],
+      "templates": [],
+      "routes": [],
+      "declared": 8
+    }
+  ]
 ]);
-assert.deepEqual(await listFiles("tests", ".spec.ts"), [...exactBrowserSpecs.keys()].sort(),
-  "The integrated browser suite must contain only the explicit 104-test predecessor and eight NFA-073 regressions.");
-for (const [path, expectedCount] of exactBrowserSpecs) {
-  if (path === "tests/portfolio.spec.ts") continue;
+assert.deepEqual(await listFiles("tests", ".spec.ts"), [...reviewedSpecCoverage.keys()].sort(),
+  "Only the seven reviewed browser specs may be declared.");
+const declaredBySpec = new Map();
+for (const [path, expected] of reviewedSpecCoverage) {
   const source = await read(path);
-  assert.equal((source.match(/^test\(/gm) ?? []).length, expectedCount,
-    `${path}: the explicit bounded browser regression count drifted.`);
-  assert.ok(manifest.files.includes(path), `${path}: the exact browser spec must be allowlisted.`);
+  assert.doesNotMatch(source, /\btest\.(?:skip|fixme|only)\s*\(/,
+    "Skipping, fixme or exclusive execution is forbidden in the qualification suite: " + path);
+  const calls = [...source.matchAll(/^\s*test\(\s*("(?:[^"\\]|\\.)*"|`[^`]*`)/gm)].map((match) => match[1]);
+  const titles = calls.filter(value => value.startsWith('"')).map(value => JSON.parse(value));
+  const templates = calls.filter(value => value.startsWith("`"));
+  assert.equal((source.match(/^\s*test\s*\(/gm) ?? []).length, calls.length,
+    "A non-reviewed or dynamic test declaration cannot be silently omitted: " + path);
+  assert.deepEqual(titles, expected.titles, "Reviewed regression titles/order drifted: " + path);
+  assert.deepEqual(templates, expected.templates, "Reviewed generated test title drifted: " + path);
+  const routeBlock = source.match(/const representativeRoutes = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
+  const routes = [...routeBlock.matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(routeBlock.replace(/"[^"]+"|[\s,]/g, ""), "", "Representative routes must remain a static literal array.");
+  assert.deepEqual(routes, expected.routes, "Representative route coverage drifted.");
+  const declared = titles.length + templates.length * routes.length;
+  assert.equal(declared, expected.declared, "Reviewed declaration census drifted: " + path);
+  assert.ok(manifest.files.includes(path), "Browser spec missing from public roster: " + path);
+  declaredBySpec.set(path, declared);
 }
-const expectedBrowserTests = [...exactBrowserSpecs.values()].reduce((total, count) => total + count, 0);
-assert.equal(expectedBrowserTests, 112);
+const expectedBrowserTests = [...declaredBySpec.values()].reduce((total,count) => total + count,0);
+assert.equal(expectedBrowserTests, 120,
+  "Current source census must match the reviewed120-case declaration contract; execution is verified separately.");
 
 assert.equal(packageJson.scripts["verify:integrated-u08"], "node scripts/verify-integrated-u08.mjs");
 assert.ok(packageJson.scripts.check.includes("npm run verify:integrated-u08"));
 assert.equal(packageJson.scripts.verify, "npm run check && npm run test:site");
 assert.ok(manifest.script_files.includes("scripts/verify-integrated-u08.mjs"));
 assert.ok(manifest.files.includes("scripts/verify-integrated-u08.mjs"));
-assert.match(releaseVerifier, /EXPECTED_BROWSER_TESTS\s*=\s*112/);
-// The current release helper matches the full 112-test suite. Its historical
-// 104-test NFA-064/070 predecessor remains recorded below, not current authority.
+assert.match(releaseVerifier, /EXPECTED_BROWSER_TESTS\s*=\s*120/);
+// The release helper must enforce the current native-homepage census.
+// Actual clean-snapshot collection and browser execution remain separate checks.
 assert.match(releaseVerifier, /verifySourcePublicScope\(\);/);
 assert.match(releaseVerifier, /verify:integrated-u08/);
 assert.match(tests, /shared chrome keeps one opaque, readable, high-contrast system across every route/);
@@ -495,12 +783,18 @@ console.log(JSON.stringify({
   preserved_legacy_tokens: legacyFoundation.size,
   reviewed_presentation_roles: presentationRoles.size,
   exact_light_print_roles: printRoles.size,
-  reachable_components: componentFiles.filter((path) => path.endsWith(".tsx")).length,
-  reachable_component_stylesheets: componentFiles.filter((path) => path.endsWith(".css")).length,
+  reachable_components: componentFiles.filter((path) => path.endsWith(".tsx") && reachableModules.has(path)).length,
+  retained_unused_predecessor_files: [...retainedUnusedPredecessor.keys()],
+  reachable_component_stylesheets: componentFiles.filter((path) => path.endsWith(".css") && reachableModules.has(path)).length,
   explicit_deletions: manifest.explicit_deletions.length,
-  expected_browser_tests: expectedBrowserTests,
+  declared_browser_tests: expectedBrowserTests,
+  declared_cases_by_spec: Object.fromEntries(declaredBySpec),
+  browser_execution_qualified: false,
+  coverage_authority: "NFA109 exact named source declarations; actual candidate collection and browser execution are separate required checks",
   root_social_image_pairs: 3,
   historical_release_helper_test_count: 104,
-  current_release_helper_test_count: 112,
+  predecessor_release_helper_test_count: 112,
+  release_helper_expected_test_count: expectedBrowserTests,
+  release_helper_requires_actual_browser_collection: true,
   historical_release_helper_is_nfa073_final_validator: false,
 }, null, 2));
