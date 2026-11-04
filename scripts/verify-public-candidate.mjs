@@ -603,6 +603,73 @@ function assertJpegHasNoMetadata(path, bytes) {
   }
 }
 
+// Exact reviewed screenshot bytes only, not general WebP upload support.
+// Structural checks precede immutable identity; no metadata-bearing/animated profile is accepted.
+const reviewedHomepageWebps = new Map([
+  ["public/media/projects/homepage-reveal/after-the-tip-expanded-mobile.webp", { bytes: 7320, width: 640, height: 640, sha256: "9cb7e4de1eb91bba6222dd48d035440b7a53ba170617c71682045d0136600721" }],
+  ["public/media/projects/homepage-reveal/after-the-tip-expanded.webp", { bytes: 11154, width: 1168, height: 600, sha256: "1b3d287937fd57fbf37e6f67baddb5762f223f99ed55ceb99741fc5bb2391a40" }],
+  ["public/media/projects/homepage-reveal/after-the-tip-thumbnail.webp", { bytes: 4326, width: 320, height: 380, sha256: "28143dd32b5b941757c16d2b7bc5b2fc9b1a0f778eda7ee1976d259bff538dec" }],
+  ["public/media/projects/homepage-reveal/nepal-expanded-mobile.webp", { bytes: 28884, width: 640, height: 640, sha256: "9fcdfe08cc51bbdccf8201d2397ac854fb43e0d6206e44cdc6e595f09b21e966" }],
+  ["public/media/projects/homepage-reveal/nepal-expanded.webp", { bytes: 92024, width: 1168, height: 600, sha256: "13a36fb18ac1b1e4e44a5c26124592728973a381eb96512b036de6aa99625a78" }],
+  ["public/media/projects/homepage-reveal/nepal-thumbnail.webp", { bytes: 45468, width: 320, height: 380, sha256: "4bd64448359811bf19e8a9779959ab492ce6b7510b1ad24b3b7ca337aa063888" }],
+  ["public/media/projects/homepage-reveal/runbook-interface-expanded-mobile-v2.webp", { bytes: 19472, width: 640, height: 640, sha256: "d8023dcea77057d0e614fb82a50b8bb435bb723047817ad8a85b353f0877fbe2" }],
+  ["public/media/projects/homepage-reveal/runbook-interface-expanded-v2.webp", { bytes: 43160, width: 1168, height: 600, sha256: "9e6d235679300a3d6ee41658e57c751a14a3beb23bcf4956bebb9cbfe4cc0145" }],
+  ["public/media/projects/homepage-reveal/runbook-interface-thumbnail-v2.webp", { bytes: 10910, width: 320, height: 380, sha256: "612953f4f30e3ff22d96fcdeaee4715bfd9d21a44da7078b850f24c4dc89a181" }],
+  ["public/media/projects/homepage-reveal/west-hawaii-expanded-mobile.webp", { bytes: 15532, width: 640, height: 640, sha256: "874c7e192ca4b7517839fa9e63df3de31be34063042e253abd464d09a8762364" }],
+  ["public/media/projects/homepage-reveal/west-hawaii-expanded.webp", { bytes: 35900, width: 1168, height: 600, sha256: "6feb93908e6c3e458eb97e47c7ab2160c3fe7835afa97deaf4fa4714a23e3089" }],
+  ["public/media/projects/homepage-reveal/west-hawaii-thumbnail.webp", { bytes: 5198, width: 320, height: 380, sha256: "40d54296189bd65d3e89b0a4d090e9c83b2da6de68a2a3698ad2571629662c83" }],
+]);
+
+function assertReviewedHomepageWebp(path, bytes) {
+  const expected = reviewedHomepageWebps.get(path);
+  if (!expected) throw new Error(`Unreviewed WebP path in public candidate: ${path}`);
+  // latin1 preserves high bits; ASCII decoding must not turn a signature alias into RIFF/WEBP.
+  if (bytes.length < 12 || bytes.toString("latin1", 0, 4) !== "RIFF"
+    || bytes.toString("latin1", 8, 12) !== "WEBP") {
+    throw new Error(`Invalid WebP signature or truncated header: ${path}`);
+  }
+  if (bytes.readUInt32LE(4) !== bytes.length - 8) {
+    throw new Error(`WebP RIFF length mismatch: ${path}`);
+  }
+  let offset = 12;
+  let imageChunks = 0;
+  while (offset < bytes.length) {
+    if (offset + 8 > bytes.length) throw new Error(`Truncated WebP chunk header: ${path}`);
+    const type = bytes.toString("latin1", offset, offset + 4);
+    const length = bytes.readUInt32LE(offset + 4);
+    const dataStart = offset + 8;
+    const dataEnd = dataStart + length;
+    const chunkEnd = dataEnd + (length % 2);
+    if (chunkEnd > bytes.length) throw new Error(`Truncated WebP chunk payload: ${path}`);
+    if (length % 2 && bytes[dataEnd] !== 0) throw new Error(`Invalid WebP chunk padding: ${path}`);
+    if (type !== "VP8 ") {
+      throw new Error(`WebP metadata or unsupported chunk ${type} found in: ${path}`);
+    }
+    imageChunks += 1;
+    if (imageChunks !== 1 || offset !== 12 || length < 10) {
+      throw new Error(`WebP requires exactly one complete VP8 chunk: ${path}`);
+    }
+    const frameTag = bytes.readUIntLE(dataStart, 3);
+    const firstPartitionBytes = frameTag >>> 5;
+    if ((frameTag & 1) !== 0 || ((frameTag >>> 1) & 7) > 3 || (frameTag & 16) === 0
+      || !bytes.subarray(dataStart + 3, dataStart + 6).equals(Buffer.from([0x9d, 0x01, 0x2a]))
+      || firstPartitionBytes === 0 || firstPartitionBytes > length - 10) {
+      throw new Error(`Invalid WebP VP8 key-frame profile: ${path}`);
+    }
+    // Exact unscaled key-frame dimensions, not merely dimensions masked to 14 bits.
+    if (bytes.readUInt16LE(dataStart + 6) !== expected.width
+      || bytes.readUInt16LE(dataStart + 8) !== expected.height) {
+      throw new Error(`Reviewed WebP dimensions or scaling mismatch: ${path}`);
+    }
+    offset = chunkEnd;
+  }
+  if (imageChunks !== 1) throw new Error(`WebP requires exactly one complete VP8 chunk: ${path}`);
+  if (bytes.byteLength !== expected.bytes
+    || createHash("sha256").update(bytes).digest("hex") !== expected.sha256) {
+    throw new Error(`Reviewed WebP source identity mismatch: ${path}`);
+  }
+}
+
 // This is an exact generated-media exception, not support for arbitrary WAV uploads.
 // Source/provenance changes require a new reviewed identity, not a manifest-only hash update.
 const generatedAudioSources = {
@@ -707,6 +774,8 @@ for (const path of listed) {
     assertPngHasNoMetadata(path, bytes);
   } else if (suffix === ".jpg" || suffix === ".jpeg") {
     assertJpegHasNoMetadata(path, bytes);
+  } else if (suffix === ".webp") {
+    assertReviewedHomepageWebp(path, bytes);
   } else if (suffix === ".wav" && generatedAudioCandidates.has(path)) {
     assertGeneratedPcmWavHasNoMetadata(path, bytes);
     const expected = generatedAudioCandidates.get(path);

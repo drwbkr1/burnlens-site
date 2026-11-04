@@ -41,9 +41,14 @@ export default function WildfireResponseCaseStudy() {
                 map, controls and consequences. I work with Codex on implementation
                 and iteration.
               </p>
-              <a className={styles.textLink} href="#my-decisions">
-                See the decisions <span aria-hidden="true">↓</span>
-              </a>
+              <div className={styles.exitLinks} data-wildfire-entry-actions>
+                <a className={styles.textLink} href="https://wildfire-response-vertical-slice.drew-baker-15.chatgpt.site" target="_blank" rel="noreferrer">
+                  Open the game <span className="sr-only">(opens in a new tab)</span><span aria-hidden="true">↗</span>
+                </a>
+                <a className={styles.textLink} href="#my-decisions">
+                  See the decisions <span aria-hidden="true">↓</span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -185,9 +190,6 @@ export default function WildfireResponseCaseStudy() {
               <a href="/media/projects/wildfire-response/sources.json">Read the media provenance record</a>
             </details>
             <div className={styles.exitLinks}>
-              <a className={styles.textLink} href="https://wildfire-response-vertical-slice.drew-baker-15.chatgpt.site" target="_blank" rel="noreferrer">
-                Open the game <span className="sr-only">(opens in a new tab)</span><span aria-hidden="true">↗</span>
-              </a>
               <Link className={styles.textLink} href="/work">Return to selected work <span aria-hidden="true">←</span></Link>
             </div>
           </div>

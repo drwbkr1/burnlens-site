@@ -725,9 +725,9 @@
   .historyList { margin-top: 1rem; }
   .historyList article { padding-block: 1rem; break-inside: avoid; }
 
-  .currentProject { display: block; padding-block: 1rem; margin-top: 0; break-inside: avoid; }
+  .currentProject { display: block; padding-block: .5rem; margin-top: 0; break-inside: avoid; }
   .currentProject h3 { font-size: 1.8rem; break-after: avoid; }
-  .currentProject p { max-width: none; margin-block: .5rem; }
+  .currentProject p { max-width: none; margin-block: .35rem; font-size: 10pt; line-height: 1.45; }
   .currentProject figure { margin-top: .5rem; break-inside: avoid; }
   .currentProject img,
   .currentProject svg,
@@ -737,4 +737,124 @@
   .audioProject .previewNote { color: black; break-inside: avoid; orphans: 3; widows: 3; }
   .currentProject figcaption::before,
   .audioProject .previewNote::before { content: "Preview omitted in print. "; }
+}
+
+/* NFA-090: contribution-first flagship overview; native records keep full facts. */
+.flagshipLane .flagshipTitle > .contributionSummary {
+  margin-top: 1.5rem;
+  color: var(--color-ink);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.6;
+  text-transform: none;
+}
+
+.recordColumn {
+  min-width: 0;
+  align-self: start;
+}
+
+.recordColumn > .atlasMark,
+.recordColumn > .controlMark {
+  margin-top: 0;
+}
+
+.projectRecord {
+  margin-top: 1.5rem;
+  border-block: 1px solid var(--color-rule);
+}
+
+.projectRecord > summary {
+  min-height: 2.75rem;
+  padding-block: 0.75rem;
+  color: var(--color-ink);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.projectRecord > summary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.fullMaturity {
+  margin: 0 0 1rem;
+  color: var(--color-soft);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.printEvidenceHint {
+  display: none;
+  margin: 1rem 0 0;
+  color: var(--color-soft);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+@supports not selector(::details-content) {
+  .printEvidenceHint { display: block; }
+}
+
+@media (forced-colors: active) {
+  /* Match the system-painted surface in both rendering and contrast APIs.
+     Normal polar-night colors and scientific figures are unchanged. */
+  .flagshipLane,
+  .flagshipLane .atlasMark,
+  .flagshipLane .atlasMark > div,
+  .flagshipLane .controlMark,
+  .flagshipLane .workFacts ul,
+  .flagshipLane .workFacts li {
+    background: Canvas;
+  }
+
+  .flagshipLane,
+  .flagshipLane .eyebrow,
+  .flagshipLane .flagshipTitle > p,
+  .flagshipLane .flagshipTitle > .contributionSummary,
+  .flagshipLane .flagshipTitle > span,
+  .flagshipLane .laneHeading > p,
+  .flagshipLane .atlasMark > div,
+  .flagshipLane .controlMark > span,
+  .flagshipLane .workFacts dt,
+  .flagshipLane .workFacts dd,
+  .flagshipLane .workFacts dd > strong,
+  .flagshipLane .workFacts li strong,
+  .flagshipLane .workFacts li span,
+  .flagshipLane .projectRecord > summary,
+  .flagshipLane .fullMaturity,
+  .flagshipLane .printEvidenceHint {
+    color: CanvasText;
+  }
+
+  .flagshipLane .flagshipTitle a {
+    color: LinkText;
+  }
+
+  .flagshipLane a:focus-visible {
+    outline-color: Highlight;
+  }
+
+  .projectRecord { border-color: CanvasText; }
+  .projectRecord > summary:focus-visible { outline-color: Highlight; }
+}
+
+@media print {
+  .flagshipLane .flagshipTitle > .contributionSummary {
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+  .recordColumn { display: block; }
+  .projectRecord { display: block; margin-top: 0.1in; border: 0; }
+  .projectRecord > summary,
+  .printEvidenceHint { display: none; }
+  .projectRecord::details-content {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+  @supports not selector(::details-content) {
+    .printEvidenceHint { display: block; font-size: 10pt; }
+  }
 }

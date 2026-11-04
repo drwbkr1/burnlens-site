@@ -13,7 +13,9 @@ const manifest = JSON.parse(
 const snapshotRoot = await mkdtemp(join(tmpdir(), "nfa-release-candidate-"));
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 let primaryError;
-const EXPECTED_BROWSER_TESTS = 112;
+// NFA109 retains the observed NFA106 suite: 120 declarations, including route-generated cases.
+// The clean-snapshot collection below must confirm this; it is not a passing-result count.
+const EXPECTED_BROWSER_TESTS = 120;
 
 async function availablePort() {
   return new Promise((resolvePort, rejectPort) => {

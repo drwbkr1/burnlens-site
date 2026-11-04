@@ -388,6 +388,19 @@ for (const [foreground, background] of socialTextPairs) {
   assert.ok(contrast(foreground, background) >= 4.5, `${foreground} on ${background} failed`);
 }
 
+// NFA094-BEGIN
+const nfa094SpecificOpening = "a Python/SQLite synthetic incident-response testbed in";
+assert.equal(pageSource.split(nfa094SpecificOpening).length - 1, 1);
+assert.equal(project.evidence.stack.state, "supported");
+assert.ok(project.evidence.stack.value.some(item => item.name === "Python 3.12+"));
+assert.ok(project.evidence.stack.value.some(item => item.name === "SQLite"));
+assert.ok(project.evidence.personalRole.value.some(item => item.includes("Python runtime") && item.includes("SQLite")));
+const nfa094PredecessorPage = pageSource.replace(nfa094SpecificOpening, "a synthetic incident-response testbed in");
+assert.equal(Buffer.byteLength(nfa094PredecessorPage), 28_940);
+assert.equal(sha256(nfa094PredecessorPage), "78b169760bc8d181c9d554dd9951f744c288fde4ad5956ee6a34cf4f650f782e",
+  "NFA094 must retain every predecessor Runbook page byte outside its exact Python/SQLite insertion.");
+// NFA094-END
+
 console.log(JSON.stringify({
   status: "pass",
   project: project.id,

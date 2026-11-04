@@ -7,6 +7,97 @@
   line-height: 1.6;
 }
 
+/* NFA-086 reader-first disclosure styles start. */
+.page summary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.projectIntro {
+  max-width: 66ch;
+  margin: 0.9rem 0 0;
+  color: var(--color-soft);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.projectDetails {
+  margin-top: 1rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+.projectDetails > summary {
+  min-height: 2.75rem;
+  padding-block: 0.65rem;
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.fullMaturity {
+  margin: 0.75rem 0 0;
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.printEvidenceHint {
+  display: none;
+  margin: 0;
+  padding: 0.85rem clamp(2rem, 5vw, 4.5rem);
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@supports not selector(::details-content) {
+  .printEvidenceHint {
+    display: block;
+  }
+}
+
+@media (forced-colors: active) {
+  .projectDetails {
+    border-color: CanvasText;
+  }
+}
+
+@media print {
+  .projectIntro,
+  .fullMaturity {
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+
+  .projectDetails {
+    display: block;
+    margin-top: 0.08in;
+    border: 0;
+  }
+
+  .projectDetails > summary,
+  .printEvidenceHint {
+    display: none;
+  }
+
+  .projectDetails::details-content {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+
+  @supports not selector(::details-content) {
+    .printEvidenceHint {
+      display: block;
+      padding: 0.05in 0;
+      font-size: 10pt;
+      line-height: 1.4;
+    }
+  }
+}
+/* NFA-086 reader-first disclosure styles end. */
+
 .page a {
   text-decoration-thickness: 1px;
   text-underline-offset: 0.24em;

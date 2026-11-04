@@ -190,8 +190,9 @@ export default function OpenClawShowcaseCaseStudy() {
                   <span>The public record stops at the runtime boundary.</span>
                 </h1>
                 <p className={styles.dek}>
-                  A disclosure-control case about making a private agent-workflow pattern
-                  inspectable without pretending the public documents expose or prove its runtime.
+                  I authored and designed the public documentation layer: a workflow model,
+                  conceptual diagrams and a sanitized representative receipt. This is
+                  documentation only; the excluded runtime was not inspected or evaluated.
                 </p>
                 <a
                   className={styles.snapshotAction}
@@ -242,7 +243,7 @@ export default function OpenClawShowcaseCaseStudy() {
 
             <div className={styles.movementLead}>
               <p className={styles.movementLabel}>Movement one · Disclosure layers</p>
-              <h2>Three filters prevent disclosure drift.</h2>
+              <h2>Three layers describe the disclosure boundary.</h2>
               <p>
                 Each layer is an independent native disclosure. Open any combination to compare
                 the public record, the approval gate, and the material that remains private.

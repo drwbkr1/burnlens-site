@@ -292,6 +292,60 @@ for (const field of ["intendedUser", "testStrategy", "failureDividend", "nextSte
   assert.equal(project.evidence[field].state, "missing", `${field} must remain explicitly missing.`);
 }
 
+// NFA091-BEGIN
+// Accepted local NFA091 candidate identity only; not owner/release approval.
+// Retain the historical target registry and prove the complete predecessor
+// before adapting only the exact reviewed contribution-first page target.
+const acceptedLocalNfa091Page = {
+  bytes: 19_402,
+  sha256: "ef7f2b39a57e4fd227e7621e0c89a13b6c579afad91a32b1ad17a783392d9f5c",
+  predecessorBytes: 19_315,
+};
+const nfa091CopyReplacements = [
+  [`                <p className={styles.dek}>
+                  I authored and designed the public documentation layer: a workflow model,
+                  conceptual diagrams and a sanitized representative receipt. This is
+                  documentation only; the excluded runtime was not inspected or evaluated.
+                </p>`, `                <p className={styles.dek}>
+                  A disclosure-control case about making a private agent-workflow pattern
+                  inspectable without pretending the public documents expose or prove its runtime.
+                </p>`],
+  ["<h2>Three layers describe the disclosure boundary.</h2>",
+    "<h2>Three filters prevent disclosure drift.</h2>"],
+];
+let nfa091PredecessorPage = pageSource;
+for (const [current, predecessor] of nfa091CopyReplacements) {
+  assert.equal(nfa091PredecessorPage.split(current).length - 1, 1,
+    `${pagePath}: the NFA091 migration must reverse exactly one reviewed copy occurrence.`);
+  nfa091PredecessorPage = nfa091PredecessorPage.replace(current, predecessor);
+}
+assert.equal(Buffer.byteLength(pageSource), acceptedLocalNfa091Page.bytes,
+  `${pagePath}: the accepted local NFA091 page byte length drifted.`);
+assert.equal(sha256(pageSource), acceptedLocalNfa091Page.sha256,
+  `${pagePath}: the exact accepted local NFA091 page identity drifted.`);
+assert.equal(Buffer.byteLength(nfa091PredecessorPage), acceptedLocalNfa091Page.predecessorBytes,
+  `${pagePath}: the two copy changes must reconstruct the full predecessor byte length.`);
+assert.equal(sha256(nfa091PredecessorPage), predecessorTargetHashes[pagePath],
+  `${pagePath}: every predecessor byte outside the two exact copy changes must remain unchanged.`);
+assert.equal(project.evidence.personalRole.summary,
+  "Author and designer of the public documentation layer only.",
+  "The contribution-first opening must retain the canonical documentation-only ownership scope.");
+assert.equal(project.evidence.implementation.summary,
+  "Eight Markdown documents, nine conceptual diagrams, a five-stage workflow model, and one sanitized representative receipt.",
+  "The contribution-first opening must retain the exact canonical public-artifact scope.");
+const nfa091CompactedPage = pageSource.replace(/\s+/g, " ");
+for (const boundary of [
+  "documentation only; the excluded runtime was not inspected or evaluated.",
+  "The documents explain an intended process. They do not show that the private runtime performed or enforced it.",
+  exactRuntimeCommitment,
+  "The disclosure layers do not prove technical access enforcement.",
+  "The representative receipt is not an actual-run record.",
+]) {
+  requireText(nfa091CompactedPage, boundary, `${pagePath} NFA091 retained content boundary`);
+}
+expectedTargetHashes[pagePath] = acceptedLocalNfa091Page.sha256;
+// NFA091-END
+
 for (const [path, expectedHash] of Object.entries(expectedTargetHashes)) {
   assert.equal(sha256(readFileSync(resolve(root, path))), expectedHash, `${path}: frozen accepted target drifted.`);
 }

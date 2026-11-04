@@ -47,8 +47,8 @@ export default function WestHawaiiHeatExposurePage() {
           <h1>Heat exposure<br />across West<br /><em>Hawaiʻi reefs.</em></h1>
           <div className={styles.intro}>
             <p className={styles.question}>What happens when an ocean-scale signal meets a coastal habitat map?</p>
-            <p>I chose to study where satellite heat stress intersects mapped reef and hardbottom habitat—and whether 2019 exposed more area than 2015.</p>
-            <p>The work connects a climate question to a spatial comparison, then leaves room for the result to challenge the starting idea.</p>
+            <p data-reef-contribution>I worked through a guided ArcGIS workflow to correct coastal coverage, compare habitat area instead of cell counts and keep missing heat data visible.</p>
+            <p data-reef-comparison-scope>The saved comparison measures how much historical mapped habitat fell in the highest heat-stress class used here (≥8 °C-weeks at the annual maximum) in 2015 and 2019. It answers one part of my original, broader exposure question.</p>
             <a className={styles.textLink} href="#maps">Explore the two-year comparison <span aria-hidden="true">↓</span></a>
           </div>
         </div>
@@ -70,6 +70,7 @@ export default function WestHawaiiHeatExposurePage() {
 
       <section className={styles.mapSection} id="maps" aria-labelledby="maps-title">
         <header className={styles.sectionHeading}><p className={styles.eyebrow}>02 / The saved regional comparison</p><h2 id="maps-title">Two years.<br /><em>The same coast.</em></h2><p>Both maps use the same cell geometry, extent and class scale. Filled cells contain historical mapped reef/hardbottom; the remaining grid is outline-only context.</p></header>
+        <p data-heat-stress-context>DHW (Degree Heating Weeks) accumulates qualifying heat stress over a rolling 12-week period. These classes use each cell’s annual maximum. They describe satellite heat exposure, not observed coral bleaching, mortality or recovery.</p>
         <div className={styles.legendHeading}><span>Annual maximum DHW <span className={styles.unit}>(°C-weeks)</span></span><Legend /></div>
         <div className={styles.maps}>
           {([2015, 2019] as const).map(year => <figure key={year} data-reef-map={year}>
@@ -82,7 +83,6 @@ export default function WestHawaiiHeatExposurePage() {
         <HabitatComparison />
         <details className={styles.method}>
           <summary>Read the values and what the map can tell us</summary>
-          <p>DHW (Degree Heating Weeks) accumulates qualifying heat stress over a rolling 12-week period. These classes use each cell’s annual maximum. They describe satellite heat exposure, not observed coral bleaching, mortality or recovery.</p>
           <p>The grid has 330 cells; 51 contain mapped reef/hardbottom. The habitat layer was published in 2007 from 2004–06 imagery, so this is historical mapped habitat—not present coral cover. Cell colours classify heat stress; the bars weight those classes by intersected habitat area, not by coloured map area.</p>
           <p>All mapped habitat: {allHabitatHa.toLocaleString("en-US", { maximumFractionDigits: 2 })} ha. Assessed habitat: {assessedHabitatHa.toLocaleString("en-US", { maximumFractionDigits: 2 })} ha. The assessed percentage excludes the unavailable area; the all-habitat percentage retains it. Values below are rounded independently.</p>
           <div className={styles.tableWrap}>

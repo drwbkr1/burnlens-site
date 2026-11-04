@@ -40,6 +40,17 @@ export const metadata: Metadata = {
 const flagships = [getProject("burnlens"), getProject("runbook-sentinel")] as const;
 const supportingNotes = [getProject("quest-craft"), getProject("openclaw-showcase")] as const;
 
+const flagshipReaderCopy = {
+  burnlens: {
+    status: "Public v0.56.0 research portfolio release",
+    summary: "I defined the audience, public story and use limits for an experimental computer-vision and geospatial project, and owned its publication decisions. Codex led technical, product and reliability work within that direction. The result was a public v0.56.0 research portfolio release—not an operational wildfire tool.",
+  },
+  "runbook-sentinel": {
+    status: "Released synthetic testbed · no real systems connected",
+    summary: "I designed and implemented a Python/SQLite synthetic incident-response testbed that separates diagnosis and proposals from approval and execution. I owned its release and evaluation, including the rejection of a local-model candidate that failed the output contract. At v0.0.20, it used synthetic state only; no real systems were connected.",
+  },
+} as const;
+
 type EvidenceKey = keyof ProjectEvidence<ProjectId>;
 
 function supported(projectId: ProjectId, field: EvidenceKey) {
@@ -69,6 +80,8 @@ function FlagshipEntry({
   project: (typeof flagships)[number];
   ordinal: "01" | "02";
 }) {
+  const readerCopy = flagshipReaderCopy[project.id];
+
   return (
     <article
       className={`shell ${styles.flagshipEntry}`}
@@ -78,12 +91,15 @@ function FlagshipEntry({
     >
       <div className={styles.flagshipTitle}>
         <span data-work-ordinal>{ordinal}</span>
-        <p data-field-key="maturity">{summary(project.id, "maturity")}</p>
+        <p data-work-short-status>{readerCopy.status}</p>
         <h3>{project.title}</h3>
+        <p className={styles.contributionSummary} data-work-contribution-first>{readerCopy.summary}</p>
         <Link href={project.route} aria-label={`Read ${project.title} case study`}>
           Read {project.title} case study <span aria-hidden="true">→</span>
         </Link>
+      </div>
 
+      <div className={styles.recordColumn}>
         {project.id === "burnlens" ? (
           <div
             className={styles.atlasMark}
@@ -118,49 +134,55 @@ function FlagshipEntry({
             </ol>
           </div>
         )}
+        <details className={styles.projectRecord} data-work-project-record={project.id}>
+          <summary>Full project record <span className="sr-only">for {project.title}</span></summary>
+          <p className={styles.fullMaturity} data-field-key="maturity">{summary(project.id, "maturity")}</p>
+          <dl className={styles.workFacts} data-work-facts>
+            <div data-field-key="problem">
+              <dt>Problem</dt>
+              <dd>{summary(project.id, "problem")}</dd>
+            </div>
+            <div data-field-key="intendedUser">
+              <dt>Intended reviewer</dt>
+              <dd>{summary(project.id, "intendedUser")}</dd>
+            </div>
+            <div data-field-key="personalRole">
+              <dt>{project.id === "burnlens" ? "Role split" : "My role"}</dt>
+              <dd>{summary(project.id, "personalRole")}</dd>
+            </div>
+            <div data-field-key="decisionSupported">
+              <dt>Decision</dt>
+              <dd>{summary(project.id, "decisionSupported")}</dd>
+            </div>
+            {project.id === "runbook-sentinel" ? (
+              <div data-field-key="stack">
+                <dt>Methods</dt>
+                <dd>
+                  <ul data-method-list>
+                    {runbookStackItems().map((item) => (
+                      <li key={item.name}>
+                        <strong>{toReaderFirst(item.name)}</strong>
+                        <span>{toReaderFirst(item.purpose)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ) : null}
+            <div data-field-key="outcome">
+              <dt>Result</dt>
+              <dd>{summary(project.id, "outcome")}</dd>
+            </div>
+            <div data-field-key="limitations">
+              <dt>Boundary</dt>
+              <dd>{summary(project.id, "limitations")}</dd>
+            </div>
+          </dl>
+        </details>
+        <p className={styles.printEvidenceHint} data-work-print-hint>
+          For a complete printout in this browser, expand “Full project record” before printing.
+        </p>
       </div>
-
-      <dl className={styles.workFacts} data-work-facts>
-        <div data-field-key="problem">
-          <dt>Problem</dt>
-          <dd>{summary(project.id, "problem")}</dd>
-        </div>
-        <div data-field-key="intendedUser">
-          <dt>Intended reviewer</dt>
-          <dd>{summary(project.id, "intendedUser")}</dd>
-        </div>
-        <div data-field-key="personalRole">
-          <dt>{project.id === "burnlens" ? "Role split" : "My role"}</dt>
-          <dd>{summary(project.id, "personalRole")}</dd>
-        </div>
-        <div data-field-key="decisionSupported">
-          <dt>Decision</dt>
-          <dd>{summary(project.id, "decisionSupported")}</dd>
-        </div>
-        {project.id === "runbook-sentinel" ? (
-          <div data-field-key="stack">
-            <dt>Methods</dt>
-            <dd>
-              <ul data-method-list>
-                {runbookStackItems().map((item) => (
-                  <li key={item.name}>
-                    <strong>{toReaderFirst(item.name)}</strong>
-                    <span>{toReaderFirst(item.purpose)}</span>
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-        ) : null}
-        <div data-field-key="outcome">
-          <dt>Result</dt>
-          <dd>{summary(project.id, "outcome")}</dd>
-        </div>
-        <div data-field-key="limitations">
-          <dt>Boundary</dt>
-          <dd>{summary(project.id, "limitations")}</dd>
-        </div>
-      </dl>
     </article>
   );
 }
@@ -263,8 +285,9 @@ export default function WorkIndexPage() {
             <h2 id="flagship-lane-title">Flagship systems</h2>
           </div>
           <p>
-            Each row states the problem, role, supported decision or result, and limits
-            before it asks you to open the full evidence narrative.
+            Start with my contribution and the project’s scope. Open the case study for
+            the story, or expand the full project record. Codex assists with research,
+            implementation and testing.
           </p>
         </header>
 

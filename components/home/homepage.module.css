@@ -1,0 +1,109 @@
+.pfrProject { margin:0; min-width:0; width:100%; max-width:584px; }
+.pfrCard { --pfr-night:#193342; --pfr-ink:#163443; --pfr-frost:#f0f6f5; --pfr-muted:#bfd0d8; position:relative; isolation:isolate; min-height:300px; min-width:0; background:var(--pfr-night); color:var(--pfr-frost); border-bottom:1px solid color-mix(in srgb,var(--pfr-frost) 20%,transparent); font-family:Arial,Helvetica,sans-serif; }
+.pfrCard *, .pfrCredit { box-sizing:border-box; }
+.pfrReveal { position:absolute; inset:0; z-index:3; pointer-events:none; }
+.pfrSummary { position:absolute; z-index:6; top:80px; left:24px; width:30%; height:calc(100% - 108px); display:flex; align-items:center; justify-content:center; list-style:none; border-radius:36px 5px 27px 7px; pointer-events:auto; }
+.pfrSummary::-webkit-details-marker { display:none; }
+.pfrSummary::marker { content:""; }
+.pfrClosedLabel, .pfrOpenLabel { padding:5px 8px; border-radius:2px; background:var(--pfr-ink); color:var(--pfr-frost); font:400 13px/1.5 Arial,sans-serif; }
+.pfrClosedLabel { opacity:0; transition:opacity 180ms ease; }
+.pfrOpenLabel { display:none; }
+.pfrSummary:hover .pfrClosedLabel, .pfrSummary:focus-visible .pfrClosedLabel { opacity:1; }
+.pfrMediaFrame { position:absolute; z-index:2; top:80px; left:24px; width:30%; height:calc(100% - 108px); overflow:hidden; border-radius:36px 5px 27px 7px; background:var(--pfr-image-surface,var(--pfr-night)); pointer-events:none; transition:top 650ms cubic-bezier(.22,.7,.15,1),left 650ms cubic-bezier(.22,.7,.15,1),width 650ms cubic-bezier(.22,.7,.15,1),height 650ms cubic-bezier(.22,.7,.15,1),border-radius 650ms cubic-bezier(.22,.7,.15,1); }
+.pfrThumbnail { position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:cover; opacity:1; transition:opacity 350ms ease; }
+.pfrFullImage { position:absolute; inset:0; display:block; width:100%; height:100%; opacity:0; transition:opacity 350ms ease; }
+.pfrFullImage img { display:block; width:100%; height:100%; object-fit:contain; }
+.pfrReveal:not([open]):hover ~ .pfrMediaFrame { border-radius:46% 54% 40% 60% / 45% 55% 45% 55%; }
+.pfrReveal:not([open]):hover ~ .pfrMediaFrame .pfrThumbnail { opacity:.4; }
+.pfrTitle { position:absolute; z-index:5; top:22px; left:24px; max-width:calc(100% - 48px); margin:0; color:var(--pfr-frost); font:400 23px/1.3 Georgia,serif; letter-spacing:-.35px; transition:top 650ms ease,left 650ms ease,font-size 650ms ease,padding 650ms ease; }
+.pfrDetails { position:absolute; z-index:1; top:80px; left:calc(30% + 44px); right:24px; bottom:70px; color:var(--pfr-muted); }
+.pfrDetails p { margin:0; font:400 13px/1.55 Arial,sans-serif; }
+.pfrSkills { display:flex; flex-wrap:wrap; gap:5px 14px; list-style:none; margin:0 0 16px; padding:0; color:var(--pfr-frost); }
+.pfrSkills li { font:500 12px/1.5 Arial,sans-serif; }
+.pfrSkills li+li::before { content:"·"; margin-right:14px; opacity:.65; }
+.pfrExpanded { position:absolute; inset:0; pointer-events:none; }
+.pfrExpanded .pfrSrOnly img { width:1px; height:1px; }
+.pfrContext { position:absolute; z-index:4; top:16px; right:16px; max-width:42%; margin:0; padding:5px 8px; border-radius:2px; background:var(--pfr-ink); color:var(--pfr-frost); font:400 12px/1.4 Arial,sans-serif; text-align:right; }
+.pfrContext span { display:block; }
+.pfrExplore { position:absolute; z-index:7; right:16px; bottom:12px; display:inline-flex; align-items:center; min-height:44px; color:var(--pfr-frost); text-decoration:none; font:400 13px/1.5 Arial,sans-serif; }
+.pfrExplore > span { display:inline-block; padding:5px 8px; border-radius:2px; }
+.pfrExplore:hover, .pfrExplore:focus-visible { text-decoration:underline; text-underline-offset:4px; }
+.pfrReveal[open] .pfrSummary { top:37px; left:14px; width:auto; height:44px; min-width:74px; border-radius:0; justify-content:flex-start; }
+.pfrReveal[open] .pfrClosedLabel { display:none; }
+.pfrReveal[open] .pfrOpenLabel { display:inline-block; padding-block:3px; text-decoration:underline; text-underline-offset:4px; animation:pfr-label-in 220ms ease 320ms both; }
+.pfrReveal[open] ~ .pfrMediaFrame { top:0; left:0; width:100%; height:100%; border-radius:0; }
+.pfrReveal[open] ~ .pfrMediaFrame .pfrThumbnail { opacity:0; transition-delay:100ms; }
+.pfrReveal[open] ~ .pfrMediaFrame .pfrFullImage { opacity:1; transition-delay:100ms; }
+.pfrCard[data-image-readiness="pending"] .pfrReveal[open] ~ .pfrMediaFrame .pfrThumbnail { opacity:1; }
+.pfrCard[data-image-readiness="pending"] .pfrReveal[open] ~ .pfrMediaFrame .pfrFullImage { opacity:0; }
+.pfrReveal[open] ~ .pfrTitle { top:12px; left:14px; max-width:52%; padding:5px 8px; background:var(--pfr-ink); font-size:14px; letter-spacing:0; }
+.pfrReveal[open] ~ .pfrDetails { visibility:hidden; }
+.pfrReveal[open] ~ .pfrExplore > span { background:var(--pfr-ink); }
+.pfrCredit { margin:0; padding:7px 24px; background:var(--pfr-night,#193342); color:var(--pfr-muted,#bfd0d8); font:400 13px/1.5 Arial,sans-serif; }
+.pfrSrOnly { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+@keyframes pfr-label-in { from { opacity:0; } to { opacity:1; } }
+@media (hover:none), (pointer:coarse) { .pfrClosedLabel { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .pfrCard *, .pfrCard *::before, .pfrCard *::after { animation:none !important; transition:none !important; } }
+.pfrStudy { max-width:1024px; width:100%; margin-inline:auto; color:#f0f6f5; background:#193342; font-family:Arial,Helvetica,sans-serif; }
+.pfrStudy *, .pfrStudy *::before, .pfrStudy *::after { box-sizing:border-box; }
+.pfrStudyColumns { display:grid; grid-template-columns:43% 57%; }
+.pfrProfile { display:flex; flex-direction:column; align-items:flex-start; min-width:0; padding:39px 34px 28px; color:#163443; background:#9eb6c1; }
+.pfrEyebrow { margin:0 0 16px; color:#294653; font:500 12px/1.5 Arial,sans-serif; text-transform:uppercase; letter-spacing:1.5px; }
+.pfrProfile h1 { margin:0 0 22px; font:400 51px/1.05 Georgia,serif; letter-spacing:-1.8px; }
+.pfrLead { max-width:29ch; margin:0 0 22px; font:400 24px/1.4 Georgia,serif; }
+.pfrBio, .pfrBackground p { max-width:44ch; margin:0 0 22px; color:#294653; font:400 14px/1.7 Arial,sans-serif; }
+.pfrBackground h2 { margin:22px 0 8px; font:500 12px/1.5 Arial,sans-serif; letter-spacing:1.1px; text-transform:uppercase; }
+.pfrProfileLinks { display:flex; flex-wrap:wrap; gap:8px 23px; margin-top:auto; padding-top:28px; }
+.pfrStudy a { color:inherit; text-decoration:none; }
+.pfrStudy a:hover, .pfrStudy a:focus-visible { text-decoration:underline; text-underline-offset:4px; }
+.pfrProfileLinks a, .pfrStudyLinks a { display:inline-flex; align-items:center; gap:9px; min-height:44px; font:500 13px/1.5 Arial,sans-serif; }
+.pfrSelected { min-width:0; }
+.pfrStudyLinks { display:flex; flex-wrap:wrap; gap:8px 24px; padding:20px 34px; }
+@media (max-width:650px) { .pfrCard { min-height:320px; } .pfrStudyColumns { display:block; } .pfrProfile { padding:28px 24px; } .pfrProfile h1 { font-size:43px; } .pfrLead { font-size:22px; } .pfrProfileLinks { margin-top:24px; padding-top:0; } .pfrStudyLinks { padding:20px 24px; } }
+
+/* Mixed light/dark screenshot surfaces require a two-tone local focus ring. */
+.pfrStudy a:focus-visible, .pfrSummary:focus-visible {
+  outline:3px solid #f0f6f5;
+  outline-offset:3px;
+  box-shadow:0 0 0 6px #163443;
+}
+@media (forced-colors:active) {
+  .pfrStudy a:focus-visible, .pfrSummary:focus-visible {
+    outline:3px solid Highlight;
+    box-shadow:none;
+  }
+}
+/* Print is a readable text/link handoff, not a dark screenshot contact sheet. */
+@media print {
+  .pfrStudy, .pfrProfile, .pfrCard, .pfrCredit {
+    max-width:none; width:auto; min-height:0; background:#fff; color:#163443;
+  }
+  .pfrStudyColumns, .pfrProfile, .pfrCard { display:block; }
+  .pfrProfile { padding:0 0 16px; }
+  .pfrProfile h1 { font-size:32px; }
+  .pfrLead { font-size:20px; }
+  .pfrProject { max-width:none; break-inside:avoid; }
+  .pfrCard { padding:16px 0; border-bottom:1px solid #163443; }
+  .pfrReveal, .pfrMediaFrame { display:none !important; }
+  .pfrTitle, .pfrDetails, .pfrExplore {
+    position:static; max-width:none; visibility:visible;
+    color:#163443; background:transparent;
+  }
+  .pfrTitle { margin-bottom:8px; }
+  .pfrReveal[open] ~ .pfrTitle {
+    max-width:none; padding:0; background:transparent; font-size:23px;
+  }
+  .pfrReveal[open] ~ .pfrDetails { visibility:visible; }
+  .pfrReveal[open] ~ .pfrExplore > span { background:transparent; }
+  .pfrSkills, .pfrBio, .pfrBackground p, .pfrEyebrow {
+    color:#163443;
+  }
+  .pfrCredit { padding:7px 0; }
+  .pfrProfileLinks { margin-top:0; padding-top:0; }
+  .pfrStudyLinks { padding:16px 0; }
+  .pfrStudy a { text-decoration:underline; }
+  .pfrStudy a[href^="/"]::after {
+    content:" (burnlensproject.org" attr(href) ")";
+    font:400 13px/1.5 Arial,sans-serif;
+  }
+}

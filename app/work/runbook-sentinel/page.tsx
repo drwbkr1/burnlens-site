@@ -265,7 +265,7 @@ export default function RunbookSentinelCaseStudy() {
               </div>
               <div>
                 <p className={styles.dek}>
-                  I designed and implemented a synthetic incident-response testbed in
+                  I designed and implemented a Python/SQLite synthetic incident-response testbed in
                   which retrieved text and model output can inform a structured proposal,
                   while separate approval and fixed software checks retain every
                   state-changing decision.

@@ -5,6 +5,11 @@ const casePath = "/work/west-hawaii-heat-exposure";
 const caseLink = "Read West Hawaiʻi heat-exposure case study";
 const detailsLabel = "Read the values and what the map can tell us";
 const testOrigin = `http://127.0.0.1:${process.env.PORTFOLIO_TEST_PORT ?? "3101"}`;
+const contributionCopy = "I worked through a guided ArcGIS workflow to correct coastal coverage, compare habitat area instead of cell counts and keep missing heat data visible.";
+const comparisonScopeCopy = "The saved comparison measures how much historical mapped habitat fell in the highest heat-stress class used here (≥8 °C-weeks at the annual maximum) in 2015 and 2019. It answers one part of my original, broader exposure question.";
+const heatStressContextCopy = "DHW (Degree Heating Weeks) accumulates qualifying heat stress over a rolling 12-week period. These classes use each cell’s annual maximum. They describe satellite heat exposure, not observed coral bleaching, mortality or recovery.";
+const originalHypothesisCopy = "My original hypothesis was that 2019 would expose more mapped habitat than 2015.";
+const findingBoundaryCopy = "The saved comparison points the other way: the ≥8 °C-weeks class contains 83.0% of all mapped habitat in 2015 and 63.3% in 2019. That is a narrower finding about annual peak satellite heat exposure—not evidence that reefs recovered.";
 
 // These are the saved display values, not assertions of field or scientific validity.
 const savedRows = [
@@ -37,6 +42,46 @@ async function expectSavedTable(page: Page) {
   await expect(page.getByText(/The assessed percentage excludes the unavailable area; the all-habitat percentage retains it\./)).toBeVisible();
 }
 
+async function expectReaderFirstScopeOutsideDetails(page: Page) {
+  await expect(page.locator("main details[open]")).toHaveCount(0);
+  for (const [selector, copy] of [
+    ["[data-reef-contribution]", contributionCopy],
+    ["[data-reef-comparison-scope]", comparisonScopeCopy],
+    ["[data-heat-stress-context]", heatStressContextCopy],
+  ]) {
+    const paragraph = page.locator(selector);
+    await expect(paragraph).toHaveCount(1);
+    await expect(paragraph).toHaveText(copy);
+    await expect(paragraph).toBeVisible();
+    expect(await paragraph.evaluate(element => element.closest("details") === null),
+      `${selector}: essential contribution, scope and definition must not depend on disclosure state`,
+    ).toBe(true);
+  }
+  for (const copy of [originalHypothesisCopy, findingBoundaryCopy]) {
+    const paragraph = page.getByText(copy, { exact: true });
+    await expect(paragraph).toBeVisible();
+    expect(await paragraph.evaluate(element => element.closest("details") === null)).toBe(true);
+  }
+  const legend = page.getByRole("list", { name: "Annual maximum DHW classes in degrees Celsius-weeks", exact: true });
+  await expect(legend).toBeVisible();
+  const context = page.locator("[data-heat-stress-context]");
+  const order = await context.evaluate(element => {
+    const key = document.querySelector('ul[aria-label="Annual maximum DHW classes in degrees Celsius-weeks"]');
+    const maps = [...document.querySelectorAll("figure[data-reef-map]")];
+    if (!key || maps.length !== 2) throw new Error("The DHW key and both year maps are required for context-order verification.");
+    return [key, ...maps].map(target => ({
+      followsDefinition: Boolean(element.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING),
+      definitionBottom: element.getBoundingClientRect().bottom,
+      targetTop: target.getBoundingClientRect().top,
+    }));
+  });
+  for (const target of order) {
+    expect(target.followsDefinition, "The complete DHW definition must precede both the class key and maps in reading order").toBe(true);
+    expect(target.definitionBottom, "The DHW definition must remain visually above the class key and maps")
+      .toBeLessThanOrEqual(target.targetTop + 1);
+  }
+}
+
 function observeExternalRequests(page: Page) {
   const external: string[] = [];
   page.on("request", request => {
@@ -55,6 +100,7 @@ test("Year-specific reef maps decode and the case stays contained at four viewpo
     await expect(page.locator("main h1")).toContainText("Heat exposure");
     await expect(page.locator("main h1")).toContainText("Hawaiʻi reefs.");
     await expect(page.getByText("Research framing and guided GIS analysis", { exact: true })).toBeVisible();
+    await expectReaderFirstScopeOutsideDetails(page);
     await expect(page.locator("main img")).toHaveCount(2);
     for (const year of [2015, 2019]) {
       const figure = page.locator(`main figure[data-reef-map="${year}"]`);
@@ -106,6 +152,8 @@ test("The native explanation opens by keyboard and distinguishes all from assess
     await page.setViewportSize({ width, height: 844 });
     await page.goto(casePath);
     const summary = page.locator("main summary").filter({ hasText: detailsLabel });
+    await expect(summary.locator("..")).not.toHaveAttribute("open", "");
+    await expectReaderFirstScopeOutsideDetails(page);
     await summary.focus();
     await page.keyboard.press("Enter");
     await expect(summary.locator("..")).toHaveAttribute("open", "");
@@ -121,6 +169,7 @@ test("The native explanation opens by keyboard and distinguishes all from assess
     await page.keyboard.press("Enter");
     await expect(summary.locator("..")).not.toHaveAttribute("open", "");
     await expect(page.getByRole("table")).not.toBeVisible();
+    await expectReaderFirstScopeOutsideDetails(page);
   }
 });
 
@@ -175,6 +224,8 @@ test("The comparison, work-index navigation and values remain usable without Jav
     await expect(page.locator("main figure[data-reef-map]")).toHaveCount(2);
     for (const image of await page.locator("main img").all()) await expectDecoded(image);
     const summary = page.locator("main summary").filter({ hasText: detailsLabel });
+    await expect(summary.locator("..")).not.toHaveAttribute("open", "");
+    await expectReaderFirstScopeOutsideDetails(page);
     await summary.focus();
     await page.keyboard.press("Enter");
     await expect(summary.locator("..")).toHaveAttribute("open", "");
@@ -182,6 +233,11 @@ test("The comparison, work-index navigation and values remain usable without Jav
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: testInfo.outputPath("no-js-mobile.png"), fullPage: true });
+    await summary.focus();
+    await page.keyboard.press("Enter");
+    await expect(summary.locator("..")).not.toHaveAttribute("open", "");
+    await expect(page.getByRole("table")).not.toBeVisible();
+    await expectReaderFirstScopeOutsideDetails(page);
     await page.getByRole("link", { name: "Back to selected work" }).click();
     await expect(page).toHaveURL(/\/work$/);
     expect(external).toEqual([]);

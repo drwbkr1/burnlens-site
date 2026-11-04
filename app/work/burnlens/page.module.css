@@ -77,6 +77,10 @@
   line-height: 1.5;
 }
 
+.heroTitle .lede {
+  padding-top: 1.4rem;
+}
+
 .audience {
   max-width: 38rem;
   padding-top: 1.4rem;
